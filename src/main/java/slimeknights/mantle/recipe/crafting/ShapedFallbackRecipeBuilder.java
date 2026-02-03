@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -13,7 +14,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
 
 /** Builder for a shaped recipe with fallbacks */
 @SuppressWarnings("unused")
@@ -44,19 +44,29 @@ public class ShapedFallbackRecipeBuilder {
 
   /**
    * Builds the recipe using the output as the name
-   * @param consumer  Recipe consumer
+   * @param output  Recipe output
    */
-  public void build(Consumer<FinishedRecipe> consumer) {
-    base.save(base -> consumer.accept(new Result(base, alternatives)));
+  public void build(RecipeOutput output) {
+    base.save(new WrappedRecipeOutput(output, alternatives));
   }
 
   /**
    * Builds the recipe using the given ID
-   * @param consumer  Recipe consumer
+   * @param output  Recipe output
    * @param id        Recipe ID
    */
-  public void build(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    base.save(base -> consumer.accept(new Result(base, alternatives)), id);
+  public void build(RecipeOutput output, ResourceLocation id) {
+    base.save(new WrappedRecipeOutput(output, alternatives), id);
+  }
+
+  /**
+   * Wraps a RecipeOutput to intercept recipes and add alternatives
+   */
+  private record WrappedRecipeOutput(RecipeOutput delegate, List<ResourceLocation> alternatives) implements RecipeOutput {
+    @Override
+    public void accept(FinishedRecipe recipe) {
+      delegate.accept(new Result(recipe, alternatives));
+    }
   }
 
   private record Result(FinishedRecipe base, List<ResourceLocation> alternatives) implements FinishedRecipe {

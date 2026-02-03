@@ -2,7 +2,7 @@ package slimeknights.mantle.recipe.cooking;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.mojang.datafixers.util.Function7;
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -99,47 +99,47 @@ public class CookingRecipeBuilder<T extends CookingRecipeBuilder<T>> extends Abs
 
   /** Helper to save a recipe */
   @SuppressWarnings("unchecked")
-  private <R extends Recipe<?>> T save(Consumer<FinishedRecipe> consumer, ResourceLocation id, RecordLoadable<R> loadable, Function7<ResourceLocation,String,CookingBookCategory,Ingredient,ItemOutput,Float,Integer,R> constructor, int cookingTime) {
+  private <R extends Recipe<?>> T save(RecipeOutput output, ResourceLocation id, RecordLoadable<R> loadable, Function7<ResourceLocation,String,CookingBookCategory,Ingredient,ItemOutput,Float,Integer,R> constructor, int cookingTime) {
     if (ingredient == Ingredient.EMPTY) {
       throw new IllegalStateException("Ingredient must be set");
     }
     ResourceLocation advancementID = buildOptionalAdvancement(id, "cooking");
-    consumer.accept(new LoadableFinishedRecipe<>(constructor.apply(id, group, category, ingredient, result, experience, cookingTime), loadable, advancementID));
+    output.accept(new LoadableFinishedRecipe<>(constructor.apply(id, group, category, ingredient, result, experience, cookingTime), loadable, advancementID));
     return (T) this;
   }
 
   /** Saves the smelting recipe */
-  public T saveSmelting(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    return save(consumer, id, SmeltingResultRecipe.LOADABLE, SmeltingResultRecipe::new, cookingTime);
+  public T saveSmelting(RecipeOutput output, ResourceLocation id) {
+    return save(output, id, SmeltingResultRecipe.LOADABLE, SmeltingResultRecipe::new, cookingTime);
   }
 
   /** Saves the blasting recipe */
-  public T saveBlasting(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    return save(consumer, id, BlastingResultRecipe.LOADABLE, BlastingResultRecipe::new, cookingTime / 2);
+  public T saveBlasting(RecipeOutput output, ResourceLocation id) {
+    return save(output, id, BlastingResultRecipe.LOADABLE, BlastingResultRecipe::new, cookingTime / 2);
   }
 
   /** Saves the smoking recipe */
-  public T saveSmoking(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    return save(consumer, id, SmokingResultRecipe.LOADABLE, SmokingResultRecipe::new, cookingTime / 2);
+  public T saveSmoking(RecipeOutput output, ResourceLocation id) {
+    return save(output, id, SmokingResultRecipe.LOADABLE, SmokingResultRecipe::new, cookingTime / 2);
   }
 
   /** Saves the campfire recipe */
-  public T saveCampfire(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-    return save(consumer, id, CampfireResultRecipe.LOADABLE, CampfireResultRecipe::new, cookingTime * 3);
+  public T saveCampfire(RecipeOutput output, ResourceLocation id) {
+    return save(output, id, CampfireResultRecipe.LOADABLE, CampfireResultRecipe::new, cookingTime * 3);
   }
 
   @Override
-  public void save(Consumer<FinishedRecipe> consumer) {
-    save(consumer, Loadables.ITEM.getKey(result.get().getItem()));
+  public void save(RecipeOutput output) {
+    save(output, Loadables.ITEM.getKey(result.get().getItem()));
   }
 
   @Override
-  public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
+  public void save(RecipeOutput output, ResourceLocation id) {
     switch (type) {
-      case SMELTING -> saveSmelting(consumer, id);
-      case BLASTING -> saveBlasting(consumer, id);
-      case SMOKING -> saveSmoking(consumer, id);
-      case CAMPFIRE -> saveCampfire(consumer, id);
+      case SMELTING -> saveSmelting(output, id);
+      case BLASTING -> saveBlasting(output, id);
+      case SMOKING -> saveSmoking(output, id);
+      case CAMPFIRE -> saveCampfire(output, id);
     }
   }
 

@@ -2,8 +2,8 @@ package slimeknights.mantle.recipe.data;
 
 import net.minecraft.advancements.critereon.InventoryChangeTrigger.TriggerInstance;
 import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
@@ -19,8 +19,6 @@ import slimeknights.mantle.registration.object.BuildingBlockObject;
 import slimeknights.mantle.registration.object.MetalItemObject;
 import slimeknights.mantle.registration.object.WallBuildingBlockObject;
 import slimeknights.mantle.registration.object.WoodBlockObject;
-
-import java.util.function.Consumer;
 
 /**
  * Crafting helper for common recipe types, like stairs, slabs, and packing.
@@ -39,7 +37,7 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
    * @param smallName  Small name
    * @param folder     Recipe folder
    */
-  default void packingRecipe(Consumer<FinishedRecipe> consumer, RecipeCategory category, String largeName, ItemLike large, String smallName, ItemLike small, String folder) {
+  default void packingRecipe(RecipeOutput output, RecipeCategory category, String largeName, ItemLike large, String smallName, ItemLike small, String folder) {
     // ingot to block
     ResourceLocation largeId = id(large);
     ShapedRecipeBuilder.shaped(category, large)
@@ -49,14 +47,14 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
                        .pattern("###")
                        .unlockedBy("has_item", RecipeProvider.has(small))
                        .group(largeId.toString())
-                       .save(consumer, wrap(largeId, folder, String.format("_from_%ss", smallName)));
+                       .save(output, wrap(largeId, folder, String.format("_from_%ss", smallName)));
     // block to ingot
     ResourceLocation smallId = id(small);
     ShapelessRecipeBuilder.shapeless(category, small, 9)
                           .requires(large)
                           .unlockedBy("has_item", RecipeProvider.has(large))
                           .group(smallId.toString())
-                          .save(consumer, wrap(smallId, folder, String.format("_from_%s", largeName)));
+                          .save(output, wrap(smallId, folder, String.format("_from_%s", largeName)));
   }
 
   /**
@@ -69,7 +67,7 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
    * @param smallName  Small name
    * @param folder     Recipe folder
    */
-  default void packingRecipe(Consumer<FinishedRecipe> consumer, RecipeCategory category, String largeName, ItemLike largeItem, String smallName, ItemLike smallItem, TagKey<Item> smallTag, String folder) {
+  default void packingRecipe(RecipeOutput output, RecipeCategory category, String largeName, ItemLike largeItem, String smallName, ItemLike smallItem, TagKey<Item> smallTag, String folder) {
     // ingot to block
     // note our item is in the center, any mod allowed around the edges
     ResourceLocation largeId = id(largeItem);
@@ -97,7 +95,7 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
    * @param metal     Metal object
    * @param folder    Folder for recipes
    */
-  default void metalCrafting(Consumer<FinishedRecipe> consumer, MetalItemObject metal, String folder) {
+  default void metalCrafting(RecipeOutput output, MetalItemObject metal, String folder) {
     ItemLike ingot = metal.getIngot();
     packingRecipe(consumer, RecipeCategory.MISC, "block", metal.get(), "ingot", ingot, metal.getIngotTag(), folder);
     packingRecipe(consumer, RecipeCategory.MISC, "ingot", ingot, "nugget", metal.getNugget(), metal.getNuggetTag(), folder);
@@ -111,7 +109,7 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
    * @param consumer  Recipe consumer
    * @param building  Building object instance
    */
-  default void slabStairsCrafting(Consumer<FinishedRecipe> consumer, BuildingBlockObject building, String folder, boolean addStonecutter) {
+  default void slabStairsCrafting(RecipeOutput output, BuildingBlockObject building, String folder, boolean addStonecutter) {
     Item item = building.asItem();
     ResourceLocation itemId = id(item);
     TriggerInstance hasBlock = RecipeProvider.has(item);
@@ -151,7 +149,7 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
    * @param consumer  Recipe consumer
    * @param building  Building object instance
    */
-  default void stairSlabWallCrafting(Consumer<FinishedRecipe> consumer, WallBuildingBlockObject building, String folder, boolean addStonecutter) {
+  default void stairSlabWallCrafting(RecipeOutput output, WallBuildingBlockObject building, String folder, boolean addStonecutter) {
     slabStairsCrafting(consumer, building, folder, addStonecutter);
     // wall
     Item item = building.asItem();
@@ -180,7 +178,7 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
    * @param wood      Wood types
    * @param folder    Wood folder
    */
-  default void woodCrafting(Consumer<FinishedRecipe> consumer, WoodBlockObject wood, String folder) {
+  default void woodCrafting(RecipeOutput output, WoodBlockObject wood, String folder) {
     TriggerInstance hasPlanks = RecipeProvider.has(wood);
 
     // planks

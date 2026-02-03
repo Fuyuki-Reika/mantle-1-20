@@ -10,6 +10,7 @@ import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.advancements.RequirementsStrategy;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -18,11 +19,6 @@ import slimeknights.mantle.data.loadable.record.RecordLoadable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
-
-/**
- * Common logic to create a recipe builder class
- * @param <T>
- */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class AbstractRecipeBuilder<T extends AbstractRecipeBuilder<T>> {
   /** Advancement builder for this class */
@@ -69,16 +65,16 @@ public abstract class AbstractRecipeBuilder<T extends AbstractRecipeBuilder<T>> 
 
   /**
    * Builds the recipe with a default recipe ID, typically based on the output
-   * @param consumerIn  Recipe consumer
+   * @param output  Recipe output consumer
    */
-  public abstract void save(Consumer<FinishedRecipe> consumerIn);
+  public abstract void save(RecipeOutput output);
 
   /**
    * Builds the recipe
-   * @param consumerIn  Recipe consumer
-   * @param id          Recipe ID
+   * @param output  Recipe output consumer
+   * @param id      Recipe ID
    */
-  public abstract void save(Consumer<FinishedRecipe> consumerIn, ResourceLocation id);
+  public abstract void save(RecipeOutput output, ResourceLocation id);
 
   /**
    * Base logic for advancement building

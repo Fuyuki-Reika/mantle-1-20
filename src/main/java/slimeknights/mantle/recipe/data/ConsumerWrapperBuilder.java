@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.neoforged.neoforge.common.crafting.CraftingHelper;
@@ -14,7 +15,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /**
@@ -76,13 +76,34 @@ public class ConsumerWrapperBuilder {
   }
 
   /**
-   * Builds the consumer for the wrapper builder
+   * Builds the recipe output for the wrapper builder
    * 
-   * @param consumer Base consumer
-   * @return Built wrapper consumer
+   * @param output Base recipe output
+   * @return Built wrapper output
    */
-  public Consumer<FinishedRecipe> build(Consumer<FinishedRecipe> consumer) {
-    return (recipe) -> consumer.accept(new Wrapped(recipe, conditions, override, overrideName));
+  public RecipeOutput build(RecipeOutput output) {
+    return new WrappedRecipeOutput(output, conditions, override, overrideName);
+  }
+
+  private static class WrappedRecipeOutput implements RecipeOutput {
+    private final RecipeOutput delegate;
+    private final List<ICondition> conditions;
+    @Nullable
+    private final RecipeSerializer<?> override;
+    @Nullable
+    private final ResourceLocation overrideName;
+
+    private WrappedRecipeOutput(RecipeOutput delegate, List<ICondition> conditions, @Nullable RecipeSerializer<?> override, @Nullable ResourceLocation overrideName) {
+      this.delegate = delegate;
+      this.conditions = conditions;
+      this.override = override;
+      this.overrideName = overrideName;
+    }
+
+    @Override
+    public void accept(FinishedRecipe recipe) {
+      delegate.accept(new Wrapped(recipe, conditions, override, overrideName));
+    }
   }
 
   private static class Wrapped implements FinishedRecipe {

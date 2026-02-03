@@ -3,6 +3,7 @@ package slimeknights.mantle.recipe.crafting;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -13,7 +14,6 @@ import slimeknights.mantle.Mantle;
 import slimeknights.mantle.recipe.MantleRecipes;
 
 import javax.annotation.Nullable;
-import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 @RequiredArgsConstructor(staticName = "fromShaped")
@@ -61,22 +61,32 @@ public class ShapedRetexturedRecipeBuilder {
   }
 
   /**
-   * Builds the recipe with the default name using the given consumer
-   * @param consumer Recipe consumer
+   * Builds the recipe with the default name using the given output
+   * @param output Recipe output
    */
-  public void build(Consumer<FinishedRecipe> consumer) {
+  public void build(RecipeOutput output) {
     this.validate();
-    parent.save(base -> consumer.accept(new Result(base)));
+    parent.save(new WrappedRecipeOutput(output));
   }
 
   /**
-   * Builds the recipe using the given consumer
-   * @param consumer Recipe consumer
+   * Builds the recipe using the given output
+   * @param output Recipe output
    * @param location Recipe location
    */
-  public void build(Consumer<FinishedRecipe> consumer, ResourceLocation location) {
+  public void build(RecipeOutput output, ResourceLocation location) {
     this.validate();
-    parent.save(base -> consumer.accept(new Result(base)), location);
+    parent.save(new WrappedRecipeOutput(output), location);
+  }
+
+  /**
+   * Wraps a RecipeOutput to intercept recipes and add retexturing data
+   */
+  private record WrappedRecipeOutput(RecipeOutput delegate) implements RecipeOutput {
+    @Override
+    public void accept(FinishedRecipe recipe) {
+      delegate.accept(new Result(recipe));
+    }
   }
 
   /**
