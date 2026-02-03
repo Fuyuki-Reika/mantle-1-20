@@ -1,15 +1,20 @@
 package slimeknights.mantle.recipe.ingredient;
 
-import com.google.gson.JsonElement;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
-import net.neoforged.neoforge.common.crafting.IIngredientSerializer;
+import net.neoforged.neoforge.common.crafting.IngredientType;
 import slimeknights.mantle.data.loadable.record.RecordLoadable;
 import slimeknights.mantle.recipe.helper.LoadableIngredientSerializer;
 
@@ -21,6 +26,24 @@ import java.util.List;
 public class PotionDisplayIngredient extends ItemIngredient {
   /** Ingredient serializer instance */
   public static final LoadableIngredientSerializer<PotionDisplayIngredient> SERIALIZER = new LoadableIngredientSerializer<>(RecordLoadable.create(ItemsField.INSTANCE, TAG_FIELD, PotionDisplayIngredient::new));
+
+  /** MapCodec for network serialization */
+  public static final MapCodec<PotionDisplayIngredient> CODEC = RecordCodecBuilder.mapCodec(instance ->
+      instance.group(
+          BuiltInRegistries.ITEM.byNameCodec().listOf().fieldOf("items").forGetter(i -> i.items),
+          TagKey.hashedCodec(Registries.ITEM).optionalFieldOf("tag").forGetter(i -> java.util.Optional.ofNullable(i.tag))
+      ).apply(instance, (items, tag) -> new PotionDisplayIngredient(items, tag.orElse(null)))
+  );
+
+  /** StreamCodec for network sync */
+  public static final StreamCodec<RegistryFriendlyByteBuf, PotionDisplayIngredient> STREAM_CODEC =
+      StreamCodec.composite(
+          ByteBufCodecs.registry(Registries.ITEM).apply(ByteBufCodecs.list()),
+          i -> i.items,
+          ByteBufCodecs.optional(ByteBufCodecs.registry(Registries.ITEM).apply(ByteBufCodecs.tagKey(Registries.ITEM))),
+          i -> java.util.Optional.ofNullable(i.tag),
+          PotionDisplayIngredient::new
+      );
 
   /** last return of {@link Ingredient#getItems()} */
   private ItemStack[] lastParentStacks = null;
@@ -52,26 +75,30 @@ public class PotionDisplayIngredient extends ItemIngredient {
   }
 
   @Override
-  public ItemStack[] getItems() {
+  public java.util.stream.Stream<ItemStack> getItems() {
     // if empty, means we want wildcard, show all potions on the stack
-    ItemStack[] parentStacks = super.getItems();
+    ItemStack[] parentStacks = super.getItems().map(ItemStack::copy).toArray(ItemStack[]::new);
     if (lastParentStacks != parentStacks) {
       lastParentStacks = parentStacks;
       displayStacks = BuiltInRegistries.POTION.stream()
-        .filter(pot -> pot != Potions.EMPTY)
-        .flatMap(pot -> Arrays.stream(parentStacks).map(item -> PotionUtils.setPotion(item.copy(), pot)))
-        .toArray(ItemStack[]::new);
+          .filter(pot -> pot != Potions.EMPTY)
+          .flatMap(pot -> Arrays.stream(parentStacks).map(item -> {
+            var copy = item.copy();
+            copy.set(net.minecraft.world.item.alchemy.PotionContents.DEFAULT, new net.minecraft.world.item.alchemy.PotionContents(pot));
+            return copy;
+          }))
+          .toArray(ItemStack[]::new);
     }
-    return displayStacks;
+    return Arrays.stream(displayStacks);
   }
 
   @Override
-  public IIngredientSerializer<? extends Ingredient> getSerializer() {
+  public LoadableIngredientSerializer<? extends Ingredient> getSerializer() {
     return SERIALIZER;
   }
 
   @Override
-  public JsonElement toJson() {
+  public com.google.gson.JsonElement toJson() {
     return SERIALIZER.serialize(this);
   }
 }

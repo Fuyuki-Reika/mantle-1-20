@@ -50,13 +50,11 @@ public record HasLootContextSetCondition(LootContextParamSet set) implements Loo
   }
 
   /** Serializer logic */
-  public static class Serializer implements net.minecraft.world.level.storage.loot.Serializer<HasLootContextSetCondition> {
-    @Override
+  public static class Serializer {
     public void serialize(JsonObject json, HasLootContextSetCondition value, JsonSerializationContext context) {
       json.addProperty("set", Objects.requireNonNull(LootContextParamSets.getKey(value.set), "Unregistered loot LootContextParamSets").toString());
     }
 
-    @Override
     public HasLootContextSetCondition deserialize(JsonObject json, JsonDeserializationContext context) {
       ResourceLocation key = JsonHelper.getResourceLocation(json, "set");
       LootContextParamSet set = LootContextParamSets.get(key);

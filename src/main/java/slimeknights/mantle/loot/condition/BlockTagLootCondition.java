@@ -13,7 +13,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.Serializer;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
@@ -55,7 +54,7 @@ public class BlockTagLootCondition implements LootItemCondition {
     return MantleLoot.BLOCK_TAG_CONDITION;
   }
 
-  private static class SerializerImpl implements Serializer<BlockTagLootCondition> {
+  private static class SerializerImpl {
     @Override
     public void serialize(JsonObject json, BlockTagLootCondition loot, JsonSerializationContext context) {
       json.addProperty("tag", loot.tag.location().toString());

@@ -2,14 +2,18 @@ package slimeknights.mantle.recipe.ingredient;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.crafting.AbstractIngredient;
-import net.neoforged.neoforge.common.crafting.IIngredientSerializer;
+import net.neoforged.neoforge.common.crafting.ICustomIngredient;
+import net.neoforged.neoforge.common.crafting.IngredientType;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
@@ -24,9 +28,17 @@ import java.util.stream.Stream;
 
 /** Ingredient that matches a container of fluid */
 @SuppressWarnings("unused") // API
-public class FluidContainerIngredient extends AbstractIngredient {
+public class FluidContainerIngredient implements ICustomIngredient {
   public static final ResourceLocation ID = Mantle.getResource("fluid_container");
   public static final Serializer SERIALIZER = new Serializer();
+
+  /** MapCodec for serialization */
+  public static final MapCodec<FluidContainerIngredient> CODEC = RecordCodecBuilder.mapCodec(instance ->
+      instance.group(
+          FluidIngredient.LOADABLE.codec().fieldOf("fluid").forGetter(i -> i.fluidIngredient),
+          Ingredient.CODEC.optionalFieldOf("display").forGetter(i -> Optional.ofNullable(i.display))
+      ).apply(instance, (fluid, display) -> new FluidContainerIngredient(fluid, display.orElse(null)))
+  );
 
   /** Ingredient to use for matching */
   private final FluidIngredient fluidIngredient;
@@ -36,7 +48,6 @@ public class FluidContainerIngredient extends AbstractIngredient {
   private ItemStack[] displayStacks;
 
   protected FluidContainerIngredient(FluidIngredient fluidIngredient, @Nullable Ingredient display) {
-    super(Stream.of());
     this.fluidIngredient = fluidIngredient;
     this.display = display;
   }
@@ -98,16 +109,26 @@ public class FluidContainerIngredient extends AbstractIngredient {
   }
 
   @Override
-  public ItemStack[] getItems() {
+  public boolean isSimple() {
+    return false;
+  }
+
+  @Override
+  public Stream<ItemStack> getItems() {
     if (displayStacks == null) {
       // no container? unfortunately hard to display this recipe so show nothing
       if (display == null) {
         displayStacks = new ItemStack[0];
       } else {
-        displayStacks = display.getItems();
+        displayStacks = display.getItems().toArray(ItemStack[]::new);
       }
     }
-    return displayStacks;
+    return Stream.of(displayStacks);
+  }
+
+  @Override
+  public Ingredient toVanilla() {
+    return display != null ? display : Ingredient.EMPTY;
   }
 
   @Override
@@ -127,29 +148,14 @@ public class FluidContainerIngredient extends AbstractIngredient {
     return json;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
-  protected void invalidate() {
-    super.invalidate();
-    this.displayStacks = null;
-  }
-
-  @Override
-  public boolean isSimple() {
-    return false;
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return false;
-  }
-
-  @Override
-  public IIngredientSerializer<? extends Ingredient> getSerializer() {
+  public net.neoforged.neoforge.common.crafting.IIngredientSerializer<? extends Ingredient> getSerializer() {
     return SERIALIZER;
   }
 
   /** Serializer logic */
-  private static class Serializer implements IIngredientSerializer<FluidContainerIngredient> {
+  private static class Serializer implements net.neoforged.neoforge.common.crafting.IIngredientSerializer<FluidContainerIngredient> {
     @Override
     public FluidContainerIngredient parse(JsonObject json) {
       FluidIngredient fluidIngredient;
@@ -159,21 +165,21 @@ public class FluidContainerIngredient extends AbstractIngredient {
       } else {
         fluidIngredient = FluidIngredient.LOADABLE.convert(json, "fluid");
       }
-      Ingredient display = null;
+      Ingredient displayIngredient = null;
       if (json.has("display")) {
-        display = Ingredient.fromJson(JsonHelper.getElement(json, "display"));
+        displayIngredient = Ingredient.fromJson(JsonHelper.getElement(json, "display"));
       }
-      return new FluidContainerIngredient(fluidIngredient, display);
+      return new FluidContainerIngredient(fluidIngredient, displayIngredient);
     }
 
     @Override
     public FluidContainerIngredient parse(FriendlyByteBuf buffer) {
       FluidIngredient fluidIngredient = FluidIngredient.LOADABLE.decode(buffer);
-      Ingredient display = null;
+      Ingredient displayIngredient = null;
       if (buffer.readBoolean()) {
-        display = Ingredient.fromNetwork(buffer);
+        displayIngredient = Ingredient.fromNetwork(buffer);
       }
-      return new FluidContainerIngredient(fluidIngredient, display);
+      return new FluidContainerIngredient(fluidIngredient, displayIngredient);
     }
 
     @Override
