@@ -3,6 +3,9 @@ package slimeknights.mantle.loot.condition;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.core.registries.Registries;
@@ -69,6 +72,13 @@ public class BlockTagLootCondition implements LootItemCondition {
         predicate = StatePropertiesPredicate.fromJson(json.get("properties"));
       }
       return new BlockTagLootCondition(tag, predicate);
+    }
+
+    public MapCodec<BlockTagLootCondition> codec() {
+      return RecordCodecBuilder.mapCodec(instance -> instance.group(
+          TagKey.codec(Registries.BLOCK).fieldOf("tag").forGetter(c -> c.tag),
+          StatePropertiesPredicate.CODEC.optionalFieldOf("properties", StatePropertiesPredicate.ANY).forGetter(c -> c.properties)
+      ).apply(instance, BlockTagLootCondition::new));
     }
   }
 }

@@ -3,6 +3,10 @@ package slimeknights.mantle.recipe.condition;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.core.Registry;
@@ -76,6 +80,17 @@ public abstract class TagCondition<T> implements ICondition {
     @Override
     public C deserialize(JsonObject json, JsonDeserializationContext context) {
       return read(json);
+    }
+
+    /** Creates a MapCodec for 1.21.1 ICondition dispatch */
+    public MapCodec<C> codec() {
+      return RecordCodecBuilder.mapCodec(instance -> instance.group(
+          Codec.STRING.optionalFieldOf("registry", Registries.ITEM.location().toString()).forGetter(c -> c.getTag().registry().location().toString()),
+          Codec.STRING.fieldOf("tag").forGetter(c -> c.getTag().location().toString())
+      ).apply(instance, (registry, tag) -> {
+        ResourceKey<?> regKey = ResourceKey.createRegistryKey(new ResourceLocation(registry));
+        return constructor.apply(TagKey.create(regKey, new ResourceLocation(tag)));
+      }));
     }
   }
 }

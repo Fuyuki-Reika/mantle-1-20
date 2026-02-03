@@ -4,6 +4,9 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSyntaxException;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
@@ -61,6 +64,19 @@ public record HasLootContextSetCondition(LootContextParamSet set) implements Loo
         throw new JsonSyntaxException("Unknown LootContextParamSet " + key);
       }
       return new HasLootContextSetCondition(set);
+    }
+
+    public MapCodec<HasLootContextSetCondition> codec() {
+      return Codec.STRING.xmap(
+          id -> {
+            LootContextParamSet set = LootContextParamSets.get(new ResourceLocation(id));
+            if (set == null) {
+              throw new IllegalArgumentException("Unknown LootContextParamSet " + id);
+            }
+            return set;
+          },
+          set -> Objects.requireNonNull(LootContextParamSets.getKey(set), "Unregistered loot LootContextParamSets").toString()
+      ).fieldOf("set").xmap(HasLootContextSetCondition::new, HasLootContextSetCondition::set);
     }
   }
 }

@@ -2,6 +2,9 @@ package slimeknights.mantle.recipe.condition;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -133,6 +136,16 @@ public record TagCombinationCondition<T>(List<TagKey<T>> match, @Nullable TagKey
       return new TagCombinationCondition<>(
           MATCH.getIfPresent(json, "match").stream().map(id -> TagKey.create(registry, id)).toList(),
           json.has("ignore") ? TagKey.create(registry, JsonHelper.getResourceLocation(json, "ignore")) : null);
+    }
+
+    public MapCodec<TagCombinationCondition<?>> codec() {
+      return RecordCodecBuilder.mapCodec(instance -> instance.group(
+          Codec.STRING.optionalFieldOf("registry", Registries.ITEM.location().toString()).forGetter(c -> c.match.get(0).registry().location().toString()),
+          TagKey.codec(Registries.ITEM).fieldOf("match").forGetter(c -> c.match.get(0))
+      ).apply(instance, (regStr, firstTag) -> {
+        ResourceKey<?> registry = ResourceKey.createRegistryKey(new ResourceLocation(regStr));
+        return new TagCombinationCondition<>(List.of(TagKey.create(registry, firstTag.location())), null);
+      }));
     }
   };
 }

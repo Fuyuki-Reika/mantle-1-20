@@ -1,14 +1,13 @@
 package slimeknights.mantle.loot;
 
-import com.google.gson.JsonDeserializer;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.storage.loot.Serializer;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
@@ -73,34 +72,34 @@ public class MantleLoot {
       MODIFIER_CONDITIONS.registerDeserializer(ContainsItemModifierLootCondition.ID,
           (JsonDeserializer<? extends ILootModifierCondition>) ContainsItemModifierLootCondition::deserialize);
     } else if (key == Registries.LOOT_FUNCTION_TYPE) {
-      RETEXTURED_FUNCTION = registerFunction("fill_retextured_block", RetexturedLootFunction.SERIALIZER);
-      SET_FLUID_FUNCTION = registerFunction("set_fluid", SetFluidLootFunction.SERIALIZER);
+      RETEXTURED_FUNCTION = registerFunction("fill_retextured_block", RetexturedLootFunction.CODEC);
+      SET_FLUID_FUNCTION = registerFunction("set_fluid", SetFluidLootFunction.CODEC);
 
     } else if (key == Registries.LOOT_CONDITION_TYPE) {
       BLOCK_TAG_CONDITION = Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE, Mantle.getResource("block_tag"),
-          new LootItemConditionType(BlockTagLootCondition.SERIALIZER));
+          new LootItemConditionType(BlockTagLootCondition.SERIALIZER.codec()));
       HAS_CONTEXT_SET = Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE, Mantle.getResource("has_context_set"),
-          new LootItemConditionType(new HasLootContextSetCondition.Serializer()));
+          new LootItemConditionType(new HasLootContextSetCondition.Serializer().codec()));
       TAG_EMPTY = Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE, TagEmptyCondition.SERIALIZER.getID(),
-          new LootItemConditionType(TagEmptyCondition.SERIALIZER));
+          new LootItemConditionType(TagEmptyCondition.SERIALIZER.codec()));
       TAG_FILLED = Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE, TagFilledCondition.SERIALIZER.getID(),
-          new LootItemConditionType(TagFilledCondition.SERIALIZER));
+          new LootItemConditionType(TagFilledCondition.SERIALIZER.codec()));
 
     } else if (key == Registries.LOOT_POOL_ENTRY_TYPE) {
       TAG_PREFERENCE = Registry.register(BuiltInRegistries.LOOT_POOL_ENTRY_TYPE, Mantle.getResource("tag_preference"),
-          new LootPoolEntryType(new TagPreferenceLootEntry.Serializer()));
+          new LootPoolEntryType(TagPreferenceLootEntry.CODEC));
     }
   }
 
   /**
    * Registers a loot function
    * 
-   * @param name       Loot function name
-   * @param serializer Loot function serializer
+   * @param name  Loot function name
+   * @param codec Loot function codec
    * @return Registered loot function
    */
-  private static LootItemFunctionType registerFunction(String name, Serializer<? extends LootItemFunction> serializer) {
+  private static LootItemFunctionType registerFunction(String name, MapCodec<? extends LootItemFunction> codec) {
     return Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE, Mantle.getResource(name),
-        new LootItemFunctionType(serializer));
+        new LootItemFunctionType(codec));
   }
 }

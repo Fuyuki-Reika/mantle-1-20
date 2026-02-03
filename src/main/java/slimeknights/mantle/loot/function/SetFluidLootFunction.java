@@ -1,8 +1,8 @@
 package slimeknights.mantle.loot.function;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
@@ -14,16 +14,21 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
 import slimeknights.mantle.data.loadable.common.FluidStackLoadable;
 import slimeknights.mantle.loot.MantleLoot;
 
+import java.util.List;
+
 /**
  * Loot function to set the fluid on a dropped item
  */
 public class SetFluidLootFunction extends LootItemConditionalFunction {
-  public static final Serializer SERIALIZER = new Serializer();
+  public static final MapCodec<SetFluidLootFunction> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+      LootItemConditionalFunction.CONDITIONAL_CODEC.forGetter(f -> f.predicates),
+      FluidStack.CODEC.fieldOf("fluid").forGetter(f -> f.fluid)
+  ).apply(instance, SetFluidLootFunction::new));
 
   /** Fluid to add to the item */
   private final FluidStack fluid;
 
-  protected SetFluidLootFunction(LootItemCondition[] conditionsIn, FluidStack fluid) {
+  protected SetFluidLootFunction(List<LootItemCondition> conditionsIn, FluidStack fluid) {
     super(conditionsIn);
     this.fluid = fluid;
   }
@@ -51,21 +56,5 @@ public class SetFluidLootFunction extends LootItemConditionalFunction {
    */
   public static Builder<?> builder(FluidStack fluid) {
     return simpleBuilder(conditions -> new SetFluidLootFunction(conditions, fluid));
-  }
-
-  /** Serializer logic for the function */
-  private static class Serializer extends LootItemConditionalFunction.Serializer<SetFluidLootFunction> {
-    @Override
-    public void serialize(JsonObject json, SetFluidLootFunction loot, JsonSerializationContext context) {
-      super.serialize(json, loot, context);
-      json.add("fluid", FluidStackLoadable.REQUIRED_STACK_NBT.serialize(loot.fluid));
-    }
-
-    @Override
-    public SetFluidLootFunction deserialize(JsonObject object, JsonDeserializationContext context,
-        LootItemCondition[] conditions) {
-      FluidStack fluid = FluidStackLoadable.REQUIRED_STACK_NBT.getIfPresent(object, "fluid");
-      return new SetFluidLootFunction(conditions, fluid);
-    }
   }
 }
