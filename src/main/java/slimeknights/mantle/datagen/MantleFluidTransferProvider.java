@@ -1,11 +1,12 @@
 package slimeknights.mantle.datagen;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
@@ -106,9 +107,11 @@ public class MantleFluidTransferProvider extends AbstractFluidContainerTransferP
     // water bottles are 1/3 of a bucket, to prevent water dupes we round up on fill
     // and down on empty, hence fill being 500mb
     // we can always fill water bottles, not always fill splash and lingering
+    ItemStack waterBottle = new ItemStack(filled);
+    waterBottle.set(DataComponents.POTION_CONTENTS, new PotionContents(Potions.WATER));
     addTransfer(prefix + "fill_water", new FillFluidContainerTransfer(
         container,
-        ItemOutput.fromStack(PotionUtils.setPotion(new ItemStack(filled), Potions.WATER)),
+        ItemOutput.fromStack(waterBottle),
         FluidIngredient.of(MantleTags.Fluids.WATER, MantleValues.BOTTLE * 2)),
         waterConditions);
   }

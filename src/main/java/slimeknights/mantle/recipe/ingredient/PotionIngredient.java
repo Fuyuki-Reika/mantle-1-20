@@ -1,11 +1,12 @@
 package slimeknights.mantle.recipe.ingredient;
 
 import com.google.gson.JsonElement;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
@@ -33,7 +34,11 @@ public class PotionIngredient extends ItemIngredient {
   protected PotionIngredient(List<Item> items, @Nullable TagKey<Item> itemTag, Potion potion) {
     // potion is added in directly to the parent value stream
     super(items, itemTag, Stream.concat(
-      items.stream().map(item -> new ItemValue(PotionUtils.setPotion(new ItemStack(item), potion))),
+      items.stream().map(item -> {
+        ItemStack stack = new ItemStack(item);
+        stack.set(DataComponents.POTION_CONTENTS, new PotionContents(potion));
+        return new ItemValue(stack);
+      }),
       Stream.ofNullable(itemTag).map(tag -> new PotionTagValue(tag, potion)))
     );
     this.potion = potion;
@@ -57,7 +62,7 @@ public class PotionIngredient extends ItemIngredient {
   @Override
   public boolean test(@Nullable ItemStack stack) {
     // stack must match, any item must match, and potion must match
-    return stack != null && super.test(stack) && PotionUtils.getPotion(stack) == potion;
+    return stack != null && super.test(stack) && stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion().map(holder -> holder.value()).orElse(Potions.EMPTY) == potion;
   }
 
   @Override
@@ -86,7 +91,10 @@ public class PotionIngredient extends ItemIngredient {
     @Override
     public Collection<ItemStack> getItems() {
       return super.getItems().stream()
-        .map(item -> PotionUtils.setPotion(item, potion))
+        .map(item -> {
+          item.set(DataComponents.POTION_CONTENTS, new PotionContents(potion));
+          return item;
+        })
         .toList();
     }
   }
