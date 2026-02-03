@@ -1,6 +1,6 @@
 package slimeknights.mantle.loot.entry;
 
-import com.mojang.serialization.Codecs;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.Registries;
@@ -28,10 +28,10 @@ public class TagPreferenceLootEntry extends LootPoolSingletonContainer {
   }
 
   /** Codec for serialization/deserialization */
-  public static final MapCodec<TagPreferenceLootEntry> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+  public static final MapCodec<TagPreferenceLootEntry>CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
       TagKey.codec(Registries.ITEM).fieldOf("tag").forGetter(e -> e.tag),
-      Codecs.INT.fieldOf("weight").forGetter(e -> e.weight),
-      Codecs.INT.fieldOf("quality").forGetter(e -> e.quality),
+      Codec.INT.fieldOf("weight").forGetter(e -> e.weight),
+      Codec.INT.fieldOf("quality").forGetter(e -> e.quality),
       LootItemCondition.DIRECT_CODEC.listOf().optionalFieldOf("conditions", List.of()).forGetter(e -> e.conditions),
       LootItemFunction.DIRECT_CODEC.listOf().optionalFieldOf("functions", List.of()).forGetter(e -> e.functions)
   ).apply(instance, TagPreferenceLootEntry::new));

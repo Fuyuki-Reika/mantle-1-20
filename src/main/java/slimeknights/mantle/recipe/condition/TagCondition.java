@@ -16,7 +16,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.neoforged.neoforge.common.conditions.ICondition;
-import net.neoforged.neoforge.common.conditions.IConditionSerializer;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.util.JsonHelper;
 
@@ -52,8 +51,7 @@ public abstract class TagCondition<T> implements ICondition {
   }
 
   /** Serializer logic for tag keys */
-  public record Serializer<C extends TagCondition<?>>(ResourceLocation getID, Function<TagKey<?>, C> constructor)
-      implements IConditionSerializer<C>, net.minecraft.world.level.storage.loot.Serializer<C> {
+  public record Serializer<C extends TagCondition<?>>(ResourceLocation getID, Function<TagKey<?>, C> constructor) {
     @Override
     public void write(JsonObject json, C value) {
       TagKey<?> tag = value.getTag();
