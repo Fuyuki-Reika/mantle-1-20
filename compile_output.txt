@@ -1,0 +1,592 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.10.2/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :
+Java: 17.0.17, JVM: 17.0.17+10 (Eclipse Adoptium), Arch: amd64, Version: 1.21.1-1.11.DEV.GITBORK
+
+> Task :createMinecraftArtifacts UP-TO-DATE
+> Task :generateEffectiveLombokConfig UP-TO-DATE
+
+> Task :compileJava
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\client\model\util\MantleItemLayerModel.java:21: error: cannot find symbol
+import net.neoforged.neoforge.client.ForgeRenderTypes;
+                                    ^
+  symbol:   class ForgeRenderTypes
+  location: package net.neoforged.neoforge.client
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\command\client\BookCommand.java:20: error: cannot find symbol
+import net.minecraft.commands.CommandRuntimeException;
+                             ^
+  symbol:   class CommandRuntimeException
+  location: package net.minecraft.commands
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\command\HarvestTiersCommand.java:19: error: cannot find symbol
+import net.neoforged.neoforge.common.TierSortingRegistry;
+                                    ^
+  symbol:   class TierSortingRegistry
+  location: package net.neoforged.neoforge.common
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\network\NetworkWrapper.java:73: error: cannot find symbol
+      Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG, Supplier<IPayloadContext>> consumer,
+                                                                       ^
+  symbol:   class IPayloadContext
+  location: class NetworkWrapper
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\network\NetworkWrapper.java:89: error: cannot find symbol
+      Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG, Supplier<IPayloadContext>> consumer,
+                                                                       ^
+  symbol:   class IPayloadContext
+  location: class NetworkWrapper
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\command\TagsForCommand.java:22: error: cannot find symbol
+import net.minecraft.world.item.alchemy.PotionUtils;
+                                       ^
+  symbol:   class PotionUtils
+  location: package net.minecraft.world.item.alchemy
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\datagen\MantleFluidTransferProvider.java:8: error: cannot find symbol
+import net.minecraft.world.item.alchemy.PotionUtils;
+                                       ^
+  symbol:   class PotionUtils
+  location: package net.minecraft.world.item.alchemy
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\fluid\InvertedFluid.java:22: error: cannot find symbol
+import net.neoforged.neoforge.fluids.ForgeFlowingFluid;
+                                    ^
+  symbol:   class ForgeFlowingFluid
+  location: package net.neoforged.neoforge.fluids
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\fluid\InvertedFluid.java:27: error: cannot find symbol
+public abstract class InvertedFluid extends ForgeFlowingFluid {
+                                            ^
+  symbol: class ForgeFlowingFluid
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\fluid\InvertedFluid.java:28: error: cannot find symbol
+  protected InvertedFluid(Properties properties) {
+                          ^
+  symbol:   class Properties
+  location: class InvertedFluid
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\fluid\InvertedFluid.java:234: error: cannot find symbol
+    public Flowing(Properties properties) {
+                   ^
+  symbol:   class Properties
+  location: class Flowing
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\fluid\InvertedFluid.java:257: error: cannot find symbol
+    public Source(Properties properties) {
+                  ^
+  symbol:   class Properties
+  location: class Source
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\fluid\texture\AbstractFluidTextureProvider.java:9: error: cannot find symbol
+import net.neoforged.neoforge.registries.RegistryObject;
+                                        ^
+  symbol:   class RegistryObject
+  location: package net.neoforged.neoforge.registries
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\fluid\texture\AbstractFluidTextureProvider.java:88: error: cannot find symbol
+  public FluidTexture.Builder texture(RegistryObject<? extends FluidType> fluid) {
+                                      ^
+  symbol:   class RegistryObject
+  location: class AbstractFluidTextureProvider
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\fluid\texture\AbstractFluidTextureProvider.java:103: error: cannot find symbol
+  public void skip(RegistryObject<? extends FluidType> fluid) {
+                   ^
+  symbol:   class RegistryObject
+  location: class AbstractFluidTextureProvider
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\fluid\transfer\EmptyPotionTransfer.java:7: error: cannot find symbol
+import net.minecraft.world.item.alchemy.PotionUtils;
+                                       ^
+  symbol:   class PotionUtils
+  location: package net.minecraft.world.item.alchemy
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\registration\FluidBuilder.java:10: error: cannot find symbol
+import net.neoforged.neoforge.fluids.ForgeFlowingFluid;
+                                    ^
+  symbol:   class ForgeFlowingFluid
+  location: package net.neoforged.neoforge.fluids
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\registration\FluidBuilder.java:89: error: package ForgeFlowingFluid does not exist
+  public ForgeFlowingFluid.Properties build(Supplier<? extends FluidType> type, Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
+                          ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\loot\AbstractLootTableInjectionProvider.java:9: error: package net.neoforged.neoforge.common.crafting.conditions does not exist
+import net.neoforged.neoforge.common.crafting.conditions.ICondition;
+                                                        ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\loot\AbstractLootTableInjectionProvider.java:66: error: cannot find symbol
+      ICondition[] conditions) {
+      ^
+  symbol:   class ICondition
+  location: class Builder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\loot\AbstractLootTableInjectionProvider.java:43: error: cannot find symbol
+  protected LootTableInjection.Builder inject(String path, ResourceLocation name, ICondition... conditions) {
+                                                                                  ^
+  symbol:   class ICondition
+  location: class AbstractLootTableInjectionProvider
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\loot\AbstractLootTableInjectionProvider.java:50: error: cannot find symbol
+  protected LootTableInjection.Builder inject(String path, String name, ICondition... conditions) {
+                                                                        ^
+  symbol:   class ICondition
+  location: class AbstractLootTableInjectionProvider
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\loot\AbstractLootTableInjectionProvider.java:55: error: cannot find symbol
+  protected LootTableInjection.Builder injectChest(String name, ICondition... conditions) {
+                                                                ^
+  symbol:   class ICondition
+  location: class AbstractLootTableInjectionProvider
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\loot\AbstractLootTableInjectionProvider.java:60: error: cannot find symbol
+  protected LootTableInjection.Builder injectGameplay(String name, ICondition... conditions) {
+                                                                   ^
+  symbol:   class ICondition
+  location: class AbstractLootTableInjectionProvider
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\loot\condition\BlockTagLootCondition.java:13: error: cannot find symbol
+import net.minecraft.world.level.storage.loot.Serializer;
+                                             ^
+  symbol:   class Serializer
+  location: package net.minecraft.world.level.storage.loot
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\loot\condition\BlockTagLootCondition.java:55: error: cannot find symbol
+  private static class SerializerImpl implements Serializer<BlockTagLootCondition> {
+                                                 ^
+  symbol:   class Serializer
+  location: class BlockTagLootCondition
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\loot\condition\HasLootContextSetCondition.java:50: error: cannot find symbol
+  public static class Serializer implements net.minecraft.world.level.storage.loot.Serializer<HasLootContextSetCondition> {
+                                                                                  ^
+  symbol:   class Serializer
+  location: package net.minecraft.world.level.storage.loot
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\loot\entry\TagPreferenceLootEntry.java:45: error: cannot find symbol
+  public static class Serializer extends LootPoolSingletonContainer.Serializer<TagPreferenceLootEntry> {
+                                                                   ^
+  symbol:   class Serializer
+  location: class LootPoolSingletonContainer
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\loot\function\RetexturedLootFunction.java:62: error: cannot find symbol
+  private static class Serializer extends LootItemConditionalFunction.Serializer<RetexturedLootFunction> {
+                                                                     ^
+  symbol:   class Serializer
+  location: class LootItemConditionalFunction
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\loot\function\SetFluidLootFunction.java:57: error: cannot find symbol
+  private static class Serializer extends LootItemConditionalFunction.Serializer<SetFluidLootFunction> {
+                                                                     ^
+  symbol:   class Serializer
+  location: class LootItemConditionalFunction
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\loot\MantleLoot.java:11: error: cannot find symbol
+import net.minecraft.world.level.storage.loot.Serializer;
+                                             ^
+  symbol:   class Serializer
+  location: package net.minecraft.world.level.storage.loot
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\loot\MantleLoot.java:102: error: cannot find symbol
+  private static LootItemFunctionType registerFunction(String name, Serializer<? extends LootItemFunction> serializer) {
+                                                                    ^
+  symbol:   class Serializer
+  location: class MantleLoot
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\ingredient\EntityIngredient.java:12: error: cannot find symbol
+import net.neoforged.neoforge.common.ForgeSpawnEggItem;
+                                    ^
+  symbol:   class ForgeSpawnEggItem
+  location: package net.neoforged.neoforge.common
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\condition\TagCombinationCondition.java:12: error: cannot find symbol
+import net.neoforged.neoforge.common.conditions.IConditionSerializer;
+                                               ^
+  symbol:   class IConditionSerializer
+  location: package net.neoforged.neoforge.common.conditions
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\condition\TagCombinationCondition.java:97: error: cannot find symbol
+  public static final IConditionSerializer<TagCombinationCondition<?>> SERIALIZER = new IConditionSerializer<>() {
+                      ^
+  symbol:   class IConditionSerializer
+  location: class TagCombinationCondition<T>
+  where T is a type-variable:
+    T extends Object declared in record TagCombinationCondition
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\condition\TagCondition.java:15: error: cannot find symbol
+import net.neoforged.neoforge.common.conditions.IConditionSerializer;
+                                               ^
+  symbol:   class IConditionSerializer
+  location: package net.neoforged.neoforge.common.conditions
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\condition\TagCondition.java:52: error: cannot find symbol
+      implements IConditionSerializer<C>, net.minecraft.world.level.storage.loot.Serializer<C> {
+                 ^
+  symbol:   class IConditionSerializer
+  location: class TagCondition<T>
+  where T is a type-variable:
+    T extends Object declared in class TagCondition
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\condition\TagCondition.java:52: error: cannot find symbol
+      implements IConditionSerializer<C>, net.minecraft.world.level.storage.loot.Serializer<C> {
+                                                                                ^
+  symbol:   class Serializer
+  location: package net.minecraft.world.level.storage.loot
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\cooking\CookingRecipeBuilder.java:5: error: cannot find symbol
+import net.minecraft.data.recipes.FinishedRecipe;
+                                 ^
+  symbol:   class FinishedRecipe
+  location: package net.minecraft.data.recipes
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\AbstractRecipeBuilder.java:10: error: cannot find symbol
+import net.minecraft.advancements.RequirementsStrategy;
+                                 ^
+  symbol:   class RequirementsStrategy
+  location: package net.minecraft.advancements
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\AbstractRecipeBuilder.java:12: error: cannot find symbol
+import net.minecraft.data.recipes.FinishedRecipe;
+                                 ^
+  symbol:   class FinishedRecipe
+  location: package net.minecraft.data.recipes
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\cooking\CookingRecipeBuilder.java:102: error: cannot find symbol
+  private <R extends Recipe<?>> T save(Consumer<FinishedRecipe> consumer, ResourceLocation id, RecordLoadable<R> loadable, Function7<ResourceLocation,String,CookingBookCategory,Ingredient,ItemOutput,Float,Integer,R> constructor, int cookingTime) {
+                                                ^
+  symbol:   class FinishedRecipe
+  location: class CookingRecipeBuilder<T>
+  where T is a type-variable:
+    T extends CookingRecipeBuilder<T> declared in class CookingRecipeBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\cooking\CookingRecipeBuilder.java:112: error: cannot find symbol
+  public T saveSmelting(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
+                                 ^
+  symbol:   class FinishedRecipe
+  location: class CookingRecipeBuilder<T>
+  where T is a type-variable:
+    T extends CookingRecipeBuilder<T> declared in class CookingRecipeBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\cooking\CookingRecipeBuilder.java:117: error: cannot find symbol
+  public T saveBlasting(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
+                                 ^
+  symbol:   class FinishedRecipe
+  location: class CookingRecipeBuilder<T>
+  where T is a type-variable:
+    T extends CookingRecipeBuilder<T> declared in class CookingRecipeBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\cooking\CookingRecipeBuilder.java:122: error: cannot find symbol
+  public T saveSmoking(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
+                                ^
+  symbol:   class FinishedRecipe
+  location: class CookingRecipeBuilder<T>
+  where T is a type-variable:
+    T extends CookingRecipeBuilder<T> declared in class CookingRecipeBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\cooking\CookingRecipeBuilder.java:127: error: cannot find symbol
+  public T saveCampfire(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
+                                 ^
+  symbol:   class FinishedRecipe
+  location: class CookingRecipeBuilder<T>
+  where T is a type-variable:
+    T extends CookingRecipeBuilder<T> declared in class CookingRecipeBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\cooking\CookingRecipeBuilder.java:132: error: cannot find symbol
+  public void save(Consumer<FinishedRecipe> consumer) {
+                            ^
+  symbol:   class FinishedRecipe
+  location: class CookingRecipeBuilder<T>
+  where T is a type-variable:
+    T extends CookingRecipeBuilder<T> declared in class CookingRecipeBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\cooking\CookingRecipeBuilder.java:137: error: cannot find symbol
+  public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
+                            ^
+  symbol:   class FinishedRecipe
+  location: class CookingRecipeBuilder<T>
+  where T is a type-variable:
+    T extends CookingRecipeBuilder<T> declared in class CookingRecipeBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\AbstractRecipeBuilder.java:74: error: cannot find symbol
+  public abstract void save(Consumer<FinishedRecipe> consumerIn);
+                                     ^
+  symbol:   class FinishedRecipe
+  location: class AbstractRecipeBuilder<T>
+  where T is a type-variable:
+    T extends AbstractRecipeBuilder<T> declared in class AbstractRecipeBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\AbstractRecipeBuilder.java:81: error: cannot find symbol
+  public abstract void save(Consumer<FinishedRecipe> consumerIn, ResourceLocation id);
+                                     ^
+  symbol:   class FinishedRecipe
+  location: class AbstractRecipeBuilder<T>
+  where T is a type-variable:
+    T extends AbstractRecipeBuilder<T> declared in class AbstractRecipeBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\crafting\ShapedFallbackRecipeBuilder.java:6: error: cannot find symbol
+import net.minecraft.data.recipes.FinishedRecipe;
+                                 ^
+  symbol:   class FinishedRecipe
+  location: package net.minecraft.data.recipes
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\crafting\ShapedFallbackRecipeBuilder.java:49: error: cannot find symbol
+  public void build(Consumer<FinishedRecipe> consumer) {
+                             ^
+  symbol:   class FinishedRecipe
+  location: class ShapedFallbackRecipeBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\crafting\ShapedFallbackRecipeBuilder.java:58: error: cannot find symbol
+  public void build(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
+                             ^
+  symbol:   class FinishedRecipe
+  location: class ShapedFallbackRecipeBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\crafting\ShapedFallbackRecipeBuilder.java:62: error: cannot find symbol
+  private record Result(FinishedRecipe base, List<ResourceLocation> alternatives) implements FinishedRecipe {
+                                                                                             ^
+  symbol:   class FinishedRecipe
+  location: class ShapedFallbackRecipeBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\crafting\ShapedFallbackRecipeBuilder.java:62: error: cannot find symbol
+  private record Result(FinishedRecipe base, List<ResourceLocation> alternatives) implements FinishedRecipe {
+                        ^
+  symbol:   class FinishedRecipe
+  location: class Result
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\crafting\ShapedRetexturedRecipeBuilder.java:5: error: cannot find symbol
+import net.minecraft.data.recipes.FinishedRecipe;
+                                 ^
+  symbol:   class FinishedRecipe
+  location: package net.minecraft.data.recipes
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\crafting\ShapedRetexturedRecipeBuilder.java:67: error: cannot find symbol
+  public void build(Consumer<FinishedRecipe> consumer) {
+                             ^
+  symbol:   class FinishedRecipe
+  location: class ShapedRetexturedRecipeBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\crafting\ShapedRetexturedRecipeBuilder.java:77: error: cannot find symbol
+  public void build(Consumer<FinishedRecipe> consumer, ResourceLocation location) {
+                             ^
+  symbol:   class FinishedRecipe
+  location: class ShapedRetexturedRecipeBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\crafting\ShapedRetexturedRecipeBuilder.java:92: error: cannot find symbol
+  private class Result implements FinishedRecipe {
+                                  ^
+  symbol:   class FinishedRecipe
+  location: class ShapedRetexturedRecipeBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\crafting\ShapedRetexturedRecipeBuilder.java:93: error: cannot find symbol
+    private final FinishedRecipe base;
+                  ^
+  symbol:   class FinishedRecipe
+  location: class ShapedRetexturedRecipeBuilder.Result
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\crafting\ShapedRetexturedRecipeBuilder.java:95: error: cannot find symbol
+    private Result(FinishedRecipe base) {
+                   ^
+  symbol:   class FinishedRecipe
+  location: class ShapedRetexturedRecipeBuilder.Result
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\AbstractRecipeBuilder.java:131: error: cannot find symbol
+  protected abstract class AbstractFinishedRecipe implements FinishedRecipe {
+                                                             ^
+  symbol:   class FinishedRecipe
+  location: class AbstractRecipeBuilder<T>
+  where T is a type-variable:
+    T extends AbstractRecipeBuilder<T> declared in class AbstractRecipeBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ConsumerWrapperBuilder.java:7: error: cannot find symbol
+import net.minecraft.data.recipes.FinishedRecipe;
+                                 ^
+  symbol:   class FinishedRecipe
+  location: package net.minecraft.data.recipes
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ConsumerWrapperBuilder.java:84: error: cannot find symbol
+  public Consumer<FinishedRecipe> build(Consumer<FinishedRecipe> consumer) {
+                                                 ^
+  symbol:   class FinishedRecipe
+  location: class ConsumerWrapperBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ConsumerWrapperBuilder.java:84: error: cannot find symbol
+  public Consumer<FinishedRecipe> build(Consumer<FinishedRecipe> consumer) {
+                  ^
+  symbol:   class FinishedRecipe
+  location: class ConsumerWrapperBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ConsumerWrapperBuilder.java:88: error: cannot find symbol
+  private static class Wrapped implements FinishedRecipe {
+                                          ^
+  symbol:   class FinishedRecipe
+  location: class ConsumerWrapperBuilder
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ConsumerWrapperBuilder.java:89: error: cannot find symbol
+    private final FinishedRecipe original;
+                  ^
+  symbol:   class FinishedRecipe
+  location: class Wrapped
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ConsumerWrapperBuilder.java:96: error: cannot find symbol
+    private Wrapped(FinishedRecipe original, List<ICondition> conditions, @Nullable RecipeSerializer<?> override,
+                    ^
+  symbol:   class FinishedRecipe
+  location: class Wrapped
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ICommonRecipeHelper.java:5: error: cannot find symbol
+import net.minecraft.data.recipes.FinishedRecipe;
+                                 ^
+  symbol:   class FinishedRecipe
+  location: package net.minecraft.data.recipes
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\IRecipeHelper.java:6: error: cannot find symbol
+import net.minecraft.data.recipes.FinishedRecipe;
+                                 ^
+  symbol:   class FinishedRecipe
+  location: package net.minecraft.data.recipes
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\IRecipeHelper.java:14: error: cannot find symbol
+import net.neoforged.neoforge.registries.RegistryObject;
+                                        ^
+  symbol:   class RegistryObject
+  location: package net.neoforged.neoforge.registries
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ICommonRecipeHelper.java:42: error: cannot find symbol
+  default void packingRecipe(Consumer<FinishedRecipe> consumer, RecipeCategory category, String largeName, ItemLike large, String smallName, ItemLike small, String folder) {
+                                      ^
+  symbol:   class FinishedRecipe
+  location: interface ICommonRecipeHelper
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ICommonRecipeHelper.java:72: error: cannot find symbol
+  default void packingRecipe(Consumer<FinishedRecipe> consumer, RecipeCategory category, String largeName, ItemLike largeItem, String smallName, ItemLike smallItem, TagKey<Item> smallTag, String folder) {
+                                      ^
+  symbol:   class FinishedRecipe
+  location: interface ICommonRecipeHelper
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ICommonRecipeHelper.java:100: error: cannot find symbol
+  default void metalCrafting(Consumer<FinishedRecipe> consumer, MetalItemObject metal, String folder) {
+                                      ^
+  symbol:   class FinishedRecipe
+  location: interface ICommonRecipeHelper
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\registration\object\ItemObject.java:9: error: cannot find symbol
+import net.neoforged.neoforge.registries.RegistryObject;
+                                        ^
+  symbol:   class RegistryObject
+  location: package net.neoforged.neoforge.registries
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ICommonRecipeHelper.java:114: error: cannot find symbol
+  default void slabStairsCrafting(Consumer<FinishedRecipe> consumer, BuildingBlockObject building, String folder, boolean addStonecutter) {
+                                           ^
+  symbol:   class FinishedRecipe
+  location: interface ICommonRecipeHelper
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ICommonRecipeHelper.java:154: error: cannot find symbol
+  default void stairSlabWallCrafting(Consumer<FinishedRecipe> consumer, WallBuildingBlockObject building, String folder, boolean addStonecutter) {
+                                              ^
+  symbol:   class FinishedRecipe
+  location: interface ICommonRecipeHelper
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ICommonRecipeHelper.java:183: error: cannot find symbol
+  default void woodCrafting(Consumer<FinishedRecipe> consumer, WoodBlockObject wood, String folder) {
+                                     ^
+  symbol:   class FinishedRecipe
+  location: interface ICommonRecipeHelper
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\registration\RegistrationHelper.java:13: error: cannot find symbol
+import net.neoforged.neoforge.registries.MissingMappingsEvent;
+                                        ^
+  symbol:   class MissingMappingsEvent
+  location: package net.neoforged.neoforge.registries
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\registration\RegistrationHelper.java:14: error: package net.neoforged.neoforge.registries.MissingMappingsEvent does not exist
+import net.neoforged.neoforge.registries.MissingMappingsEvent.Mapping;
+                                                             ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\registration\RegistrationHelper.java:62: error: cannot find symbol
+  public static <T> void handleMissingMappings(MissingMappingsEvent event, String modID, ResourceKey<? extends Registry<T>> registry, Function<String, T> handler) {
+                                               ^
+  symbol:   class MissingMappingsEvent
+  location: class RegistrationHelper
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\registration\object\ItemObject.java:42: error: cannot find symbol
+  public ItemObject(RegistryObject<? extends I> object) {
+                    ^
+  symbol:   class RegistryObject
+  location: class ItemObject<I>
+  where I is a type-variable:
+    I extends ItemLike declared in class ItemObject
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\IRecipeHelper.java:101: error: cannot find symbol
+  default ResourceLocation wrap(RegistryObject<?> location, String prefix, String suffix) {
+                                ^
+  symbol:   class RegistryObject
+  location: interface IRecipeHelper
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\IRecipeHelper.java:112: error: cannot find symbol
+  default ResourceLocation prefix(RegistryObject<?> location, String prefix) {
+                                  ^
+  symbol:   class RegistryObject
+  location: interface IRecipeHelper
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\IRecipeHelper.java:123: error: cannot find symbol
+  default ResourceLocation suffix(RegistryObject<?> location, String suffix) {
+                                  ^
+  symbol:   class RegistryObject
+  location: interface IRecipeHelper
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\IRecipeHelper.java:204: error: cannot find symbol
+  default Consumer<FinishedRecipe> withCondition(Consumer<FinishedRecipe> consumer, ICondition... conditions) {
+                                                          ^
+  symbol:   class FinishedRecipe
+  location: interface IRecipeHelper
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\IRecipeHelper.java:204: error: cannot find symbol
+  default Consumer<FinishedRecipe> withCondition(Consumer<FinishedRecipe> consumer, ICondition... conditions) {
+                   ^
+  symbol:   class FinishedRecipe
+  location: interface IRecipeHelper
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ItemNameIngredient.java:10: error: cannot find symbol
+import net.neoforged.neoforge.common.crafting.AbstractIngredient;
+                                             ^
+  symbol:   class AbstractIngredient
+  location: package net.neoforged.neoforge.common.crafting
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ItemNameIngredient.java:11: error: cannot find symbol
+import net.neoforged.neoforge.common.crafting.IIngredientSerializer;
+                                             ^
+  symbol:   class IIngredientSerializer
+  location: package net.neoforged.neoforge.common.crafting
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ItemNameIngredient.java:12: error: cannot find symbol
+import net.neoforged.neoforge.common.crafting.VanillaIngredientSerializer;
+                                             ^
+  symbol:   class VanillaIngredientSerializer
+  location: package net.neoforged.neoforge.common.crafting
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ItemNameIngredient.java:22: error: cannot find symbol
+public class ItemNameIngredient extends AbstractIngredient {
+                                        ^
+  symbol: class AbstractIngredient
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\ItemNameIngredient.java:69: error: cannot find symbol
+  public IIngredientSerializer<? extends Ingredient> getSerializer() {
+         ^
+  symbol:   class IIngredientSerializer
+  location: class ItemNameIngredient
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\NBTNameIngredient.java:9: error: cannot find symbol
+import net.neoforged.neoforge.common.crafting.StrictNBTIngredient;
+                                             ^
+  symbol:   class StrictNBTIngredient
+  location: package net.neoforged.neoforge.common.crafting
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\NBTNameIngredient.java:14: error: package net.neoforged.neoforge.common.crafting.StrictNBTIngredient does not exist
+import net.neoforged.neoforge.common.crafting.StrictNBTIngredient.Serializer;
+                                                                 ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\data\NBTNameIngredient.java:19: error: cannot find symbol
+public class NBTNameIngredient extends StrictNBTIngredient {
+                                       ^
+  symbol: class StrictNBTIngredient
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\helper\LoadableIngredientSerializer.java:7: error: cannot find symbol
+import net.neoforged.neoforge.common.crafting.IIngredientSerializer;
+                                             ^
+  symbol:   class IIngredientSerializer
+  location: package net.neoforged.neoforge.common.crafting
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\helper\LoadableIngredientSerializer.java:13: error: cannot find symbol
+public record LoadableIngredientSerializer<T extends Ingredient>(RecordLoadable<T> loadable) implements IIngredientSerializer<T> {
+                                                                                                        ^
+  symbol: class IIngredientSerializer
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\helper\SimpleFinishedRecipe.java:4: error: cannot find symbol
+import net.minecraft.data.recipes.FinishedRecipe;
+                                 ^
+  symbol:   class FinishedRecipe
+  location: package net.minecraft.data.recipes
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\helper\SimpleFinishedRecipe.java:11: error: cannot find symbol
+public record SimpleFinishedRecipe(ResourceLocation getId, RecipeSerializer<?> getType) implements FinishedRecipe {
+                                                                                                   ^
+  symbol: class FinishedRecipe
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\recipe\ingredient\FluidContainerIngredient.java:11: error: cannot find symbol
+import net.neoforged.neoforge.common.crafting.AbstractIngredient;
+                                             ^
+  symbol:   class AbstractIngredient
+  location: package net.neoforged.neoforge.common.crafting
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\block\GaugeBlock.java:91: warning: [removal] getDisplayName() in FluidStack has been deprecated and marked for removal
+                COMMA_FORMAT.format(handler.getTankCapacity(0)), fluid.getDisplayName());
+                                                                      ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\client\book\data\element\IngredientData.java:156: warning: [removal] deserialize(JsonObject) in SizedIngredient has been deprecated and marked for removal
+      return SizedIngredient.deserialize(object);
+                            ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\client\ClientEvents.java:262: warning: [removal] getDisplayName() in FluidStack has been deprecated and marked for removal
+      tooltip.add(fluid.getDisplayName());
+                       ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\client\render\InventoryTileEntityRenderer.java:24: warning: [removal] REGISTRY in RenderItem has been deprecated and marked for removal
+    List<RenderItem> renderItems = RenderItem.REGISTRY.get(state.getBlock(), List.of());
+                                             ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\fluid\FluidTransferHelper.java:200: warning: [removal] getDisplayName() in FluidStack has been deprecated and marked for removal
+                fluidStack.getDisplayName()), true);
+                          ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\fluid\FluidTransferHelper.java:217: warning: [removal] getDisplayName() in FluidStack has been deprecated and marked for removal
+        Component.translatable(KEY_FILLED, COMMA_FORMAT.format(transferred.getAmount()), transferred.getDisplayName()),
+                                                                                                    ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\fluid\FluidTransferHelper.java:225: warning: [removal] getDisplayName() in FluidStack has been deprecated and marked for removal
+        Component.translatable(KEY_DRAINED, COMMA_FORMAT.format(transferred.getAmount()), transferred.getDisplayName()),
+                                                                                                     ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\fluid\InvertedFluidType.java:16: warning: [removal] initializeClient(Consumer<IClientFluidTypeExtensions>) in FluidType has been deprecated and marked for removal
+  public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
+              ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\fluid\TextureFluidType.java:19: warning: [removal] initializeClient(Consumer<IClientFluidTypeExtensions>) in FluidType has been deprecated and marked for removal
+  public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
+              ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\fluid\tooltip\FluidTooltipHandler.java:218: warning: [removal] getDisplayName() in FluidStack has been deprecated and marked for removal
+    tooltip.add(fluid.getDisplayName());
+                     ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\plugin\jei\entity\EntityIngredientHelper.java:26: warning: [removal] getUniqueId(V,UidContext) in IIngredientHelper has been deprecated and marked for removal
+  public String getUniqueId(EntityIngredient.EntityInput type, UidContext context) {
+                ^
+  where V is a type-variable:
+    V extends Object declared in interface IIngredientHelper
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\plugin\jei\RetexturableRecipeExtension.java:80: warning: [removal] getHeight() in ICraftingCategoryExtension has been deprecated and marked for removal
+  public int getHeight() {
+             ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\plugin\jei\RetexturableRecipeExtension.java:75: warning: [removal] getWidth() in ICraftingCategoryExtension has been deprecated and marked for removal
+  public int getWidth() {
+             ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\plugin\jei\RetexturableRecipeExtension.java:70: warning: [removal] getRegistryName() in ICraftingCategoryExtension has been deprecated and marked for removal
+  public ResourceLocation getRegistryName() {
+                          ^
+G:\Fuyuki Reika\Mod Updating\Mantle-1.20\src\main\java\slimeknights\mantle\plugin\jei\RetexturableRecipeExtension.java:85: warning: [removal] setRecipe(IRecipeLayoutBuilder,ICraftingGridHelper,IFocusGroup) in ICraftingCategoryExtension has been deprecated and marked for removal
+  public void setRecipe(IRecipeLayoutBuilder builder, ICraftingGridHelper craftingGridHelper, IFocusGroup focuses) {
+              ^
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+100 errors
+15 warnings
+
+> Task :compileJava FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+> Run with --info option to get more log output.
+> Run with --scan to get full insights.
+
+BUILD FAILED in 13s
+3 actionable tasks: 1 executed, 2 up-to-date
