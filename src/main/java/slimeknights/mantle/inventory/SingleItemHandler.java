@@ -2,7 +2,9 @@ package slimeknights.mantle.inventory;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
@@ -145,30 +147,53 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
 
   /**
    * Writes this module to NBT
-   * 
+   *
+   * @param registries HolderLookup.Provider for data component serialization
+   * @return Module in NBT
+   */
+  public CompoundTag writeToNBT(HolderLookup.Provider registries) {
+    if (!stack.isEmpty()) {
+      Tag tag = stack.save(registries);
+      if (tag instanceof CompoundTag ct) {
+        return ct;
+      }
+    }
+    return new CompoundTag();
+  }
+
+  /**
+   * Writes this module to NBT, using the level's registry access if available.
+   *
    * @return Module in NBT
    */
   public CompoundTag writeToNBT() {
-    CompoundTag nbt = new CompoundTag();
-    // TODO 1.21.1: ItemStack.save() now requires HolderLookup.Provider
-    // Need to change API to accept registries parameter
-    // Temporarily writing nothing
-    // if (!stack.isEmpty()) {
-    // stack.save(nbt);
-    // }
-    return nbt;
+    if (parent.getLevel() != null) {
+      return writeToNBT(parent.getLevel().registryAccess());
+    }
+    return new CompoundTag();
   }
 
   /**
    * Reads this module from NBT
-   * 
+   *
+   * @param nbt        NBT
+   * @param registries HolderLookup.Provider for data component deserialization
+   */
+  public void readFromNBT(CompoundTag nbt, HolderLookup.Provider registries) {
+    stack = nbt.isEmpty() ? ItemStack.EMPTY : ItemStack.parseOptional(registries, nbt);
+  }
+
+  /**
+   * Reads this module from NBT, using the level's registry access if available.
+   *
    * @param nbt NBT
    */
   public void readFromNBT(CompoundTag nbt) {
-    // TODO 1.21.1: ItemStack.of() removed - use ItemStack.parseOptional(registries,
-    // nbt)
-    // Need to change API to accept registries parameter
-    // Temporarily setting empty stack
-    stack = ItemStack.EMPTY;
+    if (parent.getLevel() != null) {
+      readFromNBT(nbt, parent.getLevel().registryAccess());
+    } else {
+      // Level not yet available; defer until level is set
+      stack = ItemStack.EMPTY;
+    }
   }
 }

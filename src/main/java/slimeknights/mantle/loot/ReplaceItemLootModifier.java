@@ -26,23 +26,13 @@ import java.util.function.BiFunction;
 
 /** Loot modifier to replace an item with another */
 public class ReplaceItemLootModifier extends LootModifier {
-  // TODO 1.21.1: CODEC temporarily disabled - IGlobalLootModifier.codec() changed
-  // from Codec to MapCodec
-  // Also depends on MantleCodecs.LOOT_FUNCTIONS which is disabled
-  public static final MapCodec<ReplaceItemLootModifier> CODEC = MapCodec.unit(() -> {
-    throw new UnsupportedOperationException(
-        "ReplaceItemLootModifier codec disabled - needs NeoForge 1.21.1 codec API migration");
-  });
-  /*
-   * public static final Codec<ReplaceItemLootModifier> CODEC =
-   * RecordCodecBuilder.create(inst -> codecStart(inst).and(
-   * inst.group(
-   * MantleCodecs.INGREDIENT.fieldOf("original").forGetter(m -> m.original),
-   * ItemOutput.REQUIRED_STACK_CODEC.fieldOf("replacement").forGetter(m ->
-   * m.replacement),
-   * MantleCodecs.LOOT_FUNCTIONS.fieldOf("functions").forGetter(m -> m.functions)
-   * )).apply(inst, ReplaceItemLootModifier::new));
-   */
+  // Codec using native 1.21.1 ingredient and function codecs
+  public static final MapCodec<ReplaceItemLootModifier> CODEC = RecordCodecBuilder.mapCodec(inst ->
+      codecStart(inst).and(inst.group(
+          MantleCodecs.INGREDIENT.fieldOf("original").forGetter(m -> m.original),
+          ItemOutput.REQUIRED_STACK_CODEC.fieldOf("replacement").forGetter(m -> m.replacement),
+          MantleCodecs.LOOT_FUNCTIONS.fieldOf("functions").forGetter(m -> m.functions)
+      )).apply(inst, ReplaceItemLootModifier::new));
 
   /** Ingredient to test for the original item */
   private final Ingredient original;

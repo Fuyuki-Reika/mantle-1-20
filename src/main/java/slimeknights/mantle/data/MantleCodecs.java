@@ -5,8 +5,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.storage.loot.entries.LootPoolEntries;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctions;
 import net.neoforged.neoforge.common.loot.LootModifierManager;
 import slimeknights.mantle.data.JsonCodec.GsonCodec;
 
@@ -16,16 +18,13 @@ import slimeknights.mantle.data.JsonCodec.GsonCodec;
  * before vanilla did.
  */
 public class MantleCodecs {
-  // TODO 1.21.1: LootModifierManager.GSON_INSTANCE removed in NeoForge 21.1.85
   /** Codec for loot pool entries */
-  // public static final Codec<LootPoolEntryContainer> LOOT_ENTRY = new
-  // GsonCodec<>("loot entry", LootModifierManager.GSON_INSTANCE,
-  // LootPoolEntryContainer.class);
-  /** Codec for loot pool entries */
-  // public static final Codec<LootItemFunction[]> LOOT_FUNCTIONS = new
-  // GsonCodec<>("loot functions", LootModifierManager.GSON_INSTANCE,
-  // LootItemFunction[].class);
-  /** Codec for ingredients, handling forge ingredient types */
+  public static final Codec<LootPoolEntryContainer> LOOT_ENTRY = LootPoolEntries.CODEC;
+  /** Codec for loot item functions as an array */
+  public static final Codec<LootItemFunction[]> LOOT_FUNCTIONS =
+      LootItemFunctions.ROOT_CODEC.listOf()
+          .xmap(l -> l.toArray(LootItemFunction[]::new), java.util.Arrays::asList);
+  /** Codec for ingredients, handling NeoForge ingredient types */
   public static final Codec<Ingredient> INGREDIENT = new JsonCodec<>() {
     @Override
     public Ingredient deserialize(JsonElement element, DynamicOps<?> ops) {

@@ -62,14 +62,20 @@ public abstract class InvertedFluid extends BaseFlowingFluid {
     return count;
   }
 
-  // TODO 1.21.1: spreadToSides() removed from BaseFlowingFluid - method removed,
-  // needs reimplementation
-  // This was a protected method that spread fluid to adjacent horizontal
-  // positions
-  // For now, this is disabled to allow compilation - proper implementation needed
+  // TODO 1.21.1: spreadToSides() removed from BaseFlowingFluid - reimplemented locally
+  // Spreads the fluid to adjacent horizontal positions where possible
   protected void spreadToSides(Level level, BlockPos pos, FluidState fluid, BlockState block) {
-    // Disabled - method signature changed or removed in NeoForge 21.1.85
-    // Original implementation spread fluid horizontally
+    Map<Direction, FluidState> spread = this.getSpread(level, pos, block);
+    for (Map.Entry<Direction, FluidState> entry : spread.entrySet()) {
+      Direction direction = entry.getKey();
+      FluidState targetFluid = entry.getValue();
+      BlockPos targetPos = pos.relative(direction);
+      BlockState targetBlock = level.getBlockState(targetPos);
+      if (this.canSpreadTo(level, pos, block, direction, targetPos, targetBlock,
+          level.getFluidState(targetPos), targetFluid.getType())) {
+        this.spreadTo(level, targetPos, targetBlock, direction, targetFluid);
+      }
+    }
   }
 
   // TODO 1.21.1: canPassThroughWall() removed from BaseFlowingFluid - method
@@ -202,10 +208,9 @@ public abstract class InvertedFluid extends BaseFlowingFluid {
       BlockState sideBlock = level.getBlockState(side);
       FluidState sideFluid = sideBlock.getFluidState();
       if (sideFluid.getType().isSame(this) && this.canPassThroughWall(direction, level, pos, block, side, sideBlock)) {
-        // TODO 1.21.1: EventHooks.canCreateFluidSource signature changed - disabled for
-        // now
-        // Original: EventHooks.canCreateFluidSource(level, side, sideBlock,
-        // sideFluid.canConvertToSource(level, side))
+        // TODO 1.21.1: EventHooks.canCreateFluidSource signature changed -
+        // canConvertToSource is now a method on FluidState not a hook
+        // Using direct isSource() check as approximation
         if (sideFluid.isSource()) {
           sourceSides++;
         }

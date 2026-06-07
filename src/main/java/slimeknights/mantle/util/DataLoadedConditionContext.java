@@ -38,7 +38,8 @@ public enum DataLoadedConditionContext implements ICondition.IContext {
     Registry<T> registry = RegistryHelper.getRegistry(key);
     if (registry != null) {
       return registry.getTags()
-          .collect(Collectors.toMap(entry -> entry.getFirst().location(), entry -> entry.getSecond().stream().toList()));
+          .collect(
+              Collectors.toMap(entry -> entry.getFirst().location(), entry -> entry.getSecond().stream().toList()));
     }
     return Map.of();
   }

@@ -30,19 +30,18 @@ public class EdibleItem extends Item {
   }
 
   @Override
-  // TODO 1.21.1: appendHoverText signature changed + FoodProperties.getEffects()
-  // removed
   public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
       TooltipFlag flagIn) {
     TranslationHelper.addOptionalTooltip(stack, tooltip);
-    // TODO: use ContainerFoodItem helper for more potion like effects?
-    // Temporarily disabled - needs migration to new FoodProperties API
-    // for (Pair<MobEffectInstance, Float> pair :
-    // Objects.requireNonNull(stack.getItem().getFoodProperties(stack,
-    // null)).getEffects()) {
-    // if (pair.getFirst() != null) {
-    // tooltip.add(Component.literal(I18n.get(pair.getFirst().getDescriptionId()).trim()).withStyle(ChatFormatting.GRAY));
-    // }
-    // }
+    // Show food effect descriptions in tooltip
+    FoodProperties food = stack.getItem().getFoodProperties(stack, null);
+    if (food != null) {
+      for (FoodProperties.PossibleEffect possible : food.effects()) {
+        MobEffectInstance effect = possible.effect();
+        if (effect != null) {
+          tooltip.add(Component.literal(I18n.get(effect.getDescriptionId()).trim()).withStyle(ChatFormatting.GRAY));
+        }
+      }
+    }
   }
 }

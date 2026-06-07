@@ -193,37 +193,27 @@ public class FluidTransferHelper {
   public static FluidInteractionResult interactWithFilledBucket(Level world, BlockPos pos, IFluidHandler handler,
       Player player, InteractionHand hand, Direction offset) {
     ItemStack held = player.getItemInHand(hand);
-    if (held.getItem() instanceof BucketItem bucket) {
-      // TODO 1.21.1: BucketItem.getFluid() removed - need to get fluid from bucket's
-      // data component
-      // Temporarily disabled - needs investigation of new bucket fluid storage API
-      throw new UnsupportedOperationException(
-          "interactWithFilledBucket temporarily disabled - BucketItem.getFluid removed");
-      /*
-       * Fluid fluid = bucket.getFluid();
-       * if (fluid != Fluids.EMPTY) {
-       * if (!world.isClientSide) {
-       * FluidStack fluidStack = new FluidStack(bucket.getFluid(),
-       * FluidType.BUCKET_VOLUME);
-       * // must empty the whole bucket
-       * if (handler.fill(fluidStack, FluidAction.SIMULATE) ==
-       * FluidType.BUCKET_VOLUME) {
-       * SoundEvent sound = getEmptySound(fluidStack);
-       * handler.fill(fluidStack, FluidAction.EXECUTE);
-       * bucket.checkExtraContent(player, world, held, pos.relative(offset));
-       * world.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
-       * player.displayClientMessage(Component.translatable(KEY_FILLED,
-       * COMMA_FORMAT.format(FluidType.BUCKET_VOLUME),
-       * fluidStack.getDisplayName()), true);
-       * if (!player.isCreative()) {
-       * player.setItemInHand(hand, held.getCraftingRemainingItem());
-       * }
-       * return FluidInteractionResult.DRAINED_STACK;
-       * }
-       * }
-       * return FluidInteractionResult.CONTAINER;
-       * }
-       */
+    if (held.getItem() instanceof BucketItem) {
+      // In 1.21.1, get fluid from bucket via FluidUtil.getFluidContained
+      java.util.Optional<FluidStack> contained = net.neoforged.neoforge.fluids.FluidUtil.getFluidContained(held);
+      if (contained.isPresent()) {
+        FluidStack fluidStack = contained.get();
+        if (!world.isClientSide) {
+          // must empty the whole bucket
+          if (handler.fill(fluidStack.copy(), FluidAction.SIMULATE) == fluidStack.getAmount()) {
+            SoundEvent sound = getEmptySound(fluidStack);
+            handler.fill(fluidStack.copy(), FluidAction.EXECUTE);
+            world.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+            player.displayClientMessage(Component.translatable(KEY_FILLED,
+                COMMA_FORMAT.format(fluidStack.getAmount()), fluidStack.getDisplayName()), true);
+            if (!player.isCreative()) {
+              player.setItemInHand(hand, held.getCraftingRemainingItem());
+            }
+            return FluidInteractionResult.DRAINED_STACK;
+          }
+        }
+        return FluidInteractionResult.CONTAINER;
+      }
     }
     return FluidInteractionResult.MISSING;
   }

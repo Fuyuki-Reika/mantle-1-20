@@ -1,7 +1,14 @@
 package slimeknights.mantle.recipe.helper;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.MapLike;
+import com.mojang.serialization.RecordBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -112,13 +119,45 @@ public class LoadableRecipeSerializer<T extends Recipe<?>> implements LoggingRec
   }
 
   // TODO 1.21.1: codec() is now required by RecipeSerializer
-  // MapCodec cannot be easily created from Loadable without additional
-  // infrastructure
-  // For now, delegate to fromJson which takes ResourceLocation id
+  // MapCodec bridges Mantle's RecordLoadable deserialization to Mojang's codec system
   @Override
   public MapCodec<T> codec() {
-    throw new UnsupportedOperationException(
-        "LoadableRecipeSerializer uses custom deserialization via fromJson(ResourceLocation, JsonObject), codec() not supported");
+    return new MapCodec<>() {
+      @Override
+      public <T1> DataResult<T> decode(DynamicOps<T1> ops, MapLike<T1> input) {
+        try {
+          JsonObject json = new JsonObject();
+          input.entries().forEach(pair -> {
+            String key = ops.getStringValue(pair.getFirst()).result().orElse(null);
+            if (key != null) {
+              JsonElement value = new Dynamic<>(ops, pair.getSecond()).convert(JsonOps.INSTANCE).getValue();
+              json.add(key, value);
+            }
+          });
+          return DataResult.success(loadable.deserialize(json,
+              buildContext(ResourceLocation.withDefaultNamespace("codec")).build()));
+        } catch (Exception e) {
+          return DataResult.error(e::getMessage);
+        }
+      }
+
+      @Override
+      public <T1> RecordBuilder<T1> encode(T input, DynamicOps<T1> ops, RecordBuilder<T1> prefix) {
+        JsonElement serialized = loadable.serialize(input);
+        if (serialized instanceof JsonObject json) {
+          for (var entry : json.entrySet()) {
+            T1 value = new Dynamic<>(JsonOps.INSTANCE, entry.getValue()).convert(ops).getValue();
+            prefix.add(entry.getKey(), value);
+          }
+        }
+        return prefix;
+      }
+
+      @Override
+      public <T1> java.util.stream.Stream<T1> keys(DynamicOps<T1> ops) {
+        return java.util.stream.Stream.empty();
+      }
+    };
   }
 
   public static class TypeAware<T extends Recipe<?>> extends LoadableRecipeSerializer<T>

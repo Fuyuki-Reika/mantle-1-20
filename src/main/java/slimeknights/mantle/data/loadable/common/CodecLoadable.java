@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -34,19 +35,24 @@ public record CodecLoadable<T>(DynamicOps<Tag> ops, Codec<T> codec) implements L
 
   @Override
   public T decode(FriendlyByteBuf buffer, TypedMap context) {
-    // TODO 1.21.1: FriendlyByteBuf.readWithCodec signature changed or removed
-    // Needs investigation - may need StreamCodec migration
-    throw new UnsupportedOperationException(
-        "CodecLoadable.decode temporarily disabled - readWithCodec signature changed");
-    // return buffer.readWithCodec(ops, codec);
+    CompoundTag wrapper = buffer.readNbt();
+    if (wrapper == null) {
+      throw new RuntimeException("Expected NBT tag but got null in CodecLoadable.decode");
+    }
+    Tag encoded = wrapper.contains("__data") ? wrapper.get("__data") : wrapper;
+    return codec.parse(ops, encoded).getOrThrow();
   }
 
   @Override
   public void encode(FriendlyByteBuf buffer, T object) {
-    // TODO 1.21.1: FriendlyByteBuf.writeWithCodec signature changed or removed
-    // Needs investigation - may need StreamCodec migration
-    throw new UnsupportedOperationException(
-        "CodecLoadable.encode temporarily disabled - writeWithCodec signature changed");
-    // buffer.writeWithCodec(ops, codec, object);
+    Tag encoded = codec.encodeStart(ops, object).getOrThrow();
+    CompoundTag wrapper;
+    if (encoded instanceof CompoundTag ct) {
+      wrapper = ct;
+    } else {
+      wrapper = new CompoundTag();
+      wrapper.put("__data", encoded);
+    }
+    buffer.writeNbt(wrapper);
   }
 }

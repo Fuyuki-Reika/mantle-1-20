@@ -23,11 +23,10 @@ public record SimpleRecipeSerializer<T extends Recipe<?>>(Function<ResourceLocat
     return constructor.apply(id);
   }
 
-  // TODO 1.21.1: fromNetwork with new signature - no ID available, throws
-  // exception
+  // TODO 1.21.1: fromNetwork with new signature - no ID available
   public T fromNetwork(RegistryFriendlyByteBuf pBuffer) {
-    // Cannot construct without ID, throw exception
-    throw new UnsupportedOperationException("SimpleRecipeSerializer.fromNetwork() requires ResourceLocation id");
+    // Zero-data recipe: construct with placeholder ID (actual ID comes from RecipeHolder)
+    return constructor.apply(ResourceLocation.withDefaultNamespace("simple_recipe"));
   }
 
   // TODO 1.21.1: Old fromNetwork signature kept for internal use
@@ -40,15 +39,18 @@ public record SimpleRecipeSerializer<T extends Recipe<?>>(Function<ResourceLocat
   }
 
   // TODO 1.21.1: streamCodec() required by RecipeSerializer interface
+  // Zero-data recipe: encode/decode nothing; ID comes from RecipeHolder wrapper
   @Override
   public StreamCodec<RegistryFriendlyByteBuf, T> streamCodec() {
-    return StreamCodec.of(this::toNetwork, this::fromNetwork);
+    return StreamCodec.of(
+        (buf, recipe) -> {},  // no data to write
+        buf -> constructor.apply(ResourceLocation.withDefaultNamespace("simple_recipe")));
   }
 
   // TODO 1.21.1: codec() required by RecipeSerializer interface
+  // Zero-data recipe: no fields needed; ID comes from RecipeHolder wrapper
   @Override
   public MapCodec<T> codec() {
-    throw new UnsupportedOperationException(
-        "SimpleRecipeSerializer uses custom deserialization via fromJson(ResourceLocation, JsonObject), codec() not supported");
+    return MapCodec.unit(() -> constructor.apply(ResourceLocation.withDefaultNamespace("simple_recipe")));
   }
 }

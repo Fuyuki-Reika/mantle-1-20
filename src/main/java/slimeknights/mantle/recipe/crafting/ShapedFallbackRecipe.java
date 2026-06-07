@@ -68,7 +68,10 @@ public class ShapedFallbackRecipe extends ShapedRecipe {
     this.alternatives = alternatives;
   }
 
-  /** Returns an empty HolderLookup.Provider for use when a full registries context is unavailable */
+  /**
+   * Returns an empty HolderLookup.Provider for use when a full registries context
+   * is unavailable
+   */
   static net.minecraft.core.HolderLookup.Provider emptyProvider() {
     return net.minecraft.core.HolderLookup.Provider.create(
         java.util.stream.Stream.<net.minecraft.core.HolderLookup.RegistryLookup<?>>of());

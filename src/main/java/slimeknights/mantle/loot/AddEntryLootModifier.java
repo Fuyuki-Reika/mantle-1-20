@@ -31,20 +31,13 @@ import java.util.function.Consumer;
 // Class no longer properly registers with loot system but can still be
 // instantiated for legacy code
 public class AddEntryLootModifier extends LootModifier {
-  // Codec temporarily disabled - references removed MantleCodecs fields
-  public static final MapCodec<AddEntryLootModifier> CODEC = MapCodec.unit(() -> {
-    throw new UnsupportedOperationException(
-        "AddEntryLootModifier temporarily disabled - needs NeoForge 1.21.1 loot API migration");
-  });
-  /*
-   * public static final Codec<AddEntryLootModifier> CODEC =
-   * RecordCodecBuilder.create(inst -> codecStart(inst).and(inst.group(
-   * ILootModifierCondition.CODEC.listOf().fieldOf("post_conditions").forGetter(m
-   * -> m.modifierConditions),
-   * MantleCodecs.LOOT_ENTRY.fieldOf("entry").forGetter(m -> m.entry),
-   * MantleCodecs.LOOT_FUNCTIONS.fieldOf("functions").forGetter(m ->
-   * m.functions))).apply(inst, AddEntryLootModifier::new));
-   */
+  // Codec using native 1.21.1 loot entry and function codecs
+  public static final MapCodec<AddEntryLootModifier> CODEC = RecordCodecBuilder.mapCodec(inst ->
+      codecStart(inst).and(inst.group(
+          ILootModifierCondition.CODEC.listOf().fieldOf("post_conditions").forGetter(m -> m.modifierConditions),
+          MantleCodecs.LOOT_ENTRY.fieldOf("entry").forGetter(m -> m.entry),
+          MantleCodecs.LOOT_FUNCTIONS.fieldOf("functions").forGetter(m -> m.functions)
+      )).apply(inst, AddEntryLootModifier::new));
 
   /** Additional conditions that can consider the previously generated loot */
   private final List<ILootModifierCondition> modifierConditions;

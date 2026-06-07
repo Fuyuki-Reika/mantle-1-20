@@ -60,32 +60,11 @@ public class MantleLoot {
     ResourceKey<?> key = event.getRegistryKey();
 
     if (key == NeoForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS) {
-      // TODO 1.21.1: Global loot modifier registration disabled - event.getRegistry()
-      // type changed
-      // RegistryAdapter type inference fails with new registry API
-      Mantle.logger.warn("Global loot modifier registration disabled - needs NeoForge 1.21.1 registry API migration");
-      /*
-       * RegistryAdapter<Codec<? extends IGlobalLootModifier>> adapter = new
-       * RegistryAdapter<>(
-       * Objects.requireNonNull(event.getRegistry()));
-       * adapter.register(AddEntryLootModifier.CODEC, "add_entry");
-       * adapter.register(ReplaceItemLootModifier.CODEC, "replace_item");
-       */
-
-      // TODO 1.21.1: Loot modifier conditions disabled - JsonDeserializer removed,
-      // needs codec-based API
-      // MODIFIER_CONDITIONS registry system likely needs complete reimplementation
-      /*
-       * MODIFIER_CONDITIONS.registerDeserializer(InvertedModifierLootCondition.ID,
-       * (JsonDeserializer<? extends ILootModifierCondition>)
-       * InvertedModifierLootCondition::deserialize);
-       * MODIFIER_CONDITIONS.registerDeserializer(EmptyModifierLootCondition.ID,
-       * EmptyModifierLootCondition.INSTANCE);
-       * MODIFIER_CONDITIONS.registerDeserializer(ContainsItemModifierLootCondition.
-       * ID,
-       * (JsonDeserializer<? extends ILootModifierCondition>)
-       * ContainsItemModifierLootCondition::deserialize);
-       */
+      @SuppressWarnings("unchecked")
+      Registry<com.mojang.serialization.MapCodec<? extends net.neoforged.neoforge.common.loot.IGlobalLootModifier>> modifierRegistry =
+          (Registry<com.mojang.serialization.MapCodec<? extends net.neoforged.neoforge.common.loot.IGlobalLootModifier>>) Objects.requireNonNull(event.getRegistry());
+      Registry.register(modifierRegistry, Mantle.getResource("add_entry"), AddEntryLootModifier.CODEC);
+      Registry.register(modifierRegistry, Mantle.getResource("replace_item"), ReplaceItemLootModifier.CODEC);
     } else if (key == Registries.LOOT_FUNCTION_TYPE) {
       RETEXTURED_FUNCTION = registerFunction("fill_retextured_block", RetexturedLootFunction.CODEC);
       SET_FLUID_FUNCTION = registerFunction("set_fluid", SetFluidLootFunction.CODEC);
