@@ -1,6 +1,6 @@
 # Mantle 1.21.1 Migration TODO List
 
-**Migration Status:** Phase 1 Complete — Zero Compilation Errors  
+**Migration Status:** Phase 1–8 Complete — Zero Compilation Errors, Most APIs Functional  
 **Target Version:** Minecraft 1.21.1 / NeoForge 21.1.85  
 **Current Errors:** 0 compilation errors  
 **Date:** 2026-06-06
@@ -383,21 +383,49 @@
 
 ## 📊 Progress Summary
 
-**Completed:**
-- Basic project structure updated (gradle.properties, mods.toml → neoforge.mods.toml)
-- DeferredHolder/Registry API adapted
-- BaseFlowingFluid stubs created
-- ResourceLocation usages identified and many worked around
-- Created migration branch and pushed to remote
+**Completed (Phases 1–8):**
+- Zero compilation errors throughout
+- IUnbakedGeometry/model baking API fully migrated  
+- BlockElementFace record accessor methods
+- QuadBakingVertexConsumer, FaceBakery API
+- Config registration via `ModContainer.registerConfig()`
+- Recipe serializers: `LoadableRecipeSerializer.codec()`, `SimpleRecipeSerializer.codec()/streamCodec()`
+- `ShapedRetexturedRecipe` and `ShapedFallbackRecipe` codec/streamCodec
+- `ShapedFallbackRecipe.Serializer` implements `RecipeSerializer<ShapedFallbackRecipe>` directly
+- Cooking recipes: correct `assemble(SingleRecipeInput, HolderLookup.Provider)` and `getResultItem(HolderLookup.Provider)` signatures
+- `ICommonRecipe` and `ICustomOutputRecipe` correct interface method signatures
+- Loot modifier codecs: `AddEntryLootModifier`, `ReplaceItemLootModifier` proper `MapCodec`
+- Loot function codecs: `SetFluidLootFunction`, `RetexturedLootFunction` via `commonFields()`
+- Loot entry codec: `TagPreferenceLootEntry` via `singletonFields()`
+- Loot condition registration via `CONDITION_CODECS` registry
+- Recipe condition codecs: TagEmpty, TagFilled, TagCombination registered properly
+- `ConditionSerializer`: uses `ICondition.CODEC`
+- `HasEnchantmentEntityPredicate`: redesigned to use `ResourceKey<Enchantment>` for datapack registry compat
+- `MantleCodecs.LOOT_ENTRY` and `LOOT_FUNCTIONS` re-enabled with native 1.21.1 codecs
+- `FluidContainerTransferPacket` proper item registry serialization
+- `BucketItem.getFluid()` replaced with `FluidUtil.getFluidContained()`
+- `InvertedFluid.spreadToSides()` properly implemented using `getSpread()`
+- `SingleItemHandler.writeToNBT/readFromNBT` with `HolderLookup.Provider` overloads
+- `EdibleItem.appendHoverText` with `FoodProperties.effects()` API
+- `CodecLoadable` encode/decode via NBT buffer
+- AttributeModifier.Operation.ADDITION → ADD_VALUE
+- BookScreen fixed (mouseScrolled, AdvancementCache, fontManager reflection)
+- CombatHelper: CriticalHitEvent, attribute API, enchantment API
 
-**In Progress:**
-- Core API compilation errors (100 remaining)
-- Config/Command registration research
+**Still Disabled / Stubs (Phase 9+ / Data Component Migration):**
+- LootTableInjector, LootTableInjection, AbstractLootTableInjectionProvider — entire loot injection system needs rework
+- HasLootContextSetCondition — `LootContextParamSets` was entirely removed
+- `EmptyFluidWithNBTTransfer`, `FillFluidWithNBTTransfer` — FluidStack NBT removed, need data component migration
+- `EmptyPotionTransfer` partial (stack.getTag() usage)  
+- `ItemStackLoadable.NBTStack`, `FluidStackLoadable` NBT variants — data component migration needed
+- `SingleItemHandler.readFromNBT()` (no-arg) — uses level.registryAccess() which may be null during load; use overload with explicit registries
+- Some client book structure (FakeLevelData, TemplateLevel) — client-side rendering API changes
+- MobCategory.UNDEAD/ARTHROPOD — removed, need entity tag-based replacement
+- NeoForgeRegistries.COMMAND_ARGUMENT_TYPES — workaround in place (ArgumentTypeInfos.registerByClass)
+- LoadableIngredientSerializer — deprecated and removed; callers need IngredientType with MapCodec
 
-**Not Started:**
-- Data Components migration
-- Recipe codec migration
-- Client rendering updates
+**Last Updated:** 2026-06-06  
+**Next Steps:** Phase 9 — NBT → Data Components migration, LootTableInjector
 - Advanced features (InvertedFluid, JEI)
 
 **Estimated Completion:** Requires additional research and significant refactoring effort for NBT → Data Components migration.
