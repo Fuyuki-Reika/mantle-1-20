@@ -44,6 +44,13 @@ public class ShapedFallbackRecipe extends ShapedRecipe {
    * @param output       Recipe output
    * @param alternatives List of recipe names to fail this match if they match
    */
+  /** Creates a recipe from codec fields (pattern-based) */
+  public ShapedFallbackRecipe(String group, CraftingBookCategory category, ShapedRecipePattern pattern,
+      ItemStack output, List<ResourceLocation> alternatives) {
+    super(group, category, pattern, output);
+    this.alternatives = alternatives;
+  }
+
   // TODO 1.21.1: ShapedRecipe constructor now uses ShapedRecipePattern instead of
   // individual parameters
   public ShapedFallbackRecipe(ResourceLocation id, String group, CraftingBookCategory category, int width, int height,
@@ -113,21 +120,49 @@ public class ShapedFallbackRecipe extends ShapedRecipe {
     return MantleRecipes.CRAFTING_SHAPED_FALLBACK.get();
   }
 
-  public static class Serializer extends ShapedRecipe.Serializer {
-    // fromJson, fromNetwork, toNetwork are replaced by codec()/streamCodec() in
-    // 1.21.1
-    // These are kept as named methods for reference but are no longer called by the
-    // recipe system.
-    // TODO 1.21.1: Override codec() and streamCodec() to properly handle
-    // ShapedFallbackRecipe serialization.
+  public static class Serializer implements net.minecraft.world.item.crafting.RecipeSerializer<ShapedFallbackRecipe> {
+    private static final ShapedRecipe.Serializer BASE = new ShapedRecipe.Serializer();
+
+    @Override
+    public com.mojang.serialization.MapCodec<ShapedFallbackRecipe> codec() {
+      return com.mojang.serialization.codecs.RecordCodecBuilder.mapCodec(inst -> inst.group(
+          com.mojang.serialization.Codec.STRING.optionalFieldOf("group", "").forGetter(ShapedRecipe::getGroup),
+          net.minecraft.world.item.crafting.CraftingBookCategory.CODEC.fieldOf("category")
+              .forGetter(ShapedRecipe::category),
+          net.minecraft.world.item.crafting.ShapedRecipePattern.MAP_CODEC.forGetter(r -> r.pattern),
+          net.minecraft.world.item.ItemStack.STRICT_CODEC.fieldOf("result")
+              .forGetter(r -> r.getResultItem(emptyProvider())),
+          com.mojang.serialization.Codec.BOOL.optionalFieldOf("show_notification", true)
+              .forGetter(ShapedRecipe::showNotification),
+          ResourceLocation.CODEC.listOf().fieldOf("alternatives").forGetter(r -> r.alternatives)
+      ).apply(inst, (group, category, pattern, result, showNotification, alternatives) ->
+          new ShapedFallbackRecipe(group, category, pattern, result, alternatives)));
+    }
+
+    @Override
+    public net.minecraft.network.codec.StreamCodec<RegistryFriendlyByteBuf, ShapedFallbackRecipe> streamCodec() {
+      return net.minecraft.network.codec.StreamCodec.of(
+          (buf, recipe) -> {
+            BASE.streamCodec().encode(buf, recipe);
+            buf.writeVarInt(recipe.alternatives.size());
+            for (ResourceLocation alt : recipe.alternatives) buf.writeResourceLocation(alt);
+          },
+          buf -> {
+            ShapedRecipe base = BASE.streamCodec().decode(buf);
+            int size = buf.readVarInt();
+            List<ResourceLocation> alts = new ArrayList<>(size);
+            for (int i = 0; i < size; i++) alts.add(buf.readResourceLocation());
+            return new ShapedFallbackRecipe(base, List.copyOf(alts));
+          });
+    }
     public ShapedFallbackRecipe fromJsonFallback(ResourceLocation id, JsonObject json) {
-      ShapedRecipe base = super.codec().codec().parse(com.mojang.serialization.JsonOps.INSTANCE, json).getOrThrow();
+      ShapedRecipe base = BASE.codec().codec().parse(com.mojang.serialization.JsonOps.INSTANCE, json).getOrThrow();
       List<ResourceLocation> alternatives = JsonHelper.parseList(json, "alternatives", Loadables.RESOURCE_LOCATION);
       return new ShapedFallbackRecipe(base, alternatives);
     }
 
     public ShapedFallbackRecipe fromNetworkFallback(ResourceLocation id, RegistryFriendlyByteBuf buffer) {
-      ShapedRecipe base = super.streamCodec().decode(buffer);
+      ShapedRecipe base = BASE.streamCodec().decode(buffer);
       int size = buffer.readVarInt();
       List<ResourceLocation> builder = new ArrayList<>(size);
       for (int i = 0; i < size; i++) {
@@ -138,7 +173,7 @@ public class ShapedFallbackRecipe extends ShapedRecipe {
 
     public void toNetworkFallback(RegistryFriendlyByteBuf buffer, ShapedRecipe recipe) {
       // write base recipe
-      super.streamCodec().encode(buffer, recipe);
+      BASE.streamCodec().encode(buffer, recipe);
       // write extra data
       assert recipe instanceof ShapedFallbackRecipe;
       List<ResourceLocation> alternatives = ((ShapedFallbackRecipe) recipe).alternatives;

@@ -141,14 +141,8 @@ public class Mantle {
   private void register(RegisterEvent event) {
     ResourceKey<?> key = event.getRegistryKey();
     if (key == Registries.RECIPE_SERIALIZER) {
-      // TODO 1.21.1: CraftingHelper.register() for conditions may be removed -
-      // conditions now use codec() approach
-      // CraftingHelper.register(TagEmptyCondition.SERIALIZER.getID(),
-      // TagEmptyCondition.SERIALIZER);
-      // CraftingHelper.register(TagFilledCondition.SERIALIZER.getID(),
-      // TagFilledCondition.SERIALIZER);
-      // CraftingHelper.register(TagCombinationCondition.SERIALIZER.getID(),
-      // TagCombinationCondition.SERIALIZER);
+      // Recipe conditions now registered via CONDITION_CODECS in NeoForge 1.21.1
+      // (see else-if branch below)
 
       // fluid container transfer
       FluidContainerTransferManager.TRANSFER_LOADERS.registerDeserializer(EmptyFluidContainerTransfer.ID,
@@ -247,6 +241,14 @@ public class Mantle {
       // NeoForgeRegistries.COMMAND_ARGUMENT_TYPES.register(getResource("resource_or_tag_key"),
       // info);
       ArgumentTypeInfos.registerByClass(RegistrationHelper.genericArgumentType(ResourceOrTagKeyArgument.class), info);
+    } else if (key == NeoForgeRegistries.Keys.CONDITION_CODECS) {
+      // Register tag-based recipe conditions in the NeoForge 1.21.1 condition codec registry
+      @SuppressWarnings("unchecked")
+      net.minecraft.core.Registry<com.mojang.serialization.MapCodec<? extends net.neoforged.neoforge.common.conditions.ICondition>> conditionRegistry =
+          (net.minecraft.core.Registry<com.mojang.serialization.MapCodec<? extends net.neoforged.neoforge.common.conditions.ICondition>>) java.util.Objects.requireNonNull(event.getRegistry());
+      net.minecraft.core.Registry.register(conditionRegistry, TagEmptyCondition.SERIALIZER.getID(), TagEmptyCondition.SERIALIZER.codec());
+      net.minecraft.core.Registry.register(conditionRegistry, TagFilledCondition.SERIALIZER.getID(), TagFilledCondition.SERIALIZER.codec());
+      net.minecraft.core.Registry.register(conditionRegistry, TagCombinationCondition.SERIALIZER.getID(), TagCombinationCondition.SERIALIZER.codec());
     } else {
       MantleLoot.registerGlobalLootModifiers(event);
     }

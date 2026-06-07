@@ -44,6 +44,16 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
   private final boolean matchAll;
 
   /** Creates a new recipe using the passed parameters */
+  protected ShapedRetexturedRecipe(String group, CraftingBookCategory category, int width,
+      int height, NonNullList<Ingredient> ingredients, ItemStack result, boolean showNotification, Ingredient texture,
+      boolean matchAll) {
+    super(group, category, new ShapedRecipePattern(width, height, ingredients, java.util.Optional.empty()), result,
+        showNotification);
+    this.texture = texture;
+    this.matchAll = matchAll;
+  }
+
+  /** Creates a new recipe using the passed parameters (with ResourceLocation id for legacy compat) */
   protected ShapedRetexturedRecipe(ResourceLocation id, String group, CraftingBookCategory category, int width,
       int height, NonNullList<Ingredient> ingredients, ItemStack result, boolean showNotification, Ingredient texture,
       boolean matchAll) {
@@ -129,14 +139,26 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
   public static class Serializer implements LoggingRecipeSerializer<ShapedRetexturedRecipe> {
     @Override
     public com.mojang.serialization.MapCodec<ShapedRetexturedRecipe> codec() {
-      // TODO 1.21.1: Implement proper MapCodec for ShapedRetexturedRecipe
-      throw new UnsupportedOperationException("TODO 1.21.1: ShapedRetexturedRecipe codec not yet implemented");
+      return com.mojang.serialization.codecs.RecordCodecBuilder.mapCodec(inst -> inst.group(
+          com.mojang.serialization.Codec.STRING.optionalFieldOf("group", "").forGetter(ShapedRecipe::getGroup),
+          net.minecraft.world.item.crafting.CraftingBookCategory.CODEC.fieldOf("category")
+              .forGetter(ShapedRecipe::category),
+          net.minecraft.world.item.crafting.ShapedRecipePattern.MAP_CODEC.forGetter(r -> r.pattern),
+          net.minecraft.world.item.ItemStack.STRICT_CODEC.fieldOf("result")
+              .forGetter(r -> r.getResultItem(ShapedFallbackRecipe.emptyProvider())),
+          com.mojang.serialization.Codec.BOOL.optionalFieldOf("show_notification", true)
+              .forGetter(ShapedRecipe::showNotification),
+          Ingredient.CODEC_NONEMPTY.fieldOf("texture").forGetter(ShapedRetexturedRecipe::getTexture),
+          com.mojang.serialization.Codec.BOOL.optionalFieldOf("match_all", false)
+              .forGetter(r -> r.matchAll)
+      ).apply(inst, (group, category, pattern, result, showNotification, texture, matchAll) ->
+          new ShapedRetexturedRecipe(group, category, pattern.width(), pattern.height(),
+              pattern.ingredients(), result, showNotification, texture, matchAll)));
     }
 
     @Override
     public net.minecraft.network.codec.StreamCodec<RegistryFriendlyByteBuf, ShapedRetexturedRecipe> streamCodec() {
-      // TODO 1.21.1: Implement proper StreamCodec for ShapedRetexturedRecipe
-      throw new UnsupportedOperationException("TODO 1.21.1: ShapedRetexturedRecipe streamCodec not yet implemented");
+      return net.minecraft.network.codec.StreamCodec.of(this::toNetworkSafe, this::fromNetworkSafe);
     }
 
     @Override
