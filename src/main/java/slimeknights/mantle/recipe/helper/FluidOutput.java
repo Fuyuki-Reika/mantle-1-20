@@ -194,9 +194,12 @@ public abstract class FluidOutput implements Supplier<FluidStack> {
 
     @Override
     public void serialize(JsonObject json) {
-      // TODO 1.21.1: OPTIONAL_STACK_NBT removed, using OPTIONAL_STACK (NBT migration
-      // needed)
-      FluidStackLoadable.OPTIONAL_STACK.serialize(stack, json);
+      // Use NBT-aware loadable when the stack has component data
+      if (stack.isComponentsPatchEmpty()) {
+        FluidStackLoadable.OPTIONAL_STACK.serialize(stack, json);
+      } else {
+        FluidStackLoadable.OPTIONAL_STACK_NBT.serialize(stack, json);
+      }
     }
   }
 
@@ -225,9 +228,12 @@ public abstract class FluidOutput implements Supplier<FluidStack> {
         if (preference.isEmpty()) {
           return FluidStack.EMPTY;
         }
-        // TODO 1.21.1: FluidStack(Fluid, int, CompoundTag) removed - using simple
-        // constructor (NBT migration needed)
         cachedResult = new FluidStack(preference.orElseThrow(), amount);
+        // Apply NBT as CustomData component (replaces removed FluidStack(Fluid, int, CompoundTag))
+        if (nbt != null && !nbt.isEmpty()) {
+          cachedResult.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+              net.minecraft.world.item.component.CustomData.of(nbt.copy()));
+        }
       }
       return cachedResult;
     }
@@ -256,12 +262,11 @@ public abstract class FluidOutput implements Supplier<FluidStack> {
 
     Loadable(boolean nonEmpty) {
       this.nonEmpty = nonEmpty;
-      // TODO 1.21.1: REQUIRED_STACK_NBT and OPTIONAL_STACK_NBT removed, using non-NBT
-      // versions
+      // Use NBT-aware loadables to support CustomData component on FluidStacks
       if (nonEmpty) {
-        this.stack = FluidStackLoadable.REQUIRED_STACK;
+        this.stack = FluidStackLoadable.REQUIRED_STACK_NBT;
       } else {
-        this.stack = FluidStackLoadable.OPTIONAL_STACK;
+        this.stack = FluidStackLoadable.OPTIONAL_STACK_NBT;
       }
     }
 

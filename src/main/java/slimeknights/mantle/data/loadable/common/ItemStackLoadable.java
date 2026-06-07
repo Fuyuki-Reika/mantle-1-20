@@ -3,11 +3,13 @@ package slimeknights.mantle.data.loadable.common;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.netty.handler.codec.EncoderException;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
 import slimeknights.mantle.data.loadable.ErrorFactory;
 import slimeknights.mantle.data.loadable.Loadable;
 import slimeknights.mantle.data.loadable.Loadables;
@@ -36,6 +38,15 @@ public class ItemStackLoadable {
     }
     return stack;
   };
+  /**
+   * Gets the CustomData tag from a stack, or null if absent/empty.
+   * Replaces the removed ItemStack.getTag().
+   */
+  @Nullable
+  private static CompoundTag getCustomDataTag(ItemStack stack) {
+    CustomData data = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+    return data.isEmpty() ? null : data.copyTag();
+  }
 
   /* fields */
   /** Field for an optional item */
@@ -44,11 +55,13 @@ public class ItemStackLoadable {
   /** Field for item stack count that allows empty */
   private static final LoadableField<Integer, ItemStack> COUNT = IntLoadable.FROM_ZERO.defaultField("count", 1, true,
       ItemStack::getCount);
-  // TODO 1.21.1: ItemStack.getTag() removed - NBT field temporarily disabled
-  // Data component migration needed - ItemStack no longer supports CompoundTag
-  // NBT
-  // private static final LoadableField<CompoundTag,ItemStack> NBT =
-  // NBTLoadable.ALLOW_STRING.nullableField("nbt", ItemStack::getTag);
+  /**
+   * NBT field using CustomData component — reads/writes "nbt" key as a CompoundTag.
+   * On serialize: extracts CustomData component as CompoundTag.
+   * On deserialize: applied via CustomData.of(tag) into DataComponents.CUSTOM_DATA.
+   */
+  private static final LoadableField<CompoundTag, ItemStack> NBT =
+      NBTLoadable.ALLOW_STRING.nullableField("nbt", ItemStackLoadable::getCustomDataTag);
 
   /* Optional */
   /** Single item which may be empty with a count of 1 */
@@ -58,28 +71,20 @@ public class ItemStackLoadable {
   public static final RecordLoadable<ItemStack> OPTIONAL_STACK = RecordLoadable
       .create(ITEM, COUNT, ItemStackLoadable::makeStack)
       .compact(OPTIONAL_ITEM, stack -> stack.getCount() == 1);
-  // TODO 1.21.1: NBT-based loadables disabled until data component migration
-  // complete
-  /** Loadable for a stack that may be empty with NBT and a count of 1 */
-  // public static final RecordLoadable<ItemStack> OPTIONAL_ITEM_NBT =
-  // NBTStack.FIXED_COUNT;
-  /** Loadable for a stack that may be empty with variable count and NBT */
-  // public static final RecordLoadable<ItemStack> OPTIONAL_STACK_NBT =
-  // NBTStack.READ_COUNT;
+  /** Loadable for a stack that may be empty with CustomData (NBT equivalent) and a count of 1 */
+  public static final RecordLoadable<ItemStack> OPTIONAL_ITEM_NBT = NBTStack.FIXED_COUNT;
+  /** Loadable for a stack that may be empty with variable count and CustomData */
+  public static final RecordLoadable<ItemStack> OPTIONAL_STACK_NBT = NBTStack.READ_COUNT;
 
   /* Required */
   /** Single item which may not be empty with a count of 1 */
   public static final Loadable<ItemStack> REQUIRED_ITEM = notEmpty(OPTIONAL_ITEM);
   /** Loadable for a stack that may not be empty with variable count */
   public static final RecordLoadable<ItemStack> REQUIRED_STACK = notEmpty(OPTIONAL_STACK);
-  // TODO 1.21.1: NBT-based loadables disabled until data component migration
-  // complete
-  /** Loadable for a stack that may not be empty with NBT and a count of 1 */
-  // public static final RecordLoadable<ItemStack> REQUIRED_ITEM_NBT =
-  // notEmpty(OPTIONAL_ITEM_NBT);
-  /** Loadable for a stack that may not be empty with variable count and NBT */
-  // public static final RecordLoadable<ItemStack> REQUIRED_STACK_NBT =
-  // notEmpty(OPTIONAL_STACK_NBT);
+  /** Loadable for a stack that may not be empty with CustomData (NBT equivalent) and a count of 1 */
+  public static final RecordLoadable<ItemStack> REQUIRED_ITEM_NBT = notEmpty(OPTIONAL_ITEM_NBT);
+  /** Loadable for a stack that may not be empty with variable count and CustomData */
+  public static final RecordLoadable<ItemStack> REQUIRED_STACK_NBT = notEmpty(OPTIONAL_STACK_NBT);
 
   /* Helpers */
 
@@ -88,8 +93,22 @@ public class ItemStackLoadable {
     if (item == Items.AIR || count == 0) {
       return ItemStack.EMPTY;
     }
-    // TODO 1.21.1: ItemStack no longer supports setTag() - data components required
     return new ItemStack(item, count);
+  }
+
+  /**
+   * Makes an item stack from item, count and optional NBT tag.
+   * The tag is stored as CustomData component (replaces removed ItemStack.setTag).
+   */
+  private static ItemStack makeStack(Item item, int count, @Nullable CompoundTag nbt) {
+    if (item == Items.AIR || count == 0) {
+      return ItemStack.EMPTY;
+    }
+    ItemStack stack = new ItemStack(item, count);
+    if (nbt != null && !nbt.isEmpty()) {
+      stack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
+    }
+    return stack;
   }
 
   /** Creates a non-empty variant of the loadable */
@@ -102,94 +121,77 @@ public class ItemStackLoadable {
     return loadable.validate(NOT_EMPTY);
   }
 
-  // TODO 1.21.1: NBTStack enum disabled - uses removed NBT methods (hasTag,
-  // readShareTag, getShareTag)
-  // Data component migration needed
-  /*
-   * /** Loadable for an item stack with NBT, requires special logic due to forges
-   * share tags
-   *//*
-      * private enum NBTStack implements RecordLoadable<ItemStack> {
-      * /** Reads count from JSON
-      *//*
-         * READ_COUNT,
-         * /** Count is always 1
-         *//*
-            * FIXED_COUNT;
-            * 
-            * 
-            * /* General JSON
-            *//*
-               * 
-               * @Override
-               * public ItemStack deserialize(JsonObject json, TypedMap context) {
-               * int count = 1;
-               * if (this == READ_COUNT) {
-               * count = COUNT.get(json, context);
-               * }
-               * return makeStack(ITEM.get(json, context), count, NBT.get(json, context));
-               * }
-               * 
-               * @Override
-               * public void serialize(ItemStack stack, JsonObject json) {
-               * ITEM.serialize(stack, json);
-               * if (this == READ_COUNT) {
-               * COUNT.serialize(stack, json);
-               * }
-               * NBT.serialize(stack, json);
-               * }
-               * 
-               * 
-               * /* Compact JSON
-               *//*
-                  * 
-                  * @Override
-                  * public ItemStack convert(JsonElement element, String key, TypedMap context) {
-                  * if (element.isJsonPrimitive()) {
-                  * return OPTIONAL_ITEM.convert(element, key, context);
-                  * }
-                  * return RecordLoadable.super.convert(element, key, context);
-                  * }
-                  * 
-                  * @Override
-                  * public JsonElement serialize(ItemStack stack) {
-                  * if ((this == FIXED_COUNT || stack.getCount() == 1) && !stack.hasTag()) {
-                  * return OPTIONAL_ITEM.serialize(stack);
-                  * }
-                  * return RecordLoadable.super.serialize(stack);
-                  * }
-                  * 
-                  * 
-                  * /* Buffer
-                  *//*
-                     * 
-                     * @Override
-                     * public ItemStack decode(FriendlyByteBuf buffer, TypedMap context) {
-                     * // not using makeItemStack as we need to set the share tag NBT here
-                     * Item item = ITEM.decode(buffer, context);
-                     * int count = 1;
-                     * if (this == READ_COUNT) {
-                     * count = COUNT.decode(buffer, context);
-                     * }
-                     * CompoundTag nbt = buffer.readNbt();
-                     * // not using make stack because we want to set share tag
-                     * if (item == Items.AIR || count <= 0) {
-                     * return ItemStack.EMPTY;
-                     * }
-                     * ItemStack stack = new ItemStack(item, count);
-                     * stack.readShareTag(nbt);
-                     * return stack;
-                     * }
-                     * 
-                     * @Override
-                     * public void encode(FriendlyByteBuf buffer, ItemStack stack) throws
-                     * EncoderException {
-                     * ITEM.encode(buffer, stack);
-                     * if (this == READ_COUNT) {
-                     * COUNT.encode(buffer, stack);
-                     * }
-                     * buffer.writeNbt(stack.getShareTag());
-                     * }
-                     * }
-                     */
+  /**
+   * Loadable for an item stack with CustomData (replacing the old NBT share-tag system).
+   * Reads/writes "nbt" as a JSON object or SNBT string. On the network, serializes via
+   * buffer.readNbt() / buffer.writeNbt(), matching legacy behaviour.
+   */
+  private enum NBTStack implements RecordLoadable<ItemStack> {
+    /** Reads count from JSON */
+    READ_COUNT,
+    /** Count is always 1 */
+    FIXED_COUNT;
+
+    /* General JSON */
+
+    @Override
+    public ItemStack deserialize(JsonObject json, TypedMap context) {
+      int count = 1;
+      if (this == READ_COUNT) {
+        count = COUNT.get(json, context);
+      }
+      return makeStack(ITEM.get(json, context), count, NBT.get(json, context));
+    }
+
+    @Override
+    public void serialize(ItemStack stack, JsonObject json) {
+      ITEM.serialize(stack, json);
+      if (this == READ_COUNT) {
+        COUNT.serialize(stack, json);
+      }
+      NBT.serialize(stack, json);
+    }
+
+    /* Compact JSON — falls back to primitive (item-only) when no NBT and count == 1 */
+
+    @Override
+    public ItemStack convert(JsonElement element, String key, TypedMap context) {
+      if (element.isJsonPrimitive()) {
+        return OPTIONAL_ITEM.convert(element, key, context);
+      }
+      return RecordLoadable.super.convert(element, key, context);
+    }
+
+    @Override
+    public JsonElement serialize(ItemStack stack) {
+      if ((this == FIXED_COUNT || stack.getCount() == 1) && getCustomDataTag(stack) == null) {
+        return OPTIONAL_ITEM.serialize(stack);
+      }
+      return RecordLoadable.super.serialize(stack);
+    }
+
+    /* Buffer */
+
+    @Override
+    public ItemStack decode(FriendlyByteBuf buffer, TypedMap context) {
+      Item item = ITEM.decode(buffer, context);
+      int count = 1;
+      if (this == READ_COUNT) {
+        count = COUNT.decode(buffer, context);
+      }
+      // Read NBT as CompoundTag (was share tag in legacy code)
+      CompoundTag nbt = buffer.readNbt();
+      return makeStack(item, count, nbt);
+    }
+
+    @Override
+    public void encode(FriendlyByteBuf buffer, ItemStack stack) throws EncoderException {
+      ITEM.encode(buffer, stack);
+      if (this == READ_COUNT) {
+        COUNT.encode(buffer, stack);
+      }
+      // Write CustomData as CompoundTag on the buffer
+      buffer.writeNbt(getCustomDataTag(stack));
+    }
+  }
 }

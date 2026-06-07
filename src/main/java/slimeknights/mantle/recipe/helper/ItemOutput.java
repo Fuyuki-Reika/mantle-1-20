@@ -221,8 +221,17 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
     @Override
     public JsonElement serialize(boolean writeCount) {
-      // TODO 1.21.1: NBT loadables disabled - use non-NBT versions
-      // ItemStackLoadable.OPTIONAL_STACK_NBT and OPTIONAL_ITEM_NBT no longer exist
+      // Use NBT-aware loadable when the stack has CustomData, plain otherwise
+      net.minecraft.world.item.component.CustomData customData =
+          stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+              net.minecraft.world.item.component.CustomData.EMPTY);
+      if (!customData.isEmpty()) {
+        // Stack has custom data — use NBT-aware serialization
+        if (writeCount) {
+          return ItemStackLoadable.OPTIONAL_STACK_NBT.serialize(stack);
+        }
+        return ItemStackLoadable.OPTIONAL_ITEM_NBT.serialize(stack);
+      }
       if (writeCount) {
         return ItemStackLoadable.OPTIONAL_STACK.serialize(stack);
       }
@@ -256,11 +265,11 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
           return ItemStack.EMPTY;
         }
         cachedResult = new ItemStack(preference.orElseThrow(), count);
-        // TODO 1.21.1: ItemStack.setTag() removed - data components required
-        // Data component migration needed - commented out NBT application temporarily
-        // if (nbt != null) {
-        // cachedResult.setTag(nbt.copy());
-        // }
+        // Apply NBT as CustomData component (replaces removed ItemStack.setTag)
+        if (nbt != null && !nbt.isEmpty()) {
+          cachedResult.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+              net.minecraft.world.item.component.CustomData.of(nbt.copy()));
+        }
       }
       return cachedResult;
     }
@@ -301,13 +310,11 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
     Loadable(boolean nonEmpty, boolean readCount) {
       this.nonEmpty = nonEmpty;
       this.readCount = readCount;
-      // TODO 1.21.1: NBT-based loadables disabled - use non-NBT versions
-      // ItemStackLoadable REQUIRED/OPTIONAL_STACK/ITEM_NBT no longer exist
-      // figure out the stack serializer to use based on the two parameters
+      // Use NBT-aware loadables to support CustomData component on ItemStacks
       if (nonEmpty) {
-        this.stack = readCount ? ItemStackLoadable.REQUIRED_STACK : ItemStackLoadable.REQUIRED_ITEM;
+        this.stack = readCount ? ItemStackLoadable.REQUIRED_STACK_NBT : ItemStackLoadable.REQUIRED_ITEM_NBT;
       } else {
-        this.stack = readCount ? ItemStackLoadable.OPTIONAL_STACK : ItemStackLoadable.OPTIONAL_ITEM;
+        this.stack = readCount ? ItemStackLoadable.OPTIONAL_STACK_NBT : ItemStackLoadable.OPTIONAL_ITEM_NBT;
       }
     }
 
