@@ -6,8 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import net.minecraft.util.GsonHelper;
-import net.neoforged.neoforge.common.crafting.CraftingHelper;
+import com.mojang.serialization.JsonOps;
 import net.neoforged.neoforge.common.conditions.ICondition;
 
 import java.lang.reflect.Type;
@@ -22,18 +21,13 @@ public class ConditionSerializer implements JsonDeserializer<ICondition>, JsonSe
   @Override
   public ICondition deserialize(JsonElement json, Type type, JsonDeserializationContext context)
       throws JsonParseException {
-    // TODO 1.21.1: CraftingHelper.getCondition removed
-    throw new UnsupportedOperationException(
-        "ConditionSerializer.deserialize temporarily disabled - CraftingHelper.getCondition removed");
-    // return CraftingHelper.getCondition(GsonHelper.convertToJsonObject(json,
-    // "condition"));
+    return ICondition.CODEC.parse(JsonOps.INSTANCE, json)
+        .mapError(e -> "Failed to deserialize condition: " + e)
+        .getOrThrow();
   }
 
   @Override
   public JsonElement serialize(ICondition condition, Type type, JsonSerializationContext context) {
-    // TODO 1.21.1: CraftingHelper.serialize removed
-    throw new UnsupportedOperationException(
-        "ConditionSerializer.serialize temporarily disabled - CraftingHelper.serialize removed");
-    // return CraftingHelper.serialize(condition);
+    return ICondition.CODEC.encodeStart(JsonOps.INSTANCE, condition).getOrThrow();
   }
 }
