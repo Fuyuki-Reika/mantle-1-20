@@ -24,36 +24,11 @@ import java.util.stream.Stream;
 
 /**
  * JEI crafting extension to properly show, animate, and focus
- * {@link ShapedRetexturedRecipe} instances
+ * {@link ShapedRetexturedRecipe} instances.
+ * Stateless — all recipe data is extracted from the RecipeHolder in
+ * setRecipe().
  */
-public class RetexturableRecipeExtension implements ICraftingCategoryExtension {
-  /** Actual recipe instance */
-  private final ShapedRetexturedRecipe recipe;
-  /** List of all textured variants, fallback for JEI display */
-  private final List<ItemStack> displayOutputs;
-  /** Ingredient indexes of all texture slots */
-  private final int[] textureSlots;
-
-  RetexturableRecipeExtension(ShapedRetexturedRecipe recipe) {
-    this.recipe = recipe;
-
-    // set the output to display all variants from the texture ingredient
-    Ingredient texture = recipe.getTexture();
-    // fetch all stacks from the ingredient, note any variants that are not blocks
-    // will get a blank look
-    RegistryAccess access = Objects.requireNonNull(SafeClientAccess.getRegistryAccess());
-    List<ItemStack> displayOutputs = Arrays.stream(texture.getItems())
-        .map(stack -> recipe.getResultItem(stack.getItem(), access))
-        .toList();
-    // empty display means the tag found nothing, so just use the original output
-    this.displayOutputs = displayOutputs.isEmpty() ? List.of(this.recipe.getResultItem(access)) : displayOutputs;
-
-    // find out which inputs match the texture, we will need to use those for the
-    // focus link
-    List<Ingredient> inputs = recipe.getIngredients();
-    this.textureSlots = IntStream.range(0, inputs.size()).filter(i -> ingredientsMatch(texture, inputs.get(i)))
-        .toArray();
-  }
+public class RetexturableRecipeExtension implements ICraftingCategoryExtension<ShapedRetexturedRecipe> {
 
   /** Checks if two ingredients match based on their display items */
   private static boolean ingredientsMatch(Ingredient left, Ingredient right) {
@@ -63,8 +38,6 @@ public class RetexturableRecipeExtension implements ICraftingCategoryExtension {
       return false;
     }
     for (int i = 0; i < leftStacks.length; i++) {
-      // TODO 1.21.1: ItemStack.isSameItemSameTags() removed, using
-      // isSameItemSameComponents()
       if (!ItemStack.isSameItemSameComponents(leftStacks[i], rightStacks[i])) {
         return false;
       }
@@ -73,51 +46,62 @@ public class RetexturableRecipeExtension implements ICraftingCategoryExtension {
   }
 
   @Override
-  public ResourceLocation getRegistryName() {
-    // TODO 1.21.1: Recipe.getId() removed - JEI extension interface needs updating,
-    // disabling for now
-    return Mantle.getResource("retexturable_shaped");
+  public java.util.Optional<ResourceLocation> getRegistryName(
+      net.minecraft.world.item.crafting.RecipeHolder<ShapedRetexturedRecipe> holder) {
+    return java.util.Optional.of(holder.id());
   }
 
   @Override
-  public int getWidth() {
-    // TODO 1.21.1: ShapedRecipe API changed, disabling for now
-    return 3;
+  public int getWidth(net.minecraft.world.item.crafting.RecipeHolder<ShapedRetexturedRecipe> holder) {
+    return holder.value().getWidth();
   }
 
   @Override
-  public int getHeight() {
-    // TODO 1.21.1: ShapedRecipe API changed, disabling for now
-    return 3;
+  public int getHeight(net.minecraft.world.item.crafting.RecipeHolder<ShapedRetexturedRecipe> holder) {
+    return holder.value().getHeight();
   }
 
   @Override
-  public void setRecipe(IRecipeLayoutBuilder builder, ICraftingGridHelper craftingGridHelper, IFocusGroup focuses) {
-    // guiItemStacks.addTooltipCallback(this);
-    // we need the blank version for the sake of recipe lookup due to the subtype
-    // interpreter making it not the same
+  public void setRecipe(net.minecraft.world.item.crafting.RecipeHolder<ShapedRetexturedRecipe> holder,
+      IRecipeLayoutBuilder builder, ICraftingGridHelper craftingGridHelper, IFocusGroup focuses) {
+    ShapedRetexturedRecipe recipe = holder.value();
+    RegistryAccess access = Objects.requireNonNull(SafeClientAccess.getRegistryAccess());
+
+    // build display outputs from texture ingredient
+    Ingredient texture = recipe.getTexture();
+    List<ItemStack> displayOutputs = Arrays.stream(texture.getItems())
+        .map(stack -> recipe.getResultItem(stack.getItem(), access))
+        .toList();
+    if (displayOutputs.isEmpty()) {
+      displayOutputs = List.of(recipe.getResultItem(access));
+    }
+
+    // find texture slots
+    List<Ingredient> inputs = recipe.getIngredients();
+    int[] textureSlots = IntStream.range(0, inputs.size())
+        .filter(i -> ingredientsMatch(texture, inputs.get(i)))
+        .toArray();
+
+    // add invisible output for recipe lookup
     builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
-        .addItemStack(recipe.getResultItem(Objects.requireNonNull(SafeClientAccess.getRegistryAccess())));
+        .addItemStack(recipe.getResultItem(access));
 
-    // add the itemstacks to the grid
-    List<List<ItemStack>> inputStacks = recipe.getIngredients().stream()
-        .map(ingredient -> List.of(ingredient.getItems())).toList();
     int width = recipe.getWidth();
     int height = recipe.getHeight();
-    List<IRecipeSlotBuilder> inputs = craftingGridHelper.createAndSetInputs(builder, VanillaTypes.ITEM_STACK,
-        inputStacks, recipe.getWidth(), recipe.getHeight());
-    IRecipeSlotBuilder output = craftingGridHelper.createAndSetOutputs(builder, displayOutputs);
-    if (inputs.size() != 9) {
-      // TODO 1.21.1: Recipe.getId() removed, using getRegistryName() from interface
-      Mantle.logger.error("Failed to create focus link for {} as the layout {} is not 3x3", getRegistryName(),
-          builder.getClass().getName());
-    } else {
-      // link the output to all inputs that match the texture
+    List<List<ItemStack>> inputStacks = inputs.stream()
+        .map(ingredient -> List.of(ingredient.getItems())).toList();
+    List<IRecipeSlotBuilder> inputSlots = craftingGridHelper.createAndSetInputs(builder, VanillaTypes.ITEM_STACK,
+        inputStacks, width, height);
+    IRecipeSlotBuilder outputSlot = craftingGridHelper.createAndSetOutputs(builder, displayOutputs);
+    if (inputSlots.size() == 9) {
       builder.createFocusLink(Streams
-          .concat(Stream.of(output),
+          .concat(Stream.of(outputSlot),
               Arrays.stream(textureSlots)
-                  .mapToObj(i -> inputs.get(MantleJEIConstants.getCraftingIndex(i, width, height))))
+                  .mapToObj(i -> inputSlots.get(MantleJEIConstants.getCraftingIndex(i, width, height))))
           .toArray(IRecipeSlotBuilder[]::new));
+    } else {
+      Mantle.logger.error("Failed to create focus link for {} as the layout {} is not 3x3",
+          holder.id(), builder.getClass().getName());
     }
   }
 }

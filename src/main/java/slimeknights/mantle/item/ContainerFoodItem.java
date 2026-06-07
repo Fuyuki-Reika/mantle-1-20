@@ -44,29 +44,26 @@ public class ContainerFoodItem extends Item {
     return useAnim;
   }
 
-  /** Adds effects to the tooltip */
-  // TODO 1.21.1: FoodProperties.getEffects() removed,
-  // MobEffectUtil.formatDuration signature changed, MobEffect.getCategory()
-  // removed
-  // Need to migrate to new FoodProperties API for effects
+  /** Adds effects to the tooltip using 1.21.1 FoodProperties.effects() API */
   public static void addEffectTooltip(FoodProperties food, List<Component> tooltip) {
-    // add effects to the tooltip, code based on potion items
-    // Temporarily disabled - needs migration to new FoodProperties/MobEffect API
-    // for (Pair<MobEffectInstance, Float> pair : food.getEffects()) {
-    // MobEffectInstance effect = pair.getFirst();
-    // if (effect != null) {
-    // MutableComponent mutable = Component.translatable(effect.getDescriptionId());
-    // if (effect.getAmplifier() > 0) {
-    // mutable = Component.translatable("potion.withAmplifier", mutable,
-    // Component.translatable("potion.potency." + effect.getAmplifier()));
-    // }
-    // if (effect.getDuration() > 20) {
-    // mutable = Component.translatable("potion.withDuration", mutable,
-    // MobEffectUtil.formatDuration(effect, 1.0f));
-    // }
-    // tooltip.add(mutable.withStyle(effect.getEffect().getCategory().getTooltipFormatting()));
-    // }
-    // }
+    for (FoodProperties.PossibleEffect possible : food.effects()) {
+      net.minecraft.world.effect.MobEffectInstance effect = possible.effect();
+      if (effect != null) {
+        net.minecraft.network.chat.MutableComponent mutable = Component.translatable(effect.getDescriptionId());
+        if (effect.getAmplifier() > 0) {
+          mutable = Component.translatable("potion.withAmplifier", mutable,
+              Component.translatable("potion.potency." + effect.getAmplifier()));
+        }
+        if (effect.getDuration() > 20) {
+          mutable = Component.translatable("potion.withDuration", mutable,
+              net.minecraft.world.effect.MobEffectUtil.formatDuration(effect, 1.0f,
+                  net.minecraft.client.Minecraft.getInstance().level != null
+                      ? net.minecraft.client.Minecraft.getInstance().level.tickRateManager().tickrate()
+                      : 20f));
+        }
+        tooltip.add(mutable.withStyle(net.minecraft.ChatFormatting.BLUE));
+      }
+    }
   }
 
   @Override

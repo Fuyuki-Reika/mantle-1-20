@@ -81,7 +81,8 @@ public enum LootTableInjector implements IEarlyReloadListener {
     }
     // build final map
     injections = builders.entrySet().stream().map(e -> e.getValue().build(e.getKey()))
-        .collect(Collectors.<LootTableInjection, ResourceLocation, LootTableInjection>toUnmodifiableMap(LootTableInjection::name, Function.identity()));
+        .collect(Collectors.<LootTableInjection, ResourceLocation, LootTableInjection>toUnmodifiableMap(
+            LootTableInjection::name, Function.identity()));
     Mantle.logger.info("Loaded {} loot table injectors injecting into {} tables in {} ms",
         loaded, injections.size(), (System.nanoTime() - time) / 1000000f);
   }

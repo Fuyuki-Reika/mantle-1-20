@@ -33,10 +33,7 @@ public class JEIPlugin implements IModPlugin {
 
   @Override
   public void registerVanillaCategoryExtensions(IVanillaCategoryExtensionRegistration registry) {
-    // TODO 1.21.1: JEI API changed - addCategoryExtension() signature or method
-    // name changed, needs JEI documentation review
-    // registry.getCraftingCategory().addCategoryExtension(ShapedRetexturedRecipe.class,
-    // RetexturableRecipeExtension::new);
+    registry.getCraftingCategory().addExtension(ShapedRetexturedRecipe.class, new RetexturableRecipeExtension());
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
