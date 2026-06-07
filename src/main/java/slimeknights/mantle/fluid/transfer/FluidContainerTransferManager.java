@@ -97,14 +97,12 @@ public class FluidContainerTransferManager extends SimpleJsonResourceReloadListe
   @Nullable
   private IFluidContainerTransfer loadFluidTransfer(ResourceLocation key, JsonObject json) {
     try {
-      // TODO 1.21.1: CraftingHelper.processConditions() removed - condition
-      // processing needs new API
-      // Temporarily loading all transfers without condition checking
-      // if (!json.has("conditions")
-      // || CraftingHelper.processConditions(GsonHelper.getAsJsonArray(json,
-      // "conditions"), context)) {
+      // Use ICondition.conditionsMatched(JsonOps, json) to check conditions
+      if (json.has("conditions") && !net.neoforged.neoforge.common.conditions.ICondition.conditionsMatched(
+          com.mojang.serialization.JsonOps.INSTANCE, json)) {
+        return null;
+      }
       return GSON.fromJson(json, IFluidContainerTransfer.class);
-      // }
     } catch (JsonSyntaxException e) {
       log.error("Failed to load fluid container transfer info from {}", key, e);
     }
