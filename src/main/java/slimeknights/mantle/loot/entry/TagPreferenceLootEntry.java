@@ -32,27 +32,12 @@ public class TagPreferenceLootEntry extends LootPoolSingletonContainer {
     this.tag = tag;
   }
 
-  /** Codec for serialization/deserialization */
-  // TODO 1.21.1: CODEC disabled - parent class fields (weight, quality,
-  // conditions, functions) no longer accessible
-  // Loot entry serialization may have changed API pattern - needs
-  // reimplementation
-  public static final MapCodec<TagPreferenceLootEntry> CODEC = MapCodec.unit(() -> {
-    throw new UnsupportedOperationException(
-        "TagPreferenceLootEntry CODEC temporarily disabled - needs NeoForge 1.21.1 loot API migration");
-  });
-  /*
-   * public static final MapCodec<TagPreferenceLootEntry>CODEC =
-   * RecordCodecBuilder.mapCodec(instance -> instance.group(
-   * TagKey.codec(Registries.ITEM).fieldOf("tag").forGetter(e -> e.tag),
-   * Codec.INT.fieldOf("weight").forGetter(e -> e.weight),
-   * Codec.INT.fieldOf("quality").forGetter(e -> e.quality),
-   * LootItemCondition.DIRECT_CODEC.listOf().optionalFieldOf("conditions",
-   * List.of()).forGetter(e -> e.conditions),
-   * LootItemFunction.DIRECT_CODEC.listOf().optionalFieldOf("functions",
-   * List.of()).forGetter(e -> e.functions)
-   * ).apply(instance, TagPreferenceLootEntry::new));
-   */
+  /** Codec for serialization/deserialization using singletonFields() pattern */
+  public static final MapCodec<TagPreferenceLootEntry> CODEC = RecordCodecBuilder.mapCodec(instance ->
+      LootPoolSingletonContainer.singletonFields(instance).and(
+          TagKey.codec(Registries.ITEM).fieldOf("tag").forGetter(e -> e.tag)
+      ).apply(instance, (weight, quality, conditions, functions, tag) ->
+          new TagPreferenceLootEntry(tag, weight, quality, conditions, functions)));
 
   @Override
   public LootPoolEntryType getType() {
