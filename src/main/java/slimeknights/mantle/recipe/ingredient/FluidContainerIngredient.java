@@ -35,9 +35,6 @@ import java.util.stream.Stream;
 @SuppressWarnings("unused") // API
 public class FluidContainerIngredient implements ICustomIngredient {
   public static final ResourceLocation ID = Mantle.getResource("fluid_container");
-
-  // TODO 1.21.1: Loadable doesn't have codec() method - create custom MapCodec
-  // using Loadable's serialize/convert
   private static final MapCodec<FluidIngredient> FLUID_INGREDIENT_CODEC = new MapCodec<FluidIngredient>() {
     @Override
     public <T> Stream<T> keys(DynamicOps<T> ops) {
@@ -119,8 +116,6 @@ public class FluidContainerIngredient implements ICustomIngredient {
           && fluidIngredient.test(contained.getFluid())) {
         // so far so good, from this point on we are forced to make copies as we need to
         // try draining, so copy and fetch the copy's cap
-        // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize() removed, use
-        // copyWithCount()
         ItemStack copy = stack.copyWithCount(1);
         var copyCap = copy.getCapability(Capabilities.FluidHandler.ITEM);
         if (copyCap == null) {
@@ -153,21 +148,14 @@ public class FluidContainerIngredient implements ICustomIngredient {
       if (display == null) {
         displayStacks = new ItemStack[0];
       } else {
-        // TODO 1.21.1: display.getItems() returns ItemStack[] directly, no need for
-        // toArray()
         displayStacks = display.getItems();
       }
     }
     return Stream.of(displayStacks);
   }
-
-  // TODO 1.21.1: toVanilla() signature likely changed - removed @Override
-  // annotation
   public Ingredient toVanilla() {
     return display != null ? display : Ingredient.EMPTY;
   }
-
-  // TODO 1.21.1: toJson() signature likely changed - removed @Override annotation
   public JsonElement toJson() {
     JsonElement element = fluidIngredient.serialize();
     JsonObject json;
@@ -179,8 +167,6 @@ public class FluidContainerIngredient implements ICustomIngredient {
     }
     json.addProperty("type", ID.toString());
     if (display != null) {
-      // TODO 1.21.1: Ingredient.toJson() removed - use Ingredient.CODEC_NONEMPTY to
-      // serialize
       json.add("display",
           Ingredient.CODEC_NONEMPTY.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, display).getOrThrow());
     }

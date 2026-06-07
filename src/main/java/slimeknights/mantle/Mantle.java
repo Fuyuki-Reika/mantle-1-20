@@ -236,10 +236,6 @@ public class Mantle {
       }
     } else if (key == Registries.COMMAND_ARGUMENT_TYPE) {
       ResourceOrTagKeyArgument.Info<?> info = new ResourceOrTagKeyArgument.Info<>();
-      // TODO 1.21.1: NeoForgeRegistries.COMMAND_ARGUMENT_TYPES removed - need to find
-      // new registration approach
-      // NeoForgeRegistries.COMMAND_ARGUMENT_TYPES.register(getResource("resource_or_tag_key"),
-      // info);
       ArgumentTypeInfos.registerByClass(RegistrationHelper.genericArgumentType(ResourceOrTagKeyArgument.class), info);
     } else if (key == NeoForgeRegistries.Keys.CONDITION_CODECS) {
       // Register tag-based recipe conditions in the NeoForge 1.21.1 condition codec

@@ -24,7 +24,6 @@ import java.util.stream.Stream;
 @SuppressWarnings({ "WeakerAccess", "unused" })
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RecipeHelper {
-  // TODO 1.21.1: RecipeManager.byType is now private, must use reflection
   private static final Method BY_TYPE_METHOD;
 
   static {
@@ -64,12 +63,6 @@ public class RecipeHelper {
    * @param <C>     Return type
    * @return List of recipes from the manager
    */
-  // TODO 1.21.1: RecipeType<T> changed to RecipeType<?> - type parameter removed
-  // TODO 1.21.1: byType now returns Map<ResourceLocation, RecipeHolder<T>> - need
-  // to extract value()
-  // TODO 1.21.1: Container changed to RecipeInput - Recipe<I extends RecipeInput>
-  // instead of Recipe<C extends Container>
-  // TODO 1.21.1: RecipeManager.byType is now private - using reflection
   @SuppressWarnings("unchecked")
   public static <I extends net.minecraft.world.item.crafting.RecipeInput, T extends Recipe<I>, C extends T> List<C> getRecipes(
       RecipeManager manager, RecipeType<?> type, Class<C> clazz) {
@@ -102,14 +95,6 @@ public class RecipeHelper {
    * @param <C>     Return type
    * @return Recipe list
    */
-  // TODO 1.21.1: RecipeType<T> changed to RecipeType<?> - type parameter removed
-  // TODO 1.21.1: Recipe.getId() removed - sorting by ID no longer possible,
-  // removed sorting
-  // TODO 1.21.1: byType now returns Map<ResourceLocation, RecipeHolder<T>> - need
-  // to extract value()
-  // TODO 1.21.1: Container changed to RecipeInput - Recipe<I extends RecipeInput>
-  // instead of Recipe<C extends Container>
-  // TODO 1.21.1: RecipeManager.byType is now private - using reflection
   @SuppressWarnings("unchecked")
   public static <I extends net.minecraft.world.item.crafting.RecipeInput, T extends Recipe<I>, C extends T> List<C> getUIRecipes(
       RecipeManager manager, RecipeType<?> type, Class<C> clazz, Predicate<? super C> filter) {
@@ -139,8 +124,6 @@ public class RecipeHelper {
    * @param clazz   Preferred recipe class type
    * @return List of flattened recipes from the manager
    */
-  // TODO 1.21.1: Recipe.getId() removed - sorting by ID removed, kept
-  // multi-recipe priority
   public static <C> List<C> getJEIRecipes(RegistryAccess access, Stream<? extends Recipe<?>> recipes, Class<C> clazz) {
     return recipes
         .sorted((r1, r2) -> {
@@ -151,7 +134,6 @@ public class RecipeHelper {
             return 1;
           if (!m1 && m2)
             return -1;
-          // TODO 1.21.1: Recipe.getId() removed - can no longer sort by ID
           return 0;
         })
         .flatMap((recipe) -> {
@@ -177,12 +159,6 @@ public class RecipeHelper {
    * @param clazz   Preferred recipe class type
    * @return List of flattened recipes from the manager
    */
-  // TODO 1.21.1: RecipeType<T> changed to RecipeType<?> - type parameter removed
-  // TODO 1.21.1: byType now returns Map<ResourceLocation, RecipeHolder<T>> - need
-  // to extract value()
-  // TODO 1.21.1: Container changed to RecipeInput - Recipe<I extends RecipeInput>
-  // instead of Recipe<C extends Container>
-  // TODO 1.21.1: RecipeManager.byType is now private - using reflection
   @SuppressWarnings("unchecked")
   public static <I extends net.minecraft.world.item.crafting.RecipeInput, T extends Recipe<I>, C> List<C> getJEIRecipes(
       RegistryAccess access, RecipeManager manager, RecipeType<?> type, Class<C> clazz) {

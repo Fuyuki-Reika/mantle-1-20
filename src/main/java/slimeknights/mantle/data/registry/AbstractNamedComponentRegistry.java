@@ -86,7 +86,6 @@ public abstract class AbstractNamedComponentRegistry<T> implements ResourceLocat
     if (key.isEmpty()) {
       return null;
     }
-    // TODO 1.21.1: ResourceLocation(String) constructor removed - use parse()
     return decodeInternal(ResourceLocation.parse(key));
   }
 

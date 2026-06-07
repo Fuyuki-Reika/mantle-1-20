@@ -24,8 +24,6 @@ public interface LoggingRecipeSerializer<T extends Recipe<?>> extends RecipeSeri
    * @throws RuntimeException If any errors happen, the exception will be logged
    *                          automatically
    */
-  // TODO 1.21.1: fromNetwork signature changed from (ResourceLocation,
-  // FriendlyByteBuf) to (RegistryFriendlyByteBuf)
   @Nullable
   T fromNetworkSafe(RegistryFriendlyByteBuf buffer);
 
@@ -37,12 +35,9 @@ public interface LoggingRecipeSerializer<T extends Recipe<?>> extends RecipeSeri
    * @throws RuntimeException If any errors happen, the exception will be logged
    *                          automatically
    */
-  // TODO 1.21.1: toNetwork signature changed to use RegistryFriendlyByteBuf
   void toNetworkSafe(RegistryFriendlyByteBuf buffer, T recipe);
 
   @Nullable
-  // TODO 1.21.1: Removed @Override - checking if method signature matches
-  // interface
   default T fromNetwork(RegistryFriendlyByteBuf buffer) {
     try {
       return fromNetworkSafe(buffer);
@@ -51,14 +46,10 @@ public interface LoggingRecipeSerializer<T extends Recipe<?>> extends RecipeSeri
       throw e;
     }
   }
-
-  // TODO 1.21.1: Removed @Override - checking if method signature matches
-  // interface
   default void toNetwork(RegistryFriendlyByteBuf buffer, T recipe) {
     try {
       toNetworkSafe(buffer, recipe);
     } catch (RuntimeException e) {
-      // TODO 1.21.1: Recipe.getId() removed, logging class and type only
       Mantle.logger.error("{}: Error writing recipe of class {} and type {} to packet", this.getClass().getSimpleName(),
           recipe.getClass().getSimpleName(), recipe.getType(), e);
       throw e;

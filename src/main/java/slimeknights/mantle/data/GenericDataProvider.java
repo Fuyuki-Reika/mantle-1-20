@@ -92,8 +92,6 @@ public abstract class GenericDataProvider implements DataProvider {
    */
   protected <T> CompletableFuture<?> saveJson(CachedOutput output, ResourceLocation location, Codec<T> codec,
       T object) {
-    // TODO 1.21.1: DataResult.getOrThrow signature changed - no longer takes
-    // boolean and Consumer
     return saveJson(output, location, codec.encodeStart(JsonOps.INSTANCE, object).getOrThrow());
   }
 

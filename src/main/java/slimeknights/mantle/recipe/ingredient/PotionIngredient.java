@@ -26,8 +26,6 @@ public class PotionIngredient extends ItemIngredient {
       BuiltInRegistries.ITEM.byNameCodec().listOf().fieldOf("items").forGetter((PotionIngredient i) -> i.items),
       TagKey.hashedCodec(Registries.ITEM).optionalFieldOf("tag")
           .forGetter((PotionIngredient i) -> java.util.Optional.ofNullable(i.tag)),
-      // TODO 1.21.1: Use holderByNameCodec() for Holder<Potion>, nullable without
-      // default
       BuiltInRegistries.POTION.holderByNameCodec().optionalFieldOf("potion")
           .forGetter((PotionIngredient i) -> java.util.Optional.ofNullable(i.potion)))
       .apply(instance, (items, tag, potion) -> new PotionIngredient(items, tag.orElse(null), potion.orElse(null))));
@@ -65,8 +63,6 @@ public class PotionIngredient extends ItemIngredient {
     if (potion == null) {
       return true; // null potion means match any potion
     }
-    // TODO 1.21.1: potion() returns Optional<Holder<Potion>>, compare holders
-    // directly
     return stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion()
         .orElse(null) == potion;
   }
@@ -77,7 +73,6 @@ public class PotionIngredient extends ItemIngredient {
     return super.getItems().map(stack -> {
       ItemStack potionStack = stack.copy();
       if (potion != null) {
-        // TODO 1.21.1: PotionContents now takes Holder<Potion>
         potionStack.set(DataComponents.POTION_CONTENTS, new PotionContents(potion));
       }
       return potionStack;

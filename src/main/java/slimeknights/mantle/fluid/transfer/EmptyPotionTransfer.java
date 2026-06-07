@@ -40,8 +40,6 @@ public class EmptyPotionTransfer extends EmptyFluidContainerTransfer {
   @Override
   public boolean matches(ItemStack stack, FluidStack fluid) {
     // to match, must either have water in the stack, or a potion fluid
-    // TODO 1.21.1: Potions.EMPTY removed - using null check and Potions.WATER
-    // constant
     Potion potion = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion()
         .map(holder -> holder.value()).orElse(null);
     return super.matches(stack, fluid)
@@ -51,18 +49,24 @@ public class EmptyPotionTransfer extends EmptyFluidContainerTransfer {
   @Override
   protected FluidStack getFluid(ItemStack stack) {
     // water just returns water
-    // TODO 1.21.1: Potions.EMPTY removed - using null check and Potions.WATER
-    // constant
     Potion potion = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion()
         .map(holder -> holder.value()).orElse(null);
     if (potion == Potions.WATER) {
       return fluid.copy();
     }
     // if it's not water, we need a potion fluid to return anything
-    // TODO 1.21.1: stack.getTag() removed - data component migration needed
-    // Returning FluidStack without NBT temporarily
+    // Preserve the PotionContents component on the FluidStack via CUSTOM_DATA
     return TagPreference.getPreference(MantleTags.Fluids.POTION)
-        .map(value -> new FluidStack(value, fluid.getAmount()))
+        .map(value -> {
+          FluidStack result = new FluidStack(value, fluid.getAmount());
+          // Copy all CustomData from the item stack (includes potion effects)
+          net.minecraft.world.item.component.CustomData itemCustomData =
+              stack.getOrDefault(DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY);
+          if (!itemCustomData.isEmpty()) {
+            result.set(DataComponents.CUSTOM_DATA, itemCustomData);
+          }
+          return result;
+        })
         .orElse(FluidStack.EMPTY);
   }
 

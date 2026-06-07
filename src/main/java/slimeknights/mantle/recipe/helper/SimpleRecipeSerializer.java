@@ -17,30 +17,19 @@ import java.util.function.Function;
  */
 public record SimpleRecipeSerializer<T extends Recipe<?>>(Function<ResourceLocation, T> constructor)
     implements RecipeSerializer<T> {
-  // TODO 1.21.1: fromJson(ResourceLocation, JsonObject) no longer in
-  // RecipeSerializer interface
   public T fromJson(ResourceLocation id, JsonObject pSerializedRecipe) {
     return constructor.apply(id);
   }
-
-  // TODO 1.21.1: fromNetwork with new signature - no ID available
   public T fromNetwork(RegistryFriendlyByteBuf pBuffer) {
     // Zero-data recipe: construct with placeholder ID (actual ID comes from
     // RecipeHolder)
     return constructor.apply(ResourceLocation.withDefaultNamespace("simple_recipe"));
   }
-
-  // TODO 1.21.1: Old fromNetwork signature kept for internal use
   public T fromNetwork(ResourceLocation id, FriendlyByteBuf pBuffer) {
     return constructor.apply(id);
   }
-
-  // TODO 1.21.1: toNetwork no longer part of RecipeSerializer interface in 1.21.1
   public void toNetwork(RegistryFriendlyByteBuf pBuffer, T pRecipe) {
   }
-
-  // TODO 1.21.1: streamCodec() required by RecipeSerializer interface
-  // Zero-data recipe: encode/decode nothing; ID comes from RecipeHolder wrapper
   @Override
   public StreamCodec<RegistryFriendlyByteBuf, T> streamCodec() {
     return StreamCodec.of(
@@ -48,9 +37,6 @@ public record SimpleRecipeSerializer<T extends Recipe<?>>(Function<ResourceLocat
         }, // no data to write
         buf -> constructor.apply(ResourceLocation.withDefaultNamespace("simple_recipe")));
   }
-
-  // TODO 1.21.1: codec() required by RecipeSerializer interface
-  // Zero-data recipe: no fields needed; ID comes from RecipeHolder wrapper
   @Override
   public MapCodec<T> codec() {
     return MapCodec.unit(() -> constructor.apply(ResourceLocation.withDefaultNamespace("simple_recipe")));

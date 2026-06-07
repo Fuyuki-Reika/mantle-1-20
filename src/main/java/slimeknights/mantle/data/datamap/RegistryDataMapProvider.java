@@ -47,7 +47,6 @@ public abstract class RegistryDataMapProvider<R, D> extends GenericDataProvider 
 
   /** Makes a location from a path */
   protected ResourceLocation key(String name) {
-    // TODO 1.21.1: ResourceLocation(String, String) constructor is private
     return ResourceLocation.fromNamespaceAndPath(modId, name);
   }
 

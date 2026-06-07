@@ -36,8 +36,6 @@ public class PotionDisplayIngredient extends ItemIngredient {
       .composite(
           ByteBufCodecs.registry(Registries.ITEM).apply(ByteBufCodecs.list()),
           i -> i.items,
-          // TODO 1.21.1: ByteBufCodecs.tagKey() removed - use
-          // ResourceLocation.STREAM_CODEC and map to TagKey
           ByteBufCodecs.optional(ResourceLocation.STREAM_CODEC.map(
               loc -> TagKey.create(Registries.ITEM, loc),
               TagKey::location)),
@@ -52,16 +50,12 @@ public class PotionDisplayIngredient extends ItemIngredient {
   protected PotionDisplayIngredient(List<Item> items, @Nullable TagKey<Item> tag) {
     super(items, tag);
   }
-
-  // TODO 1.21.1: Helper constructor for StreamCodec that unwraps
-  // Optional<TagKey<Item>>
   private PotionDisplayIngredient(List<Item> items, java.util.Optional<TagKey<Item>> tag) {
     this(items, tag.orElse(null));
   }
 
   /** Creates a ingredient matching a list of items */
   public static PotionDisplayIngredient of(List<ItemLike> items) {
-    // TODO 1.21.1: Cast null to TagKey<Item> to disambiguate constructor
     return new PotionDisplayIngredient(toItem(items), (TagKey<Item>) null);
   }
 
@@ -86,12 +80,10 @@ public class PotionDisplayIngredient extends ItemIngredient {
     ItemStack[] parentStacks = super.getItems().map(ItemStack::copy).toArray(ItemStack[]::new);
     if (lastParentStacks != parentStacks) {
       lastParentStacks = parentStacks;
-      // TODO 1.21.1: Use holders() instead of stream() for Holder<Potion>
       displayStacks = BuiltInRegistries.POTION.holders()
           .filter(holder -> holder.value() != null)
           .flatMap(holder -> Arrays.stream(parentStacks).map(item -> {
             var copy = item.copy();
-            // TODO 1.21.1: Use DataComponents.POTION_CONTENTS to set potion
             copy.set(DataComponents.POTION_CONTENTS, new PotionContents(holder));
             return copy;
           }))

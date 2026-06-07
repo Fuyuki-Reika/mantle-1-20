@@ -67,8 +67,6 @@ public class ContainerFoodItem extends Item {
   }
 
   @Override
-  // TODO 1.21.1: appendHoverText signature changed - Level worldIn ->
-  // Item.TooltipContext context
   public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
       TooltipFlag flagIn) {
     FoodProperties food = stack.getFoodProperties(null);
@@ -104,14 +102,5 @@ public class ContainerFoodItem extends Item {
       super(props);
       this.fluid = fluid;
     }
-
-    // TODO 1.21.1: initCapabilities removed - capability system changed to data
-    // attachments
-    // @Nullable
-    // @Override
-    // public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable
-    // CompoundTag nbt) {
-    // return new ConstantFluidContainerWrapper(fluid.get(), stack);
-    // }
   }
 }

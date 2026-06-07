@@ -77,24 +77,14 @@ public class LoadableRecipeSerializer<T extends Recipe<?>> implements LoggingRec
   protected TypedMapBuilder buildContext(ResourceLocation id) {
     return TypedMapBuilder.builder().put(ContextKey.ID, id).put(ContextKey.DEBUG, "Recipe " + id).put(SERIALIZER, this);
   }
-
-  // TODO 1.21.1: fromJson(ResourceLocation, JsonObject) no longer in
-  // RecipeSerializer, uses codec() now
   public T fromJson(ResourceLocation id, JsonObject json) {
     return loadable.deserialize(json, buildContext(id).build());
   }
-
-  // TODO 1.21.1: fromNetworkSafe signature changed - removed ResourceLocation id
-  // parameter
   @Override
   public T fromNetworkSafe(RegistryFriendlyByteBuf buffer) {
     // Extract ID from buffer context if needed, for now use placeholder
     return loadable.decode(buffer, buildContext(ResourceLocation.withDefaultNamespace("unknown")).build());
   }
-
-  // TODO 1.21.1: fromNetwork with old signature kept for internal use, no longer
-  // overrides parent
-  // Old signature calls loadable directly since fromNetworkSafe signature changed
   @Nullable
   public T fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
     try {
@@ -105,22 +95,14 @@ public class LoadableRecipeSerializer<T extends Recipe<?>> implements LoggingRec
       throw e;
     }
   }
-
-  // TODO 1.21.1: toNetworkSafe signature changed to use RegistryFriendlyByteBuf
   @Override
   public void toNetworkSafe(RegistryFriendlyByteBuf buffer, T recipe) {
     loadable.encode(buffer, recipe);
   }
-
-  // TODO 1.21.1: streamCodec() is now required by RecipeSerializer
   @Override
   public StreamCodec<RegistryFriendlyByteBuf, T> streamCodec() {
     return StreamCodec.of(this::toNetworkSafe, this::fromNetworkSafe);
   }
-
-  // TODO 1.21.1: codec() is now required by RecipeSerializer
-  // MapCodec bridges Mantle's RecordLoadable deserialization to Mojang's codec
-  // system
   @Override
   public MapCodec<T> codec() {
     return new MapCodec<>() {
@@ -179,9 +161,6 @@ public class LoadableRecipeSerializer<T extends Recipe<?>> implements LoggingRec
     public RecipeType<?> getType() {
       return type.get();
     }
-
-    // TODO 1.21.1: fromNetwork with old signature - using loadable directly since
-    // fromNetworkSafe changed
     @Nullable
     @Override
     public T fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
@@ -203,8 +182,6 @@ public class LoadableRecipeSerializer<T extends Recipe<?>> implements LoggingRec
       super(loadable);
       this.replacement = replacement;
     }
-
-    // TODO 1.21.1: Recipe.getId() removed, using id parameter instead
     @Override
     public T fromJson(ResourceLocation id, JsonObject json) {
       T recipe = super.fromJson(id, json);

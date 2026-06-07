@@ -26,13 +26,9 @@ public class TagEmptyCondition<T> extends TagCondition<T> implements LootItemCon
   public TagEmptyCondition(ResourceKey<? extends Registry<T>> registry, ResourceLocation name) {
     this(TagKey.create(registry, name));
   }
-
-  // TODO 1.21.1: getID() is not an override, removed @Override annotation
   public ResourceLocation getID() {
     return SERIALIZER.getID();
   }
-
-  // TODO 1.21.1: codec() added to ICondition interface
   @Override
   public com.mojang.serialization.MapCodec<? extends net.neoforged.neoforge.common.conditions.ICondition> codec() {
     return SERIALIZER.codec();

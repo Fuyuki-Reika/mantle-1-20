@@ -24,12 +24,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 /** Loot modifier to inject an additional loot entry into an existing table */
-// TODO 1.21.1: codec() method removed - signature changed in
-// IGlobalLootModifier interface
-// MantleCodecs.LOOT_ENTRY and LOOT_FUNCTIONS also removed, entire class needs
-// API migration
-// Class no longer properly registers with loot system but can still be
-// instantiated for legacy code
 public class AddEntryLootModifier extends LootModifier {
   // Codec using native 1.21.1 loot entry and function codecs
   public static final MapCodec<AddEntryLootModifier> CODEC = RecordCodecBuilder.mapCodec(inst -> codecStart(inst)
@@ -57,7 +51,6 @@ public class AddEntryLootModifier extends LootModifier {
     this.modifierConditions = modifierConditions;
     this.entry = entry;
     this.functions = functions;
-    // TODO 1.21.1: LootItemFunctions.compose now expects List instead of array
     this.combinedFunctions = LootItemFunctions.compose(List.of(functions));
   }
 
@@ -85,8 +78,6 @@ public class AddEntryLootModifier extends LootModifier {
     entry.expand(context, generator -> generator.createItemStack(consumer, context));
     return generatedLoot;
   }
-
-  // TODO 1.21.1: codec() return type changed from Codec to MapCodec
   @Override
   public MapCodec<? extends IGlobalLootModifier> codec() {
     return CODEC;

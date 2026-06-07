@@ -86,8 +86,6 @@ public class EntityIngredientRenderer implements IIngredientRenderer<EntityIngre
           // catch exceptions drawing the entity to be safe, any caught exceptions
           // blacklist the entity
           try {
-            // TODO 1.21.1: renderEntityInInventoryFollowsMouse signature changed - added
-            // mouse tracking parameters
             InventoryScreen.renderEntityInInventoryFollowsMouse(graphics, size / 2, size, scale, 0, 10, 0f, 0f, 0f,
                 livingEntity);
             return;

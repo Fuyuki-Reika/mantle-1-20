@@ -175,8 +175,6 @@ public final class FluidTexture {
      * @return Builder instance
      */
     public Builder wrapId(String prefix, String suffix, boolean overlay, boolean camera) {
-      // TODO 1.21.1: NeoForgeRegistries.FLUID_TYPES.get() no longer exists - use
-      // registry directly
       return textures(
           JsonHelper.wrap(Objects.requireNonNull(NeoForgeRegistries.FLUID_TYPES.getKey(fluid)), prefix, suffix),
           overlay, camera);

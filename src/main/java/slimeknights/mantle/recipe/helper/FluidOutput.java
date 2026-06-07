@@ -229,7 +229,8 @@ public abstract class FluidOutput implements Supplier<FluidStack> {
           return FluidStack.EMPTY;
         }
         cachedResult = new FluidStack(preference.orElseThrow(), amount);
-        // Apply NBT as CustomData component (replaces removed FluidStack(Fluid, int, CompoundTag))
+        // Apply NBT as CustomData component (replaces removed FluidStack(Fluid, int,
+        // CompoundTag))
         if (nbt != null && !nbt.isEmpty()) {
           cachedResult.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA,
               net.minecraft.world.item.component.CustomData.of(nbt.copy()));

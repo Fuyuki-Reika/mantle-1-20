@@ -27,8 +27,6 @@ import java.util.function.Function;
  */
 public class TagPreference {
   /** Just an alphabetically late RL to simplify null checks */
-  // TODO 1.21.1: ResourceLocation constructor no longer accepts "namespace:path"
-  // format, use parse() method
   private static final ResourceLocation DEFAULT_ID = ResourceLocation.parse("zzzzz:zzzzz"); // simplfies null checks
 
   /** Cache from any tag key to its value */

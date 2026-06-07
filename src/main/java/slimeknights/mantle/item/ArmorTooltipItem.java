@@ -14,15 +14,11 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class ArmorTooltipItem extends ArmorItem {
-
-  // TODO 1.21.1: ArmorMaterial now requires Holder wrapper
   public ArmorTooltipItem(Holder<ArmorMaterial> armorMaterial, ArmorItem.Type type, Properties builder) {
     super(armorMaterial, type, builder);
   }
 
   @Override
-  // TODO 1.21.1: appendHoverText signature changed - Level worldIn ->
-  // Item.TooltipContext context
   public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
       TooltipFlag flagIn) {
     TranslationHelper.addOptionalTooltip(stack, tooltip);

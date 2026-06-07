@@ -22,8 +22,6 @@ public class ResourceLocationSerializer<T extends ResourceLocation> implements J
 
   /** Creates an instance for resource locations */
   public static ResourceLocationSerializer<ResourceLocation> resourceLocation(String modId) {
-    // TODO 1.21.1: ResourceLocation constructor is private, use parse() static
-    // method
     return new ResourceLocationSerializer<>(ResourceLocation::parse, modId);
   }
 

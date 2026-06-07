@@ -69,7 +69,6 @@ public interface BaseRegistryLoadable<T> extends ResourceLocationLoadable<T> {
     if (registry == null) {
       throw new EncoderException("Registry " + registryId() + " cannot be located");
     }
-    // TODO 1.21.1: writeId removed, manually write ID using registry.getId()
     buffer.writeVarInt(registry.getId(object));
   }
 }

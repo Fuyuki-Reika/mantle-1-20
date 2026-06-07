@@ -15,9 +15,6 @@ public class FakeLevelData implements WritableLevelData {
   private int spawnY;
   private int spawnZ;
   private float spawnAngle;
-
-  // TODO 1.21.1: WritableLevelData spawn API consolidated into setSpawn(BlockPos,
-  // float)
   @Override
   public void setSpawn(BlockPos pos, float angle) {
     this.spawnX = pos.getX();
@@ -25,15 +22,10 @@ public class FakeLevelData implements WritableLevelData {
     this.spawnZ = pos.getZ();
     this.spawnAngle = angle;
   }
-
-  // TODO 1.21.1: New getSpawnPos() method returns BlockPos
   @Override
   public BlockPos getSpawnPos() {
     return new BlockPos(this.spawnX, this.spawnY, this.spawnZ);
   }
-
-  // TODO 1.21.1: Individual spawn setters no longer part of interface, removed
-  // @Override
   public void setXSpawn(int x) {
     this.spawnX = x;
   }
@@ -49,9 +41,6 @@ public class FakeLevelData implements WritableLevelData {
   public void setSpawnAngle(float angle) {
     this.spawnAngle = angle;
   }
-
-  // TODO 1.21.1: Individual spawn getters no longer part of interface, removed
-  // @Override
   public int getXSpawn() {
     return this.spawnX;
   }

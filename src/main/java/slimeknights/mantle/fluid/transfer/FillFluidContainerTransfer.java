@@ -60,7 +60,6 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer.WithD
       return null;
     }
     int amount = this.fluid.getAmount(fluid.getFluid());
-    // TODO 1.21.1: FluidStack(FluidStack, int) removed - use copy + setAmount
     FluidStack toDrain = fluid.copy();
     toDrain.setAmount(amount);
     FluidStack simulated = handler.drain(toDrain.copy(), FluidAction.SIMULATE);
@@ -79,7 +78,6 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer.WithD
   public JsonObject serialize(JsonSerializationContext context) {
     JsonObject json = new JsonObject();
     json.addProperty("type", ID.toString());
-    // TODO 1.21.1: Ingredient.toJson() removed - use Codec
     json.add("input", Ingredient.CODEC_NONEMPTY.encodeStart(JsonOps.INSTANCE, input).getOrThrow());
     if (!result.isEmpty()) {
       json.add("result", result.serialize(false));
@@ -100,7 +98,6 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer.WithD
     public T deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context)
         throws JsonParseException {
       JsonObject json = element.getAsJsonObject();
-      // TODO 1.21.1: Ingredient.fromJson() removed - use Codec
       Ingredient input = Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, JsonHelper.getElement(json, "input"))
           .getOrThrow();
       ItemOutput result = EmptyFluidContainerTransfer.getResult(json);

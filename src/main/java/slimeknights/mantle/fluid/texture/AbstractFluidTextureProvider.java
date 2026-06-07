@@ -38,8 +38,6 @@ public abstract class AbstractFluidTextureProvider extends GenericDataProvider {
   @Override
   public final CompletableFuture<?> run(CachedOutput cache) {
     ensureTexturesAdded();
-    // TODO 1.21.1: NeoForgeRegistries.FLUID_TYPES.get() no longer exists - use
-    // registry directly
     Registry<FluidType> fluidTypeRegistry = NeoForgeRegistries.FLUID_TYPES;
 
     // ensure we added textures for all our fluid types

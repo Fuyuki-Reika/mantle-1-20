@@ -38,6 +38,7 @@ public class ItemStackLoadable {
     }
     return stack;
   };
+
   /**
    * Gets the CustomData tag from a stack, or null if absent/empty.
    * Replaces the removed ItemStack.getTag().
@@ -56,12 +57,14 @@ public class ItemStackLoadable {
   private static final LoadableField<Integer, ItemStack> COUNT = IntLoadable.FROM_ZERO.defaultField("count", 1, true,
       ItemStack::getCount);
   /**
-   * NBT field using CustomData component — reads/writes "nbt" key as a CompoundTag.
+   * NBT field using CustomData component — reads/writes "nbt" key as a
+   * CompoundTag.
    * On serialize: extracts CustomData component as CompoundTag.
-   * On deserialize: applied via CustomData.of(tag) into DataComponents.CUSTOM_DATA.
+   * On deserialize: applied via CustomData.of(tag) into
+   * DataComponents.CUSTOM_DATA.
    */
-  private static final LoadableField<CompoundTag, ItemStack> NBT =
-      NBTLoadable.ALLOW_STRING.nullableField("nbt", ItemStackLoadable::getCustomDataTag);
+  private static final LoadableField<CompoundTag, ItemStack> NBT = NBTLoadable.ALLOW_STRING.nullableField("nbt",
+      ItemStackLoadable::getCustomDataTag);
 
   /* Optional */
   /** Single item which may be empty with a count of 1 */
@@ -71,7 +74,10 @@ public class ItemStackLoadable {
   public static final RecordLoadable<ItemStack> OPTIONAL_STACK = RecordLoadable
       .create(ITEM, COUNT, ItemStackLoadable::makeStack)
       .compact(OPTIONAL_ITEM, stack -> stack.getCount() == 1);
-  /** Loadable for a stack that may be empty with CustomData (NBT equivalent) and a count of 1 */
+  /**
+   * Loadable for a stack that may be empty with CustomData (NBT equivalent) and a
+   * count of 1
+   */
   public static final RecordLoadable<ItemStack> OPTIONAL_ITEM_NBT = NBTStack.FIXED_COUNT;
   /** Loadable for a stack that may be empty with variable count and CustomData */
   public static final RecordLoadable<ItemStack> OPTIONAL_STACK_NBT = NBTStack.READ_COUNT;
@@ -81,9 +87,14 @@ public class ItemStackLoadable {
   public static final Loadable<ItemStack> REQUIRED_ITEM = notEmpty(OPTIONAL_ITEM);
   /** Loadable for a stack that may not be empty with variable count */
   public static final RecordLoadable<ItemStack> REQUIRED_STACK = notEmpty(OPTIONAL_STACK);
-  /** Loadable for a stack that may not be empty with CustomData (NBT equivalent) and a count of 1 */
+  /**
+   * Loadable for a stack that may not be empty with CustomData (NBT equivalent)
+   * and a count of 1
+   */
   public static final RecordLoadable<ItemStack> REQUIRED_ITEM_NBT = notEmpty(OPTIONAL_ITEM_NBT);
-  /** Loadable for a stack that may not be empty with variable count and CustomData */
+  /**
+   * Loadable for a stack that may not be empty with variable count and CustomData
+   */
   public static final RecordLoadable<ItemStack> REQUIRED_STACK_NBT = notEmpty(OPTIONAL_STACK_NBT);
 
   /* Helpers */
@@ -98,7 +109,8 @@ public class ItemStackLoadable {
 
   /**
    * Makes an item stack from item, count and optional NBT tag.
-   * The tag is stored as CustomData component (replaces removed ItemStack.setTag).
+   * The tag is stored as CustomData component (replaces removed
+   * ItemStack.setTag).
    */
   private static ItemStack makeStack(Item item, int count, @Nullable CompoundTag nbt) {
     if (item == Items.AIR || count == 0) {
@@ -122,8 +134,10 @@ public class ItemStackLoadable {
   }
 
   /**
-   * Loadable for an item stack with CustomData (replacing the old NBT share-tag system).
-   * Reads/writes "nbt" as a JSON object or SNBT string. On the network, serializes via
+   * Loadable for an item stack with CustomData (replacing the old NBT share-tag
+   * system).
+   * Reads/writes "nbt" as a JSON object or SNBT string. On the network,
+   * serializes via
    * buffer.readNbt() / buffer.writeNbt(), matching legacy behaviour.
    */
   private enum NBTStack implements RecordLoadable<ItemStack> {
@@ -152,7 +166,9 @@ public class ItemStackLoadable {
       NBT.serialize(stack, json);
     }
 
-    /* Compact JSON — falls back to primitive (item-only) when no NBT and count == 1 */
+    /*
+     * Compact JSON — falls back to primitive (item-only) when no NBT and count == 1
+     */
 
     @Override
     public ItemStack convert(JsonElement element, String key, TypedMap context) {

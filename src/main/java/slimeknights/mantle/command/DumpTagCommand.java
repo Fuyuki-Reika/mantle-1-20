@@ -30,8 +30,6 @@ import java.util.List;
 
 /**
  * Command that dumps a tag into a JSON object.
- * TODO 1.21: rename to {@code TagEntriesCommand}.
- * TODO 1.21: move to {@link slimeknights.mantle.command.tags}.
  */
 public class DumpTagCommand {
   protected static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();

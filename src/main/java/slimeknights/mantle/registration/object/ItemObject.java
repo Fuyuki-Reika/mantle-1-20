@@ -49,8 +49,6 @@ public class ItemObject<I extends ItemLike> implements Supplier<I>, ItemLike, Id
    * 
    * @param object Object base
    */
-  // TODO 1.21.1: DeferredHolder type bounds changed, added constructor type
-  // parameter
   @SuppressWarnings("unchecked")
   public <R> ItemObject(DeferredHolder<R, ?> object) {
     this.entry = (Supplier<? extends I>) object;

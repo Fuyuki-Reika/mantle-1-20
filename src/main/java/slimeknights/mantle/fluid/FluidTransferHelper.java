@@ -98,8 +98,6 @@ public class FluidTransferHelper {
       if (simulatedFill > 0) {
         // actually drain, use the fluid we successfully filled with just in case that
         // changes
-        // TODO 1.21.1: FluidStack(FluidStack, int) constructor removed - use copy +
-        // setAmount
         FluidStack drainRequest = fluid.copy();
         drainRequest.setAmount(simulatedFill);
         FluidStack drainedFluid = input.drain(drainRequest, FluidAction.EXECUTE);
@@ -110,8 +108,6 @@ public class FluidTransferHelper {
           if (actualFill < drainedFluid.getAmount()) {
             int toReturn = drainedFluid.getAmount() - actualFill;
             drainedFluid.setAmount(actualFill);
-            // TODO 1.21.1: FluidStack(FluidStack, int) constructor removed - use copy +
-            // setAmount
             FluidStack returnRequest = drainedFluid.copy();
             returnRequest.setAmount(toReturn);
             int returned = input.fill(returnRequest, FluidAction.EXECUTE);
@@ -312,8 +308,6 @@ public class FluidTransferHelper {
     }
 
     // if the item has a capability, do a direct transfer
-    // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize removed - use
-    // ItemStack.copyWithCount
     ItemStack copy = stack.copyWithCount(1);
     IFluidHandlerItem itemHandler = copy.getCapability(Capabilities.FluidHandler.ITEM);
     if (itemHandler != null) {
@@ -434,8 +428,6 @@ public class FluidTransferHelper {
       }
 
       // if the item has a capability, do a direct transfer
-      // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize removed - use
-      // ItemStack.copyWithCount
       ItemStack copy = stack.copyWithCount(1);
       IFluidHandlerItem itemHandler = copy.getCapability(Capabilities.FluidHandler.ITEM);
       if (itemHandler != null) {
@@ -511,8 +503,6 @@ public class FluidTransferHelper {
       }
 
       // if the item has a capability, do a direct transfer
-      // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize removed - use
-      // ItemStack.copyWithCount
       ItemStack copy = stack.copyWithCount(1);
       IFluidHandlerItem itemHandler = copy.getCapability(Capabilities.FluidHandler.ITEM);
       if (itemHandler != null) {

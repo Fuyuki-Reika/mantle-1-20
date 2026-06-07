@@ -28,8 +28,6 @@ public class FluidTextureManager implements IEarlySafeManagerReloadListener {
   /** Map of fluid type to texture */
   private Map<FluidType, FluidTexture> textures = Collections.emptyMap();
   /** Fallback texture instance */
-  // TODO 1.21.1: ResourceLocation constructor requires namespace - use minecraft
-  // namespace
   private static final FluidTexture FALLBACK = new FluidTexture(
       ResourceLocation.withDefaultNamespace("block/water_still"),
       ResourceLocation.withDefaultNamespace("block/water_flow"), null, null, 0, -1, -1, false, null, 0, 0);
@@ -53,15 +51,12 @@ public class FluidTextureManager implements IEarlySafeManagerReloadListener {
 
     // start building fluid type map
     Map<FluidType, FluidTexture> map = new HashMap<>();
-    // TODO 1.21.1: NeoForgeRegistries.FLUID_TYPES.get() no longer exists - use
-    // registry directly
     Registry<FluidType> fluidTypeRegistry = NeoForgeRegistries.FLUID_TYPES;
 
     for (Map.Entry<ResourceLocation, JsonElement> entry : jsons.entrySet()) {
       ResourceLocation id = entry.getKey();
       // first step is to find the matching fluid type, if there is none ignore the
       // file
-      // TODO 1.21.1: Registry.getValue() removed - use Registry.get() instead
       FluidType type = fluidTypeRegistry.get(id);
       if (type == null || !id.equals(fluidTypeRegistry.getKey(type))) {
         Mantle.logger.debug("Ignoring fluid texture {} as no fluid type exists with that name", id);

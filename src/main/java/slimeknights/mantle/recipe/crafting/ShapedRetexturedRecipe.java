@@ -34,8 +34,6 @@ import java.util.Map;
  * {@link slimeknights.mantle.block.RetexturedBlock} based on an ingredient
  * input.
  */
-// TODO 1.21: rework to be more like the ShapedMaterialsRecipe from Tinkers for
-// more efficient network syncing
 @SuppressWarnings("WeakerAccess")
 public class ShapedRetexturedRecipe extends ShapedRecipe {
   /** Ingredient used to determine the texture on the output */
@@ -60,8 +58,6 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
   protected ShapedRetexturedRecipe(ResourceLocation id, String group, CraftingBookCategory category, int width,
       int height, NonNullList<Ingredient> ingredients, ItemStack result, boolean showNotification, Ingredient texture,
       boolean matchAll) {
-    // TODO 1.21.1: ShapedRecipe constructor API changed - now expects
-    // ShapedRecipePattern instead of individual parameters
     super(group, category, new ShapedRecipePattern(width, height, ingredients, java.util.Optional.empty()), result,
         showNotification);
     this.texture = texture;
@@ -76,8 +72,6 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
    * @param matchAll If true, all inputs must match for the recipe to match
    */
   protected ShapedRetexturedRecipe(ShapedRecipe orig, Ingredient texture, boolean matchAll) {
-    // TODO 1.21.1: ShapedRecipe API changed - orig.getId() removed, orig.result not
-    // accessible, using getResultItem() and placeholder ID
     this(Mantle.getResource("shaped_retextured"), orig.getGroup(), orig.category(), orig.getWidth(), orig.getHeight(),
         orig.getIngredients(), orig.getResultItem(null), orig.showNotification(), texture, matchAll);
   }

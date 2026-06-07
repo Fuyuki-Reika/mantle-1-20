@@ -22,12 +22,6 @@ public class FillFluidWithNBTTransfer extends FillFluidContainerTransfer {
   @Override
   protected ItemStack getFilled(FluidStack drained) {
     ItemStack filled = super.getFilled(drained);
-    // TODO 1.21.1: FluidStack.hasTag() and getTag() removed - data component
-    // migration needed
-    // Returning ItemStack without NBT copy temporarily
-    // if (drained.hasTag()) {
-    // filled.setTag(drained.getTag().copy());
-    // }
     return filled;
   }
 

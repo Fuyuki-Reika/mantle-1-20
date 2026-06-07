@@ -128,9 +128,6 @@ public class CombatHelper {
       }
 
       // find enchantment damage
-      // TODO 1.21.1: EnchantmentHelper.getDamageBonus removed - use modifyDamage from
-      // ServerLevel context
-      // For now, enchantment bonus is 0; full implementation needs ServerLevel access
       float enchantmentDamage = 0f;
 
       // scale damage cooldown
@@ -148,10 +145,6 @@ public class CombatHelper {
         } else {
           knockback = (float) player.getAttributeValue(Attributes.ATTACK_KNOCKBACK);
         }
-
-        // TODO 1.21.1: EnchantmentHelper.getKnockbackBonus removed - now uses
-        // modifyKnockback(ServerLevel...)
-        // knockback += EnchantmentHelper.getKnockbackBonus(player);
         boolean sprinting = false;
         if (player.isSprinting() && fullyCharged) {
           player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
@@ -178,9 +171,6 @@ public class CombatHelper {
         boolean canSweep = fullyCharged && !critical && !sprinting && player.onGround()
             && (player.walkDist - player.walkDistO) < player.getSpeed()
             && stack.canPerformAction(ItemAbilities.SWORD_SWEEP) && !criticalHitEvent.disableSweep();
-
-        // TODO 1.21.1: EnchantmentHelper.getFireAspect removed - fire aspect now
-        // handled via doPostAttackEffectsWithItemSource
         int fire = 0;
         // int fire = EnchantmentHelper.getFireAspect(player);
         // apply fire aspect and fetch health
@@ -231,7 +221,6 @@ public class CombatHelper {
 
           // sweep attack
           if (canSweep) {
-            // TODO 1.21.1: EnchantmentHelper.getSweepingDamageRatio removed
             float sweepDamage = 1.0f; // was: 1 + EnchantmentHelper.getSweepingDamageRatio(player) * damage
             for (LivingEntity living : player.level().getEntitiesOfClass(LivingEntity.class,
                 stack.getSweepHitBox(player, target))) {
@@ -275,17 +264,10 @@ public class CombatHelper {
           // enchantment post effects
           player.setLastHurtMob(target);
           if (targetLiving != null) {
-            // TODO 1.21.1: EnchantmentHelper.doPostHurtEffects removed - use
-            // doPostAttackEffects
-            // EnchantmentHelper.doPostHurtEffects(targetLiving, player);
             if (player.level() instanceof ServerLevel serverLevel) {
               EnchantmentHelper.doPostAttackEffectsWithItemSource(serverLevel, target, damageSource, stack);
             }
           }
-          // TODO 1.21.1: EnchantmentHelper.doPostDamageEffects removed - handled above
-          // EnchantmentHelper.doPostDamageEffects(player, target);
-
-          // handle multipart
           Entity parent = target;
           if (target instanceof PartEntity<?> part) {
             parent = part.getParent();

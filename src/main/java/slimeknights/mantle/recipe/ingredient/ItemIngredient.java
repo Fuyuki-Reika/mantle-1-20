@@ -57,8 +57,6 @@ public abstract class ItemIngredient implements ICustomIngredient {
 
   @Override
   public Stream<ItemStack> getItems() {
-    // TODO 1.21.1: Ingredient.getItems() returns ItemStack[] not Stream - convert
-    // to stream
     return Stream.concat(
         items.stream().map(ItemStack::new),
         tag != null ? Stream.of(Ingredient.of(tag).getItems()) : Stream.empty());

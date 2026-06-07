@@ -23,13 +23,11 @@ public record CodecLoadable<T>(DynamicOps<Tag> ops, Codec<T> codec) implements L
 
   @Override
   public T convert(JsonElement element, String key, TypedMap context) {
-    // TODO 1.21.1: DataResult.getOrThrow() no longer takes arguments
     return codec.parse(JsonOps.INSTANCE, element).getOrThrow();
   }
 
   @Override
   public JsonElement serialize(T object) {
-    // TODO 1.21.1: DataResult.getOrThrow() no longer takes arguments
     return codec.encodeStart(JsonOps.INSTANCE, object).getOrThrow();
   }
 

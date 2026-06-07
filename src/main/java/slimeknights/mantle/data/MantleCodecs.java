@@ -27,13 +27,11 @@ public class MantleCodecs {
   public static final Codec<Ingredient> INGREDIENT = new JsonCodec<>() {
     @Override
     public Ingredient deserialize(JsonElement element, DynamicOps<?> ops) {
-      // TODO 1.21.1: Ingredient.fromJson removed - use CODEC instead
       return Ingredient.CODEC.parse(JsonOps.INSTANCE, element).getOrThrow();
     }
 
     @Override
     public JsonElement serialize(Ingredient ingredient, DynamicOps<?> ops) {
-      // TODO 1.21.1: toJson() removed - use CODEC.encodeStart()
       return Ingredient.CODEC.encodeStart(JsonOps.INSTANCE, ingredient).getOrThrow();
     }
 

@@ -12,8 +12,6 @@ public class TextData {
   /** @deprecated use {@link #linebreak} */
   @Deprecated(forRemoval = true)
   public static final TextData LINEBREAK = new TextData().linebreak(true);
-
-  // TODO 1.21: make no longer nullable
   @Nullable
   public String text = "";
   public String color = "black";

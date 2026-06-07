@@ -46,8 +46,6 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
 
   /** Adds a transfer to be saved */
   protected void addTransfer(String name, IFluidContainerTransfer transfer, ICondition... conditions) {
-    // TODO 1.21.1: ResourceLocation(String, String) constructor is private - use
-    // fromNamespaceAndPath
     addTransfer(ResourceLocation.fromNamespaceAndPath(modId, name), transfer, conditions);
   }
 

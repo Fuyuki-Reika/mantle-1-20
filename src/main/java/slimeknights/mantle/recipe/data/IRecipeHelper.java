@@ -35,8 +35,6 @@ public interface IRecipeHelper {
    * @return Location for the mod
    */
   default ResourceLocation location(String name) {
-    // TODO 1.21.1: ResourceLocation(String, String) constructor is now private, use
-    // fromNamespaceAndPath()
     return ResourceLocation.fromNamespaceAndPath(getModId(), name);
   }
 
@@ -171,8 +169,6 @@ public interface IRecipeHelper {
    * @return Tag instance
    */
   default TagKey<Item> getItemTag(String modId, String name) {
-    // TODO 1.21.1: ResourceLocation(String, String) constructor is now private, use
-    // fromNamespaceAndPath()
     return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(modId, name));
   }
 
@@ -184,8 +180,6 @@ public interface IRecipeHelper {
    * @return Tag instance
    */
   default TagKey<Fluid> getFluidTag(String modId, String name) {
-    // TODO 1.21.1: ResourceLocation(String, String) constructor is now private, use
-    // fromNamespaceAndPath()
     return TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(modId, name));
   }
 

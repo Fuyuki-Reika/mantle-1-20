@@ -15,7 +15,6 @@ import java.util.function.Predicate;
 
 /**
  * Predicate matching an entity
- * TODO 1.21: separate out into {@code LivingEntityPredicate} and
  * {@code EntityPredicate}
  */
 public interface LivingEntityPredicate extends IJsonPredicate<LivingEntity> {
@@ -60,8 +59,6 @@ public interface LivingEntityPredicate extends IJsonPredicate<LivingEntity> {
   LivingEntityPredicate ELYTRA_FLYING = simple(LivingEntity::isFallFlying);
 
   // water
-  // TODO 1.21.1: wasEyeInWater field is now protected - use
-  // isEyeInFluid(FluidTags.WATER) instead
   /** Entities with eyes in water */
   LivingEntityPredicate EYES_IN_WATER = simple(entity -> entity.isEyeInFluid(net.minecraft.tags.FluidTags.WATER));
   /** Entities with feet in water */

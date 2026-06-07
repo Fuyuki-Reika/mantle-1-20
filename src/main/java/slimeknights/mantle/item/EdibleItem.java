@@ -23,10 +23,6 @@ public class EdibleItem extends Item {
 
   public EdibleItem(Item.Properties properties) {
     super(properties);
-    // TODO 1.21.1: foodProperties field removed - validation needs different
-    // approach
-    // Objects.requireNonNull(foodProperties, "Must set food to make an
-    // EdibleItem");
   }
 
   @Override

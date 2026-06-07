@@ -50,9 +50,6 @@ public class ShapedFallbackRecipe extends ShapedRecipe {
     super(group, category, pattern, output);
     this.alternatives = alternatives;
   }
-
-  // TODO 1.21.1: ShapedRecipe constructor now uses ShapedRecipePattern instead of
-  // individual parameters
   public ShapedFallbackRecipe(ResourceLocation id, String group, CraftingBookCategory category, int width, int height,
       NonNullList<Ingredient> ingredients, ItemStack output, List<ResourceLocation> alternatives) {
     super(group, category, new ShapedRecipePattern(width, height, ingredients, java.util.Optional.empty()), output);
@@ -65,9 +62,6 @@ public class ShapedFallbackRecipe extends ShapedRecipe {
    * @param base         Shaped recipe to copy data from
    * @param alternatives List of recipe names to fail this match if they match
    */
-  // TODO 1.21.1: ShapedRecipe API changed - removed getId(), result field,
-  // showNotification(), getWidth(), getHeight()
-  // ShapedRecipe now exposes pattern() method to access ShapedRecipePattern
   public ShapedFallbackRecipe(ShapedRecipe base, List<ResourceLocation> alternatives) {
     super(base.getGroup(), base.category(), base.pattern,
         base.getResultItem(net.minecraft.core.HolderLookup.Provider.create(
@@ -83,9 +77,6 @@ public class ShapedFallbackRecipe extends ShapedRecipe {
     return net.minecraft.core.HolderLookup.Provider.create(
         java.util.stream.Stream.<net.minecraft.core.HolderLookup.RegistryLookup<?>>of());
   }
-
-  // TODO 1.21.1: matches() signature changed from CraftingContainer to
-  // CraftingInput
   @Override
   public boolean matches(CraftingInput inv, Level world) {
     // if this recipe does not match, fail it
@@ -97,7 +88,6 @@ public class ShapedFallbackRecipe extends ShapedRecipe {
     // cache to save effort down the line
     if (alternativeCache == null) {
       RecipeManager manager = world.getRecipeManager();
-      // TODO 1.21.1: byKey() now returns RecipeHolder, need to extract value()
       alternativeCache = alternatives.stream()
           .map(manager::byKey)
           .filter(Optional::isPresent)

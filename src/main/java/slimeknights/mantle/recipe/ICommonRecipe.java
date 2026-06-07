@@ -10,8 +10,6 @@ import net.minecraft.world.item.crafting.RecipeInput;
  * 
  * @param <C> Inventory type
  */
-// TODO 1.21.1: Container changed to RecipeInput - Recipe<C extends RecipeInput>
-// instead of Recipe<C extends Container>
 public interface ICommonRecipe<C extends RecipeInput> extends Recipe<C> {
   @Override
   default ItemStack assemble(C inv, HolderLookup.Provider registries) {

@@ -84,7 +84,6 @@ public class FluidContainerTransferManager extends SimpleJsonResourceReloadListe
 
   /** For internal use only */
   public void init() {
-    // TODO 1.21.1: MinecraftForge.EVENT_BUS replaced with NeoForge.EVENT_BUS
     NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, AddReloadListenerEvent.class, e -> {
       e.addListener(this);
       this.context = e.getConditionContext();

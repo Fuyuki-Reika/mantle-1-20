@@ -155,7 +155,6 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
    * @param buffer Packet buffer instance
    */
   public void write(FriendlyByteBuf buffer) {
-    // TODO 1.21.1: buffer.writeItem() removed - use ItemStack.STREAM_CODEC
     ItemStack.STREAM_CODEC.encode((RegistryFriendlyByteBuf) buffer, get());
   }
 
@@ -166,7 +165,6 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
    * @return Item output
    */
   public static ItemOutput read(FriendlyByteBuf buffer) {
-    // TODO 1.21.1: buffer.readItem() removed - use ItemStack.STREAM_CODEC
     return fromStack(ItemStack.STREAM_CODEC.decode((RegistryFriendlyByteBuf) buffer));
   }
 
@@ -222,9 +220,9 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
     @Override
     public JsonElement serialize(boolean writeCount) {
       // Use NBT-aware loadable when the stack has CustomData, plain otherwise
-      net.minecraft.world.item.component.CustomData customData =
-          stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA,
-              net.minecraft.world.item.component.CustomData.EMPTY);
+      net.minecraft.world.item.component.CustomData customData = stack.getOrDefault(
+          net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+          net.minecraft.world.item.component.CustomData.EMPTY);
       if (!customData.isEmpty()) {
         // Stack has custom data — use NBT-aware serialization
         if (writeCount) {
@@ -303,8 +301,6 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
     private final boolean nonEmpty;
     private final boolean readCount;
-    // TODO 1.21.1: Changed from RecordLoadable to Loadable to support
-    // non-RecordLoadable ITEM variants
     private final slimeknights.mantle.data.loadable.Loadable<ItemStack> stack;
 
     Loadable(boolean nonEmpty, boolean readCount) {
@@ -329,8 +325,6 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
         }
         return fromTag(tag, count, NBTLoadable.ALLOW_STRING.getOrDefault(json, "nbt", null));
       }
-      // TODO 1.21.1: stack is now Loadable not RecordLoadable - use convert() instead
-      // of deserialize()
       return fromStack(stack.convert(json, "item", context));
     }
 

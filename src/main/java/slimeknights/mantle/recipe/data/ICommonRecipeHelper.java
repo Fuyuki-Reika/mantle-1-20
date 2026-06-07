@@ -27,9 +27,6 @@ import slimeknights.mantle.registration.object.WoodBlockObject;
  */
 @SuppressWarnings("unused") // API
 public interface ICommonRecipeHelper extends IRecipeHelper {
-
-  // TODO 1.21.1: RecipeProvider.has() is now protected, creating local helper
-  // that returns Criterion<?>
   /**
    * Creates a criterion for having the specified item in inventory
    */

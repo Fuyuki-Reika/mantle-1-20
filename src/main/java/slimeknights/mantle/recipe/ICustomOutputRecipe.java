@@ -9,8 +9,6 @@ import net.minecraft.world.item.crafting.RecipeInput;
  * 
  * @param <C> Inventory type
  */
-// TODO 1.21.1: Container changed to RecipeInput - ICommonRecipe<C extends
-// RecipeInput>
 public interface ICustomOutputRecipe<C extends RecipeInput> extends ICommonRecipe<C> {
   /** @deprecated Item stack output not supported */
   @Deprecated

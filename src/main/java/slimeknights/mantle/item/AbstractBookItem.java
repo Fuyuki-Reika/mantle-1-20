@@ -46,7 +46,6 @@ public abstract class AbstractBookItem extends LecternBookItem {
   /** Checks if the given menu supports opening the menu */
   public static boolean isValidContainer(AbstractContainerMenu menu) {
     // player inventory has a null type, which throws when used through the getter
-    // TODO 1.21.1: menuType field is now private - use getType() getter
     if (menu.getType() == null) {
       return true;
     }
@@ -61,22 +60,8 @@ public abstract class AbstractBookItem extends LecternBookItem {
   }
 
   @Override
-  // TODO 1.21.1: appendHoverText signature changed - Level world ->
-  // Item.TooltipContext context
   public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
     // if the stack is in the player inventory, show the right click to open tooltip
-    // TODO 1.21.1: TooltipContext doesn't provide Level - need to refactor to get
-    // level differently
-    // Temporarily disabling level-dependent tooltip
-    // if (world != null && world.isClientSide) {
-    // Player player = SafeClientAccess.getPlayer();
-    // if (player != null && isValidContainer(player.containerMenu)) {
-    // Inventory inventory = player.getInventory();
-    // if (inventory.items.contains(stack) || inventory.offhand.contains(stack)) {
-    // tooltip.add(CLICK_TO_OPEN);
-    // }
-    // }
-    // }
     super.appendHoverText(stack, context, tooltip, flag);
   }
 

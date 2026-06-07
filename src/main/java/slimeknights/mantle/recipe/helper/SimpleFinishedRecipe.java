@@ -15,8 +15,6 @@ public record SimpleFinishedRecipe(ResourceLocation getId, RecipeSerializer<?> g
    * @deprecated This class is deprecated and should not be used. Migrate to
    *             RecipeOutput.accept() pattern.
    */
-  // TODO 1.21.1: Canonical constructor parameter names must match record
-  // component names
   @Deprecated(forRemoval = true)
   public SimpleFinishedRecipe(ResourceLocation getId, RecipeSerializer<?> getType) {
     this.getId = getId;

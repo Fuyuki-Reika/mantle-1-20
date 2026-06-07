@@ -57,7 +57,6 @@ public class RegistryHelper {
     if (index == Registry.DEFAULT) {
       return false;
     }
-    // TODO 1.21.1: Use .is(tag) instead of .containsTag(tag)
     return registry.getHolder(index).filter(holder -> holder.is(tag)).isPresent();
   }
 
@@ -103,7 +102,6 @@ public class RegistryHelper {
    * @return Supplier for the given registry
    */
   public static <T> Supplier<T> getHolder(DefaultedRegistry<T> registry, T entry) {
-    // TODO 1.21.1: Holder no longer implements Supplier, wrap in lambda
     Holder<T> holder = registry.getHolder(registry.getId(entry)).orElseThrow();
     return holder::value;
   }

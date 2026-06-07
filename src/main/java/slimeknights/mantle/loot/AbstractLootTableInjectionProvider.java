@@ -49,20 +49,16 @@ public abstract class AbstractLootTableInjectionProvider extends GenericDataProv
   }
 
   /** Creates a new injection for the Minecraft domain */
-  // TODO 1.21.1: ResourceLocation constructor changed - use parse for potentially
-  // namespaced strings
   protected LootTableInjection.Builder inject(String path, String name, ICondition... conditions) {
     return inject(path, ResourceLocation.parse(name), conditions);
   }
 
   /** Creates a new injection for the Minecraft domain */
-  // TODO 1.21.1: ResourceLocation constructor changed - use fromNamespaceAndPath
   protected LootTableInjection.Builder injectChest(String name, ICondition... conditions) {
     return inject(name, ResourceLocation.fromNamespaceAndPath("minecraft", "chests/" + name), conditions);
   }
 
   /** Creates a new injection for the Minecraft domain */
-  // TODO 1.21.1: ResourceLocation constructor changed - use fromNamespaceAndPath
   protected LootTableInjection.Builder injectGameplay(String name, ICondition... conditions) {
     return inject(name, ResourceLocation.fromNamespaceAndPath("minecraft", "gameplay/" + name), conditions);
   }

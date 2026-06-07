@@ -33,11 +33,6 @@ public class EmptyFluidWithNBTTransfer extends EmptyFluidContainerTransfer {
 
   @Override
   protected FluidStack getFluid(ItemStack stack) {
-    // TODO 1.21.1: ItemStack.getTag() and FluidStack NBT constructor removed
-    // Data component migration required - returning FluidStack without NBT
-    // temporarily
-    // return new FluidStack(fluid.get().getFluid(), fluid.getAmount(),
-    // stack.getTag());
     return new FluidStack(fluid.get().getFluid(), fluid.getAmount());
   }
 

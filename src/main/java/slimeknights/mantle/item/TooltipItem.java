@@ -20,8 +20,6 @@ public class TooltipItem extends Item {
   }
 
   @Override
-  // TODO 1.21.1: appendHoverText signature changed - Level worldIn ->
-  // Item.TooltipContext context
   public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
       TooltipFlag flagIn) {
     TranslationHelper.addOptionalTooltip(stack, tooltip);

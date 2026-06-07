@@ -70,7 +70,6 @@ public class MantleLoot {
       SET_FLUID_FUNCTION = registerFunction("set_fluid", SetFluidLootFunction.CODEC);
 
     } else if (key == Registries.LOOT_CONDITION_TYPE) {
-      // TODO 1.21.1: Use SERIALIZER.codec() for MapCodec access
       BLOCK_TAG_CONDITION = Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE, Mantle.getResource("block_tag"),
           new LootItemConditionType(BlockTagLootCondition.SERIALIZER.codec()));
       // Re-enabled: LootContextParamSets.CODEC is available in 1.21.1

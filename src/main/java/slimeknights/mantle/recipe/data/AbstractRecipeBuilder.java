@@ -21,8 +21,6 @@ public abstract class AbstractRecipeBuilder<T extends AbstractRecipeBuilder<T>> 
   /** Group for this recipe */
   @Nonnull
   protected String group = "";
-  // TODO 1.21.1: Track if criteria were added since Builder.getCriteria() is not
-  // accessible
   private boolean hasCriteria = false;
 
   /**
@@ -33,8 +31,6 @@ public abstract class AbstractRecipeBuilder<T extends AbstractRecipeBuilder<T>> 
    * @return Builder
    */
   @SuppressWarnings("unchecked")
-  // TODO 1.21.1: Changed parameter type from CriterionTriggerInstance to
-  // Criterion<?> for API compatibility
   public T unlockedBy(String name, Criterion<?> criteria) {
     this.advancementBuilder.addCriterion(name, criteria);
     this.hasCriteria = true;
@@ -91,22 +87,12 @@ public abstract class AbstractRecipeBuilder<T extends AbstractRecipeBuilder<T>> 
    * @return AdvancementHolder
    */
   private AdvancementHolder buildAdvancementInternal(ResourceLocation id, String folder) {
-    // TODO 1.21.1: ResourceLocation constructor changed, now uses
-    // fromNamespaceAndPath for (namespace, path) constructor
     ResourceLocation advancementId = ResourceLocation.fromNamespaceAndPath(id.getNamespace(),
         "recipes/" + folder + "/" + id.getPath());
-    // TODO 1.21.1: ResourceLocation constructor changed, now uses parse() for
-    // string input
-    // TODO 1.21.1: Builder.criteria is now private, using empty
-    // AdvancementRequirements for now
-    // TODO 1.21.1: parent() is deprecated, need alternative API
     this.advancementBuilder
         .parent(ResourceLocation.parse("recipes/root"))
         .rewards(AdvancementRewards.Builder.recipe(id));
-    // TODO 1.21.1: RecipeUnlockedTrigger.unlocked() now returns Criterion<?>
-    // directly
     this.advancementBuilder.addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id));
-    // TODO 1.21.1: build() now returns AdvancementHolder directly
     return this.advancementBuilder.build(advancementId);
   }
 
@@ -121,7 +107,6 @@ public abstract class AbstractRecipeBuilder<T extends AbstractRecipeBuilder<T>> 
    */
   @Nullable
   protected AdvancementHolder buildAdvancement(ResourceLocation id, String folder) {
-    // TODO 1.21.1: getCriteria() not accessible, using hasCriteria flag
     if (!this.hasCriteria) {
       throw new IllegalStateException("No way of obtaining recipe " + id);
     }
@@ -140,7 +125,6 @@ public abstract class AbstractRecipeBuilder<T extends AbstractRecipeBuilder<T>> 
   @SuppressWarnings("SameParameterValue") // API
   @Nullable
   protected AdvancementHolder buildOptionalAdvancement(ResourceLocation id, String folder) {
-    // TODO 1.21.1: getCriteria() not accessible, using hasCriteria flag
     if (!this.hasCriteria) {
       return null;
     }

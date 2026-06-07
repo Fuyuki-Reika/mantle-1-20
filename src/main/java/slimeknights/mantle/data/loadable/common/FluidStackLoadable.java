@@ -32,7 +32,8 @@ public class FluidStackLoadable {
   /** Getter for a fluid from a stack */
   private static final Function<FluidStack, Fluid> FLUID_GETTER = FluidStack::getFluid;
   /**
-   * Checks if a stack can be serialized to a primitive form (fluid-only, no components).
+   * Checks if a stack can be serialized to a primitive form (fluid-only, no
+   * components).
    * Replaces the removed hasTag() check.
    */
   private static final Predicate<FluidStack> COMPACT_NBT = stack -> stack.getComponentsPatch().isEmpty();
@@ -63,10 +64,11 @@ public class FluidStackLoadable {
       FluidStack::getAmount);
   /**
    * NBT field stored as CustomData component.
-   * Reads/writes "nbt" JSON key as CompoundTag; applied to DataComponents.CUSTOM_DATA.
+   * Reads/writes "nbt" JSON key as CompoundTag; applied to
+   * DataComponents.CUSTOM_DATA.
    */
-  private static final LoadableField<CompoundTag, FluidStack> NBT =
-      NBTLoadable.ALLOW_STRING.nullableField("nbt", FluidStackLoadable::getFluidCustomDataTag);
+  private static final LoadableField<CompoundTag, FluidStack> NBT = NBTLoadable.ALLOW_STRING.nullableField("nbt",
+      FluidStackLoadable::getFluidCustomDataTag);
 
   /* Optional */
   /** Single item which may be empty with an amount of 1000 */
@@ -74,20 +76,27 @@ public class FluidStackLoadable {
   /** Loadable for a stack that may be empty with variable count */
   public static final RecordLoadable<FluidStack> OPTIONAL_STACK = RecordLoadable.create(FLUID, AMOUNT,
       FluidStackLoadable::makeStack);
-  /** Loadable for a stack that may be empty with CustomData and an amount of 1000 */
+  /**
+   * Loadable for a stack that may be empty with CustomData and an amount of 1000
+   */
   public static final RecordLoadable<FluidStack> OPTIONAL_BUCKET_NBT = fixedSizeNBT(FluidType.BUCKET_VOLUME);
   /** Loadable for a stack that may be empty with variable count and CustomData */
-  public static final RecordLoadable<FluidStack> OPTIONAL_STACK_NBT =
-      RecordLoadable.create(FLUID, AMOUNT, NBT, FluidStackLoadable::makeStack);
+  public static final RecordLoadable<FluidStack> OPTIONAL_STACK_NBT = RecordLoadable.create(FLUID, AMOUNT, NBT,
+      FluidStackLoadable::makeStack);
 
   /* Required */
   /** Single item which may not be empty with an amount of 1000 */
   public static final Loadable<FluidStack> REQUIRED_BUCKET = notEmpty(OPTIONAL_BUCKET);
   /** Loadable for a stack that may not be empty with variable count */
   public static final RecordLoadable<FluidStack> REQUIRED_STACK = notEmpty(OPTIONAL_STACK);
-  /** Loadable for a stack that may not be empty with CustomData and an amount of 1000 */
+  /**
+   * Loadable for a stack that may not be empty with CustomData and an amount of
+   * 1000
+   */
   public static final RecordLoadable<FluidStack> REQUIRED_BUCKET_NBT = notEmpty(OPTIONAL_BUCKET_NBT);
-  /** Loadable for a stack that may not be empty with variable count and CustomData */
+  /**
+   * Loadable for a stack that may not be empty with variable count and CustomData
+   */
   public static final RecordLoadable<FluidStack> REQUIRED_STACK_NBT = notEmpty(OPTIONAL_STACK_NBT);
 
   /* Helpers */
@@ -102,7 +111,8 @@ public class FluidStackLoadable {
 
   /**
    * Makes a fluid stack from fluid, amount, and optional CustomData tag.
-   * The tag is stored as DataComponents.CUSTOM_DATA (replaces removed FluidStack(Fluid, int, CompoundTag)).
+   * The tag is stored as DataComponents.CUSTOM_DATA (replaces removed
+   * FluidStack(Fluid, int, CompoundTag)).
    */
   private static FluidStack makeStack(Fluid fluid, int amount, @Nullable CompoundTag nbt) {
     if (fluid == Fluids.EMPTY || amount <= 0) {
@@ -115,7 +125,9 @@ public class FluidStackLoadable {
     return stack;
   }
 
-  /** Creates a loadable for a fluid stack with a fixed amount and no components */
+  /**
+   * Creates a loadable for a fluid stack with a fixed amount and no components
+   */
   public static Loadable<FluidStack> fixedSize(int amount) {
     if (amount <= 0) {
       throw new IllegalArgumentException("Count must be positive, received " + amount);
@@ -123,7 +135,10 @@ public class FluidStackLoadable {
     return Loadables.FLUID.flatXmap(fluid -> makeStack(fluid, amount), FLUID_GETTER);
   }
 
-  /** Creates a loadable for a fluid stack with a fixed amount and CustomData component support */
+  /**
+   * Creates a loadable for a fluid stack with a fixed amount and CustomData
+   * component support
+   */
   public static RecordLoadable<FluidStack> fixedSizeNBT(int amount) {
     if (amount <= 0) {
       throw new IllegalArgumentException("Amount must be positive, received " + amount);

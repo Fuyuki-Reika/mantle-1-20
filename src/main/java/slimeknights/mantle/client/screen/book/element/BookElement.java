@@ -23,14 +23,12 @@ import java.util.stream.Stream;
 public abstract class BookElement {
 
   /**
-   * TODO 1.21: make this field protected instead of public to ensure setter is
    * used.
    */
   @Setter
   public BookScreen parent;
 
   protected Minecraft mc = Minecraft.getInstance();
-  // TODO 1.21.1: textureManager is now private, use getter instead
   protected TextureManager renderEngine = this.mc.getTextureManager();
 
   public int x, y;
@@ -58,8 +56,6 @@ public abstract class BookElement {
   }
 
   public void renderToolTip(GuiGraphics graphics, Font fontRenderer, ItemStack stack, int x, int y) {
-    // TODO 1.21.1: getTooltipLines now requires Item.TooltipContext instead of
-    // Player
     Item.TooltipContext tooltipContext = Item.TooltipContext.of(this.mc.level);
     List<Component> list = stack.getTooltipLines(tooltipContext, this.mc.player,
         this.mc.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
@@ -109,10 +105,6 @@ public abstract class BookElement {
    */
   @SuppressWarnings("UnstableApiUsage") // this is a javadoc my dude
   public void drawTooltip(GuiGraphics graphics, List<Component> textLines, int mouseX, int mouseY, Font font) {
-    // TODO 1.21.1: renderTooltipInternal with custom positioner is private
-    // Using renderComponentTooltip for List<Component> support
-    // This doesn't support custom positioning, so tooltips may not stay within book
-    // page bounds
     graphics.renderComponentTooltip(font, textLines, mouseX, mouseY);
   }
 }

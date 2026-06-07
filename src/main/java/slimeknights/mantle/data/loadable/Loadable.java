@@ -173,8 +173,6 @@ public interface Loadable<T> extends JsonDeserializer<T>, JsonSerializer<T>, Str
   default ArrayLoadable<T[]> array(IntFunction<T[]> constructor, boolean allowNull, int minSize) {
     return array(constructor, allowNull, minSize, Integer.MAX_VALUE);
   }
-
-  // TODO 1.21: switch return type to ArrayLoadable
   /** Makes a list of this loadable */
   default Loadable<List<T>> list(int minSize) {
     return new ListLoadable<>(this, minSize);

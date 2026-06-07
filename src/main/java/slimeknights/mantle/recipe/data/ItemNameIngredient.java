@@ -67,9 +67,6 @@ public class ItemNameIngredient implements ICustomIngredient {
     json.addProperty("item", name.toString());
     return json;
   }
-
-  // TODO 1.21.1: toJson() no longer in ICustomIngredient interface, removed
-  // @Override
   public JsonElement toJson() {
     if (names.size() == 1) {
       return forName(names.get(0));

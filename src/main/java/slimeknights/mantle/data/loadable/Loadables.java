@@ -50,7 +50,6 @@ public class Loadables {
   /** Loadable for a resource location */
   public static final StringLoadable<ResourceLocation> RESOURCE_LOCATION = StringLoadable.DEFAULT.xmap((s, e) -> {
     try {
-      // TODO 1.21.1: ResourceLocation(String) constructor removed - use parse()
       return ResourceLocation.parse(s);
     } catch (ResourceLocationException ex) {
       throw e.create(ex);
@@ -68,11 +67,6 @@ public class Loadables {
   public static final ResourceLocationLoadable<MobEffect> MOB_EFFECT = new RegistryLoadable<>(
       BuiltInRegistries.MOB_EFFECT);
   public static final ResourceLocationLoadable<Block> BLOCK = new RegistryLoadable<>(BuiltInRegistries.BLOCK);
-  // TODO 1.21.1: ENCHANTMENT moved to datapack registry - no longer in
-  // BuiltInRegistries
-  // public static final ResourceLocationLoadable<Enchantment> ENCHANTMENT = new
-  // RegistryLoadable<>(
-  // BuiltInRegistries.ENCHANTMENT);
   public static final ResourceLocationLoadable<EntityType<?>> ENTITY_TYPE = new RegistryLoadable<>(
       BuiltInRegistries.ENTITY_TYPE);
   public static final ResourceLocationLoadable<Item> ITEM = new RegistryLoadable<>(BuiltInRegistries.ITEM);
@@ -107,7 +101,6 @@ public class Loadables {
   public static final StringLoadable<ResourceKey<DamageType>> DAMAGE_TYPE_KEY = resourceKey(Registries.DAMAGE_TYPE);
 
   /* Loot tables */
-  // TODO 1.21.1: LootModifierManager.GSON_INSTANCE removed in NeoForge 21.1.85
   /** Loadable for a loot entry instance */
   // public static final Loadable<LootPoolEntryContainer> LOOT_ENTRY = new
   // GsonLoadable<>(

@@ -91,14 +91,10 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
           // insert up to the stack limit
           int size = Math.min(stack.getCount(), getSlotLimit(0));
           if (!simulate) {
-            // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize removed - use copyWithCount
             this.setStack(stack.copyWithCount(size));
           }
-          // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize removed - use copyWithCount
           return stack.copyWithCount(stack.getCount() - size);
         }
-        // TODO 1.21.1: ItemHandlerHelper.canItemStacksStack() removed - use
-        // ItemStack.isSameItemSameComponents
       } else if (ItemStack.isSameItemSameComponents(current, stack)) {
         // increase up to the stack limit
         int added = Math.min(stack.getCount(), getSlotLimit(0) - current.getCount());
@@ -107,7 +103,6 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
             current.grow(added);
             setStack(current);
           }
-          // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize removed - use copyWithCount
           return stack.copyWithCount(stack.getCount() - added);
         }
       }
@@ -127,10 +122,8 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
 
     // if amount is less than our size, need to do some shrinking
     if (amount < stack.getCount()) {
-      // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize removed - use copyWithCount
       ItemStack result = stack.copyWithCount(amount);
       if (!simulate) {
-        // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize removed - use copyWithCount
         setStack(stack.copyWithCount(stack.getCount() - amount));
       }
       return result;

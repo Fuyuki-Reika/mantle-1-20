@@ -27,7 +27,6 @@ public class MantleRenderTypes extends RenderType {
 
     /**
      * Render type used for the fluid renderer.
-     * TODO 1.21: can we replace this with
      * {@link RenderType#ENTITY_TRANSLUCENT_CULL}? Would require including normals
      * in our vertex format.
      */

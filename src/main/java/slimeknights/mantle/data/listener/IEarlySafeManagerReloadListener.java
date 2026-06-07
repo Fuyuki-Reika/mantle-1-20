@@ -18,8 +18,6 @@ public interface IEarlySafeManagerReloadListener extends PreparableReloadListene
       ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor,
       Executor gameExecutor) {
     return CompletableFuture.runAsync(() -> {
-      // TODO 1.21.1: ModLoader.isLoadingStateValid() removed in NeoForge 21.1.85
-      // Removed check - assuming reload is always safe at this point
       onReloadSafe(resourceManager);
     }, backgroundExecutor).thenCompose(stage::wait);
   }

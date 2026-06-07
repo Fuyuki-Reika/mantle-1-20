@@ -49,7 +49,6 @@ public class ReplaceItemLootModifier extends LootModifier {
     this.original = original;
     this.replacement = replacement;
     this.functions = functions;
-    // TODO 1.21.1: LootItemFunctions.compose() now expects List instead of array
     this.combinedFunctions = LootItemFunctions.compose(List.of(functions));
   }
 
@@ -66,16 +65,12 @@ public class ReplaceItemLootModifier extends LootModifier {
       ItemStack stack = iterator.next();
       if (original.test(stack)) {
         ItemStack replacement = this.replacement.get();
-        // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize() removed, use
-        // ItemStack.copyWithCount()
         iterator.set(
             combinedFunctions.apply(replacement.copyWithCount(replacement.getCount() * stack.getCount()), context));
       }
     }
     return generatedLoot;
   }
-
-  // TODO 1.21.1: codec() return type changed from Codec to MapCodec
   @Override
   public MapCodec<? extends IGlobalLootModifier> codec() {
     return CODEC;

@@ -56,13 +56,9 @@ public record TagCombinationCondition<T>(List<TagKey<T>> match, @Nullable TagKey
   public static <T> TagCombinationCondition<T> difference(TagKey<T> match, TagKey<T> ignore) {
     return match(ignore, match);
   }
-
-  // TODO 1.21.1: getID() is not an override, removed @Override annotation
   public ResourceLocation getID() {
     return ID;
   }
-
-  // TODO 1.21.1: codec() added to ICondition interface
   @Override
   public MapCodec<? extends ICondition> codec() {
     return SERIALIZER.codec();
@@ -132,8 +128,6 @@ public record TagCombinationCondition<T>(List<TagKey<T>> match, @Nullable TagKey
         json.addProperty("ignore", value.ignore.location().toString());
       }
     }
-
-    // TODO 1.21.1: read() is not an override, removed @Override annotation
     public TagCombinationCondition<?> read(JsonObject json) {
       // default to item registry if registry is unset
       ResourceKey<Registry<Object>> registry = ResourceKey
@@ -142,17 +136,12 @@ public record TagCombinationCondition<T>(List<TagKey<T>> match, @Nullable TagKey
           MATCH.getIfPresent(json, "match").stream().map(id -> TagKey.create(registry, id)).toList(),
           json.has("ignore") ? TagKey.create(registry, JsonHelper.getResourceLocation(json, "ignore")) : null);
     }
-
-    // TODO 1.21.1: codec() implementation simplified due to type inference issues
-    // with TagKey.codec()
     public MapCodec<TagCombinationCondition<?>> codec() {
       return RecordCodecBuilder.mapCodec(instance -> instance.group(
           Codec.STRING.optionalFieldOf("registry", Registries.ITEM.location().toString())
               .forGetter(c -> c.match.get(0).registry().location().toString()),
           Codec.STRING.fieldOf("match").forGetter(c -> c.match.get(0).location().toString()))
           .apply(instance, (regStr, tagStr) -> {
-            // TODO 1.21.1: ResourceLocation constructor changed, now uses parse() for
-            // string input
             ResourceKey<?> registry = ResourceKey.createRegistryKey(ResourceLocation.parse(regStr));
             @SuppressWarnings("unchecked")
             TagKey<?> tagKey = TagKey.create((ResourceKey) registry, ResourceLocation.parse(tagStr));

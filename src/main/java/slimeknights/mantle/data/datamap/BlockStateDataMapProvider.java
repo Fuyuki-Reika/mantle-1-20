@@ -74,8 +74,6 @@ public abstract class BlockStateDataMapProvider<D> extends GenericDataProvider {
 
   /** Adds an entry that a block may redirect to */
   protected void entry(String key, D data) {
-    // TODO 1.21.1: ResourceLocation(String, String) constructor is private - use
-    // fromNamespaceAndPath
     entry(ResourceLocation.fromNamespaceAndPath(modId, key), data);
   }
 
@@ -105,8 +103,6 @@ public abstract class BlockStateDataMapProvider<D> extends GenericDataProvider {
 
     /** Adds a parent variant, stored as a string */
     public VariantBuilder variant(String parent) {
-      // TODO 1.21.1: ResourceLocation(String, String) constructor is private - use
-      // fromNamespaceAndPath
       return variant(ResourceLocation.fromNamespaceAndPath(modId, parent));
     }
 

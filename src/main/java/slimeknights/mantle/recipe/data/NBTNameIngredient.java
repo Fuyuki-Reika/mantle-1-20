@@ -67,8 +67,6 @@ public class NBTNameIngredient implements ICustomIngredient {
     if (!name.equals(itemId)) {
       return false;
     }
-    // TODO 1.21.1: ItemStack.getTag() removed - using CustomData component
-    // If nbt is null, item must have no custom data (empty tag)
     if (nbt == null) {
       net.minecraft.world.item.component.CustomData customData = stack.getOrDefault(
           net.minecraft.core.component.DataComponents.CUSTOM_DATA,
@@ -86,7 +84,6 @@ public class NBTNameIngredient implements ICustomIngredient {
   public Stream<ItemStack> getItems() {
     ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.get(name));
     if (nbt != null) {
-      // TODO 1.21.1: ItemStack.setTag() removed - using CustomData component
       stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA,
           net.minecraft.world.item.component.CustomData.of(nbt.copy()));
     }
@@ -97,9 +94,6 @@ public class NBTNameIngredient implements ICustomIngredient {
   public boolean isSimple() {
     return false;
   }
-
-  // TODO 1.21.1: toJson() no longer in ICustomIngredient interface, removed
-  // @Override
   public JsonElement toJson() {
     JsonObject json = new JsonObject();
     json.addProperty("item", name.toString());

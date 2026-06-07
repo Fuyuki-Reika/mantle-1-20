@@ -87,8 +87,6 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer.With
   public JsonObject serialize(JsonSerializationContext context) {
     JsonObject json = new JsonObject();
     json.addProperty("type", ID.toString());
-    // TODO 1.21.1: Ingredient.toJson() removed - use Ingredient.CODEC_NONEMPTY to
-    // serialize
     json.add("input", Ingredient.CODEC_NONEMPTY.encodeStart(JsonOps.INSTANCE, input).getOrThrow());
     if (!result.isEmpty()) {
       json.add("result", result.serialize(false));
@@ -120,8 +118,6 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer.With
     public T deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context)
         throws JsonParseException {
       JsonObject json = element.getAsJsonObject();
-      // TODO 1.21.1: Ingredient.fromJson() removed - use Ingredient.CODEC_NONEMPTY to
-      // deserialize
       Ingredient input = Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, JsonHelper.getElement(json, "input"))
           .getOrThrow();
       ItemOutput result = getResult(json);
