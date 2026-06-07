@@ -26,20 +26,22 @@ public class FileRepository extends BookRepository {
 
   @Override
   public List<SectionData> getSections() {
-    return new ArrayList<>(Arrays.asList(BookLoader.getGson().fromJson(this.resourceToString(this.getResource(this.getResourceLocation("index.json"))), SectionData[].class)));
+    return new ArrayList<>(Arrays.asList(BookLoader.getGson().fromJson(
+        this.resourceToString(this.getResource(this.getResourceLocation("index.json"))), SectionData[].class)));
   }
 
   @Override
   public ResourceLocation getResourceLocation(@Nullable String path, boolean safe) {
     if (path == null) {
-      return safe ? new ResourceLocation("") : null;
+      return safe ? ResourceLocation.parse("") : null;
     }
 
     if (!path.contains(":")) {
       String langPath = null;
 
-      //noinspection ConstantConditions - this was proven to be null once
-      if (Minecraft.getInstance().getLanguageManager() != null && Minecraft.getInstance().getLanguageManager().getSelected() != null) {
+      // noinspection ConstantConditions - this was proven to be null once
+      if (Minecraft.getInstance().getLanguageManager() != null
+          && Minecraft.getInstance().getLanguageManager().getSelected() != null) {
         langPath = Minecraft.getInstance().getLanguageManager().getSelected();
       }
 
@@ -47,30 +49,31 @@ public class FileRepository extends BookRepository {
 
       ResourceLocation res;
 
-      // TODO: this can be optimized if we return the resource instead of the location, how feasible is that in practice?
-      //noinspection ConstantConditions - see above
+      // TODO: this can be optimized if we return the resource instead of the
+      // location, how feasible is that in practice?
+      // noinspection ConstantConditions - see above
       if (langPath != null) {
-        res = new ResourceLocation(this.location + "/" + langPath + "/" + path);
+        res = ResourceLocation.parse(this.location + "/" + langPath + "/" + path);
         if (this.resourceExists(res)) {
           return res;
         }
       }
-      res = new ResourceLocation(this.location + "/" + defaultLangPath + "/" + path);
+      res = ResourceLocation.parse(this.location + "/" + defaultLangPath + "/" + path);
       if (this.resourceExists(res)) {
         return res;
       }
-      res = new ResourceLocation(this.location + "/" + path);
+      res = ResourceLocation.parse(this.location + "/" + path);
       if (this.resourceExists(res)) {
         return res;
       }
     } else {
-      ResourceLocation res = new ResourceLocation(path);
+      ResourceLocation res = ResourceLocation.parse(path);
       if (this.resourceExists(res)) {
         return res;
       }
     }
 
-    return safe ? new ResourceLocation("") : null;
+    return safe ? ResourceLocation.parse("") : null;
   }
 
   @Override

@@ -26,9 +26,11 @@ import java.util.stream.Stream;
 public abstract class BlockStateDataMapProvider<D> extends GenericDataProvider {
   private final Loadable<D> dataLoader;
   private final String modId;
-  private final Map<Block,DataMap> blocks = new HashMap<>();
-  private final Map<ResourceLocation,D> entries = new HashMap<>();
-  public BlockStateDataMapProvider(PackOutput output, Target type, String folder, Loadable<D> dataLoader, String modId) {
+  private final Map<Block, DataMap> blocks = new HashMap<>();
+  private final Map<ResourceLocation, D> entries = new HashMap<>();
+
+  public BlockStateDataMapProvider(PackOutput output, Target type, String folder, Loadable<D> dataLoader,
+      String modId) {
     super(output, type, folder);
     this.dataLoader = dataLoader;
     this.modId = modId;
@@ -45,9 +47,10 @@ public abstract class BlockStateDataMapProvider<D> extends GenericDataProvider {
   public CompletableFuture<?> run(CachedOutput cached) {
     addEntries();
     return allOf(Stream.concat(
-      blocks.values().stream().map(entry -> saveJson(cached, BuiltInRegistries.BLOCK.getKey(entry.owner), entry.toJson())),
-      entries.entrySet().stream().map(entry -> saveJson(cached, entry.getKey(), dataLoader.serialize(entry.getValue())))
-    ));
+        blocks.values().stream()
+            .map(entry -> saveJson(cached, BuiltInRegistries.BLOCK.getKey(entry.owner), entry.toJson())),
+        entries.entrySet().stream()
+            .map(entry -> saveJson(cached, entry.getKey(), dataLoader.serialize(entry.getValue())))));
   }
 
   /** Creates a new builder for a block */
@@ -64,17 +67,21 @@ public abstract class BlockStateDataMapProvider<D> extends GenericDataProvider {
   protected void entry(ResourceLocation key, D data) {
     D original = entries.putIfAbsent(key, data);
     if (original != null) {
-      throw new IllegalArgumentException("Duplicate entry at " + key + ", original " + original + ", new value " + data);
+      throw new IllegalArgumentException(
+          "Duplicate entry at " + key + ", original " + original + ", new value " + data);
     }
   }
 
   /** Adds an entry that a block may redirect to */
   protected void entry(String key, D data) {
-    entry(new ResourceLocation(modId, key), data);
+    // TODO 1.21.1: ResourceLocation(String, String) constructor is private - use
+    // fromNamespaceAndPath
+    entry(ResourceLocation.fromNamespaceAndPath(modId, key), data);
   }
 
   /** Record holding a single entry in the variants list */
-  private record Variant<D>(@Nullable D data, @Nullable ResourceLocation parent, StateVariantStringBuilder variant) {}
+  private record Variant<D>(@Nullable D data, @Nullable ResourceLocation parent, StateVariantStringBuilder variant) {
+  }
 
   /** Represents a single file to be generated */
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -98,7 +105,9 @@ public abstract class BlockStateDataMapProvider<D> extends GenericDataProvider {
 
     /** Adds a parent variant, stored as a string */
     public VariantBuilder variant(String parent) {
-      return variant(new ResourceLocation(modId, parent));
+      // TODO 1.21.1: ResourceLocation(String, String) constructor is private - use
+      // fromNamespaceAndPath
+      return variant(ResourceLocation.fromNamespaceAndPath(modId, parent));
     }
 
     /** Serializes this to JSON */

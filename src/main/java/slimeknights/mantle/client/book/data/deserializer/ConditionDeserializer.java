@@ -16,6 +16,11 @@ public class ConditionDeserializer implements JsonDeserializer<ICondition> {
     if (!json.isJsonObject())
       throw new JsonParseException("A condition must be a JSON Object");
 
-    return CraftingHelper.getCondition(json.getAsJsonObject());
+    // TODO: NeoForge 1.21.1 - CraftingHelper.getCondition was removed, conditions
+    // now use codecs
+    // This deserializer may need to be updated or removed if conditions are handled
+    // differently
+    throw new UnsupportedOperationException(
+        "Condition deserialization needs migration to NeoForge 1.21.1 condition system");
   }
 }

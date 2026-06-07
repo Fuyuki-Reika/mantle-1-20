@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -13,6 +14,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -35,18 +37,21 @@ import java.util.function.Predicate;
 public final class RetexturedHelper {
   /** Translation key for the texture ID in advanced tooltips. */
   public static final String KEY_ID = Mantle.makeDescriptionId("block", "retextured.id");
-  /** Tag name for texture blocks. Should not be used directly, use the utils to interact */
+  /**
+   * Tag name for texture blocks. Should not be used directly, use the utils to
+   * interact
+   */
   public static final String TAG_TEXTURE = "texture";
   /** Property for tile entities containing a texture block */
   public static final ModelProperty<Block> BLOCK_PROPERTY = new ModelProperty<>(block -> block != Blocks.AIR);
-
 
   /* Texture name */
 
   /**
    * Gets the name of the texture from NBT
-   * @param nbt  NBT tag
-   * @return  Name of the texture, or empty if no texture
+   * 
+   * @param nbt NBT tag
+   * @return Name of the texture, or empty if no texture
    */
   public static String getTextureName(@Nullable CompoundTag nbt) {
     if (nbt == null) {
@@ -57,17 +62,20 @@ public final class RetexturedHelper {
 
   /**
    * Gets the texture name from a stack
-   * @param stack  Stack
-   * @return  Texture, or empty string if none
+   * 
+   * @param stack Stack
+   * @return Texture, or empty string if none
    */
   public static String getTextureName(ItemStack stack) {
-    return getTextureName(stack.getTag());
+    CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+    return getTextureName(customData.copyTag());
   }
 
   /**
    * Gets the name of the texture from the block
-   * @param block  Block
-   * @return  Name of the texture, or empty if the block is air
+   * 
+   * @param block Block
+   * @return Name of the texture, or empty if the block is air
    */
   public static String getTextureName(Block block) {
     if (block == Blocks.AIR) {
@@ -76,19 +84,19 @@ public final class RetexturedHelper {
     return Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(block)).toString();
   }
 
-
   /* Texture */
 
   /**
    * Gets a block for the given name
-   * @param name  Block name
-   * @return  Block entry, or {@link Blocks#AIR} if no match
+   * 
+   * @param name Block name
+   * @return Block entry, or {@link Blocks#AIR} if no match
    */
   public static Block getBlock(String name) {
     if (!name.isEmpty()) {
       ResourceLocation location = ResourceLocation.tryParse(name);
       if (location != null) {
-        return BuiltInRegistries.BLOCK.get(new ResourceLocation(name));
+        return BuiltInRegistries.BLOCK.get(location);
       }
     }
     return Blocks.AIR;
@@ -96,20 +104,21 @@ public final class RetexturedHelper {
 
   /**
    * Gets the texture from a stack
-   * @param stack  Stack to fetch texture
-   * @return  Texture, or {@link Blocks#AIR} if none
+   * 
+   * @param stack Stack to fetch texture
+   * @return Texture, or {@link Blocks#AIR} if none
    */
   public static Block getTexture(ItemStack stack) {
     return getBlock(getTextureName(stack));
   }
 
-
   /* Setting */
 
   /**
    * Sets the texture in an NBT instance
-   * @param nbt      Tag instance
-   * @param texture  Texture to set
+   * 
+   * @param nbt     Tag instance
+   * @param texture Texture to set
    */
   public static void setTexture(@Nullable CompoundTag nbt, String texture) {
     if (nbt != null) {
@@ -120,23 +129,25 @@ public final class RetexturedHelper {
       }
     }
   }
+
   /**
    * Creates a new item stack with the given block as it's texture tag
-   * @param stack  Stack to modify
-   * @param name   Block name to set. If empty, clears the tag
+   * 
+   * @param stack Stack to modify
+   * @param name  Block name to set. If empty, clears the tag
    * @return The item stack with the proper NBT
    */
   public static ItemStack setTexture(ItemStack stack, String name) {
-    if (!name.isEmpty()) {
-      setTexture(stack.getOrCreateTag(), name);
-    } else if (stack.hasTag()) {
-      setTexture(stack.getTag(), name);
-    }
+    CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+    CompoundTag tag = customData.copyTag();
+    setTexture(tag, name);
+    stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
     return stack;
   }
 
   /**
    * Creates a new item stack with the given block as it's texture tag
+   * 
    * @param stack Stack to modify
    * @param block Block to set
    * @return The item stack with the proper NBT
@@ -148,10 +159,11 @@ public final class RetexturedHelper {
     return setTexture(stack, BuiltInRegistries.BLOCK.getKey(block).toString());
   }
 
-
   /* Block entity */
 
-  /** Helper to call client side when the model data changes to refresh model data */
+  /**
+   * Helper to call client side when the model data changes to refresh model data
+   */
   public static void onTextureUpdated(BlockEntity self) {
     // update the texture in BE data
     Level level = self.getLevel();
@@ -176,14 +188,14 @@ public final class RetexturedHelper {
     return getModelDataBuilder(block).build();
   }
 
-
   /* Block */
 
   /**
    * Adds the texture block to the tooltip
-   * @param stack    Stack instance
-   * @param tooltip  Tooltip
-   * @param flag     Tooltip flag instance
+   * 
+   * @param stack   Stack instance
+   * @param tooltip Tooltip
+   * @param flag    Tooltip flag instance
    */
   public static void addTooltip(ItemStack stack, List<Component> tooltip, TooltipFlag flag) {
     Block block = getTexture(stack);
@@ -191,7 +203,8 @@ public final class RetexturedHelper {
       tooltip.add(block.getName().withStyle(ChatFormatting.GRAY));
       // advanced includes the ID of the texture
       if (flag.isAdvanced()) {
-        tooltip.add(Component.translatable(KEY_ID, BuiltInRegistries.BLOCK.getKey(block)).withStyle(ChatFormatting.DARK_GRAY));
+        tooltip.add(
+            Component.translatable(KEY_ID, BuiltInRegistries.BLOCK.getKey(block)).withStyle(ChatFormatting.DARK_GRAY));
       }
     }
   }
@@ -204,9 +217,11 @@ public final class RetexturedHelper {
 
   /**
    * Adds all blocks from the block tag to the specified block for creative tabs
-   * @param block              Dynamic texture item instance
-   * @param tag                Tag for texturing
-   * @param tab                Consumer accepting items for the tab. If it returns true the iteration stops.
+   * 
+   * @param block Dynamic texture item instance
+   * @param tag   Tag for texturing
+   * @param tab   Consumer accepting items for the tab. If it returns true the
+   *              iteration stops.
    * @return true if any variants were added, false otherwise
    */
   @SuppressWarnings("deprecation")

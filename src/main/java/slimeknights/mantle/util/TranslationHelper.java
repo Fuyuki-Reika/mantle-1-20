@@ -30,7 +30,7 @@ public class TranslationHelper {
    * @return True if its translatable
    */
   public static boolean canTranslate(String key) {
-    return !key.equals(ForgeI18n.getPattern(key));
+    return !key.equals(I18n.get(key));
   }
 
   /**
@@ -62,7 +62,7 @@ public class TranslationHelper {
    * @param tooltip List of tooltips
    */
   public static void addOptionalTooltip(String key, List<Component> tooltip) {
-    String translated = ForgeI18n.getPattern(key);
+    String translated = I18n.get(key);
     if (canTranslate(key, translated)) {
       addEachLine(translated, tooltip);
     }

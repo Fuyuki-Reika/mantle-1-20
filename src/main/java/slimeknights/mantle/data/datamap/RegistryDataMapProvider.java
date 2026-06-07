@@ -16,20 +16,21 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 /** Data provider for {@link RegistryDataMapLoader} */
-public abstract class RegistryDataMapProvider<R,D> extends GenericDataProvider {
+public abstract class RegistryDataMapProvider<R, D> extends GenericDataProvider {
   private final Registry<R> registry;
   private final RecordLoadable<D> dataLoader;
   private final String modId;
-  private final Map<ResourceLocation,Supplier<JsonObject>> entries = new HashMap<>();
+  private final Map<ResourceLocation, Supplier<JsonObject>> entries = new HashMap<>();
 
-  public RegistryDataMapProvider(PackOutput output, Target type, Registry<R> registry, RecordLoadable<D> dataLoader, String folder, String modId) {
+  public RegistryDataMapProvider(PackOutput output, Target type, Registry<R> registry, RecordLoadable<D> dataLoader,
+      String folder, String modId) {
     super(output, type, folder);
     this.registry = registry;
     this.dataLoader = dataLoader;
     this.modId = modId;
   }
 
-  public RegistryDataMapProvider(PackOutput output, Target type, RegistryDataMapLoader<R,D> dataLoader, String modId) {
+  public RegistryDataMapProvider(PackOutput output, Target type, RegistryDataMapLoader<R, D> dataLoader, String modId) {
     this(output, type, dataLoader.getRegistry(), dataLoader.getDataLoader(), dataLoader.getFolder(), modId);
   }
 
@@ -42,12 +43,12 @@ public abstract class RegistryDataMapProvider<R,D> extends GenericDataProvider {
     return allOf(entries.entrySet().stream().map(entry -> saveJson(cache, entry.getKey(), entry.getValue().get())));
   }
 
-
   /* Provider helpers */
 
   /** Makes a location from a path */
   protected ResourceLocation key(String name) {
-    return new ResourceLocation(modId, name);
+    // TODO 1.21.1: ResourceLocation(String, String) constructor is private
+    return ResourceLocation.fromNamespaceAndPath(modId, name);
   }
 
   /** Makes a location from a registry entry */
@@ -60,17 +61,16 @@ public abstract class RegistryDataMapProvider<R,D> extends GenericDataProvider {
     return key(entry.get());
   }
 
-
   /* Basic supplier methods */
 
   /** Adds an entry to the provider */
   protected void entry(ResourceLocation key, Supplier<JsonObject> json) {
     Supplier<JsonObject> original = entries.putIfAbsent(key, json);
     if (original != null) {
-      throw new IllegalArgumentException("Duplicate entry at " + key + ", original " + original + ", new value " + json);
+      throw new IllegalArgumentException(
+          "Duplicate entry at " + key + ", original " + original + ", new value " + json);
     }
   }
-
 
   /* Redirects */
 
@@ -112,7 +112,6 @@ public abstract class RegistryDataMapProvider<R,D> extends GenericDataProvider {
   protected void redirect(Supplier<? extends R> key, String parent) {
     redirect(key(key), key(parent));
   }
-
 
   /* Data entry methods */
 

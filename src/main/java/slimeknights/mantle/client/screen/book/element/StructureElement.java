@@ -1,5 +1,6 @@
 package slimeknights.mantle.client.screen.book.element;
 
+import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Transformation;
@@ -41,10 +42,11 @@ public class StructureElement extends SizedBookElement {
   public long lastStep = -1;
   public long lastPrintedErrorTimeMs = -1;
 
-  public StructureElement(int x, int y, int width, int height, StructureTemplate template, List<StructureTemplate.StructureBlockInfo> structure) {
+  public StructureElement(int x, int y, int width, int height, StructureTemplate template,
+      List<StructureTemplate.StructureBlockInfo> structure) {
     super(x, y, width, height);
 
-    int[] size = {template.getSize().getX(), template.getSize().getY(), template.getSize().getZ()};
+    int[] size = { template.getSize().getX(), template.getSize().getY(), template.getSize().getZ() };
 
     this.scale = 100f / (float) IntStream.of(size).max().getAsInt();
 
@@ -60,12 +62,15 @@ public class StructureElement extends SizedBookElement {
     this.transX = x + width / 2F;
     this.transY = y + height / 2F;
 
-    this.additionalTransform = new Transformation(null, new Quaternionf().rotateYXZ(0, (float)(25 * Math.PI / 180f), 0), null, new Quaternionf().rotateYXZ((float)(-45 * Math.PI / 180f), 0, 0));
+    this.additionalTransform = new Transformation(null,
+        new Quaternionf().rotateYXZ(0, (float) (25 * Math.PI / 180f), 0), null,
+        new Quaternionf().rotateYXZ((float) (-45 * Math.PI / 180f), 0, 0));
   }
 
   @Override
   public void draw(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
-    MultiBufferSource.BufferSource buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+    // In 1.21.1, use Minecraft renderBuffers to get BufferSource
+    MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
     PoseStack transform = graphics.pose();
     PoseStack.Pose lastEntryBeforeTry = transform.last();
 
@@ -91,7 +96,8 @@ public class StructureElement extends SizedBookElement {
 
       final BlockRenderDispatcher blockRender = Minecraft.getInstance().getBlockRenderer();
 
-      transform.translate(this.transX, this.transY, Math.max(structureHeight, Math.max(structureWidth, structureLength)));
+      transform.translate(this.transX, this.transY,
+          Math.max(structureHeight, Math.max(structureWidth, structureLength)));
       transform.scale(this.scale, -this.scale, 1);
       transform.pushTransformation(this.additionalTransform);
       transform.mulPose(new Quaternionf().rotateYXZ(0, 0, 0));
@@ -126,9 +132,10 @@ public class StructureElement extends SizedBookElement {
               BakedModel model = blockRender.getBlockModel(state);
               for (RenderType renderType : model.getRenderTypes(state, structureWorld.random, modelData)) {
                 blockRender.getModelRenderer().tesselateBlock(
-                  structureWorld, blockRender.getBlockModel(state), state, pos, transform,
-                  buffer.getBuffer(MantleRenderTypes.TRANSLUCENT_FULLBRIGHT), false, structureWorld.random, state.getSeed(pos),
-                  overlay, modelData, renderType);
+                    structureWorld, blockRender.getBlockModel(state), state, pos, transform,
+                    buffer.getBuffer(MantleRenderTypes.TRANSLUCENT_FULLBRIGHT), false, structureWorld.random,
+                    state.getSeed(pos),
+                    overlay, modelData, renderType);
               }
 
               transform.popPose();
@@ -161,7 +168,8 @@ public class StructureElement extends SizedBookElement {
   }
 
   @Override
-  public void mouseDragged(double clickX, double clickY, double mouseX, double mouseY, double lastX, double lastY, int button) {
+  public void mouseDragged(double clickX, double clickY, double mouseX, double mouseY, double lastX, double lastY,
+      int button) {
     double dx = mouseX - lastX;
     double dy = mouseY - lastY;
     this.additionalTransform = forRotation(dx * 80D / 104, dy * 0.8).compose(this.additionalTransform);

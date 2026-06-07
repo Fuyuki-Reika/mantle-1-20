@@ -70,7 +70,7 @@ public class NetworkWrapper {
    * @param <MSG>     Packet class type
    */
   public <MSG> void registerPacket(Class<MSG> clazz, BiConsumer<MSG, FriendlyByteBuf> encoder,
-      Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG, Supplier<IPayloadContext>> consumer,
+      Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG, Supplier<ISimplePacket.IPayloadContext>> consumer,
       @Nullable Object direction) {
     registerPacketNoLogger(clazz, encoder, wrapLogger(clazz, decoder), consumer, direction);
   }
@@ -86,7 +86,7 @@ public class NetworkWrapper {
    * @param <MSG>     Packet class type
    */
   public <MSG> void registerPacketNoLogger(Class<MSG> clazz, BiConsumer<MSG, FriendlyByteBuf> encoder,
-      Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG, Supplier<IPayloadContext>> consumer,
+      Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG, Supplier<ISimplePacket.IPayloadContext>> consumer,
       @Nullable Object direction) {
     // In NeoForge 1.21, packets are registered via RegisterPayloadHandlersEvent
     // This method is kept for API compatibility but registration happens in Mantle

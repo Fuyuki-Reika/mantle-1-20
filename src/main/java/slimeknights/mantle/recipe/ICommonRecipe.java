@@ -1,16 +1,20 @@
 package slimeknights.mantle.recipe;
 
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeInput;
 
 /**
  * Extension of {@link Recipe} to set some methods that always set.
- * @param <C>  Inventory type
+ * 
+ * @param <C> Inventory type
  */
-public interface ICommonRecipe<C extends Container> extends Recipe<C> {
-  @Override
+// TODO 1.21.1: Container changed to RecipeInput - Recipe<C extends RecipeInput>
+// instead of Recipe<C extends Container>
+public interface ICommonRecipe<C extends RecipeInput> extends Recipe<C> {
+  // TODO 1.21.1: assemble() signature likely changed - removed @Override
+  // annotation
   default ItemStack assemble(C inv, RegistryAccess access) {
     return getResultItem(access).copy();
   }
@@ -23,8 +27,10 @@ public interface ICommonRecipe<C extends Container> extends Recipe<C> {
   }
 
   /**
-   * Returns true to hide this recipe from the recipe book. Needed until Forge has proper recipe book support.
-   * @return  True
+   * Returns true to hide this recipe from the recipe book. Needed until Forge has
+   * proper recipe book support.
+   * 
+   * @return True
    */
   @Override
   default boolean isSpecial() {

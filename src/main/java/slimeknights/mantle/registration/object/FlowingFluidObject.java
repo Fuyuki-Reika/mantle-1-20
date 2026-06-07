@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.LiquidBlock;
-import net.minecraft.world.level.material.FlowingFluid;
+import net.neoforged.neoforge.fluids.BaseFlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidType;
 import slimeknights.mantle.recipe.ingredient.FluidIngredient;
@@ -20,7 +20,7 @@ import java.util.function.Supplier;
  * @param <F>  Fluid class
  */
 @SuppressWarnings("WeakerAccess")
-public class FlowingFluidObject<F extends FlowingFluid> extends FluidObject<F> {
+public class FlowingFluidObject<F extends BaseFlowingFluid> extends FluidObject<F> {
   /** Tag in the mod namespace, exact match */
   @Getter @Nonnull
   private final TagKey<Fluid> localTag;

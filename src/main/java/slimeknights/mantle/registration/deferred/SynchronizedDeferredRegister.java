@@ -5,7 +5,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.function.Supplier;
 
@@ -25,7 +25,7 @@ public class SynchronizedDeferredRegister<T> {
   }
 
   /** Registers the given object, synchronized over the internal register */
-  public <I extends T> RegistryObject<I> register(final String name, final Supplier<? extends I> sup) {
+  public <I extends T> DeferredHolder<T, I> register(final String name, final Supplier<? extends I> sup) {
     synchronized (internal) {
       return internal.register(name, sup);
     }

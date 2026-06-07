@@ -55,11 +55,14 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
   private final TagKey<Item> logItemTag;
 
   public WoodBlockObject(ResourceLocation name, WoodType woodType, BuildingBlockObject planks,
-                         Supplier<? extends Block> log, Supplier<? extends Block> strippedLog, Supplier<? extends Block> wood, Supplier<? extends Block> strippedWood,
-                         Supplier<? extends FenceBlock> fence, Supplier<? extends FenceGateBlock> fenceGate, Supplier<? extends DoorBlock> door, Supplier<? extends TrapDoorBlock> trapdoor,
-                         Supplier<? extends PressurePlateBlock> pressurePlate, Supplier<? extends ButtonBlock> button,
-                         Supplier<? extends StandingSignBlock> sign, Supplier<? extends WallSignBlock> wallSign,
-                         Supplier<? extends CeilingHangingSignBlock> hangingSign, Supplier<? extends WallHangingSignBlock> wallHangingSign) {
+      Supplier<? extends Block> log, Supplier<? extends Block> strippedLog, Supplier<? extends Block> wood,
+      Supplier<? extends Block> strippedWood,
+      Supplier<? extends FenceBlock> fence, Supplier<? extends FenceGateBlock> fenceGate,
+      Supplier<? extends DoorBlock> door, Supplier<? extends TrapDoorBlock> trapdoor,
+      Supplier<? extends PressurePlateBlock> pressurePlate, Supplier<? extends ButtonBlock> button,
+      Supplier<? extends StandingSignBlock> sign, Supplier<? extends WallSignBlock> wallSign,
+      Supplier<? extends CeilingHangingSignBlock> hangingSign,
+      Supplier<? extends WallHangingSignBlock> wallHangingSign) {
     super(planks, fence);
     this.woodType = woodType;
     this.log = log;
@@ -75,17 +78,18 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
     this.wallSign = wallSign;
     this.hangingSign = hangingSign;
     this.wallHangingSign = wallHangingSign;
-    ResourceLocation tagName = new ResourceLocation(name.getNamespace(), name.getPath() + "_logs");
+    // TODO 1.21.1: Use fromNamespaceAndPath() instead of private constructor
+    ResourceLocation tagName = ResourceLocation.fromNamespaceAndPath(name.getNamespace(), name.getPath() + "_logs");
     this.logBlockTag = BlockTags.create(tagName);
     this.logItemTag = ItemTags.create(tagName);
   }
 
   @SuppressWarnings("deprecation")
   public WoodBlockObject(ResourceLocation name, WoodType woodType, BuildingBlockObject planks,
-                         Block log, Block strippedLog, Block wood, Block strippedWood,
-                         Block fence, Block fenceGate, Block door, Block trapdoor,
-                         Block pressurePlate, Block button,
-                         Block sign, Block wallSign, Block hangingSign, Block wallHangingSign) {
+      Block log, Block strippedLog, Block wood, Block strippedWood,
+      Block fence, Block fenceGate, Block door, Block trapdoor,
+      Block pressurePlate, Block button,
+      Block sign, Block wallSign, Block hangingSign, Block wallHangingSign) {
     super(planks, fence);
     this.woodType = woodType;
     this.log = getHolder(BuiltInRegistries.BLOCK, log);
@@ -101,7 +105,8 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
     this.wallSign = getCastedHolder(BuiltInRegistries.BLOCK, wallSign);
     this.hangingSign = getCastedHolder(BuiltInRegistries.BLOCK, hangingSign);
     this.wallHangingSign = getCastedHolder(BuiltInRegistries.BLOCK, wallHangingSign);
-    ResourceLocation tagName = new ResourceLocation(name.getNamespace(), name.getPath() + "_logs");
+    // TODO 1.21.1: Use fromNamespaceAndPath() instead of private constructor
+    ResourceLocation tagName = ResourceLocation.fromNamespaceAndPath(name.getNamespace(), name.getPath() + "_logs");
     this.logBlockTag = BlockTags.create(tagName);
     this.logItemTag = ItemTags.create(tagName);
   }
@@ -180,11 +185,11 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
   @Override
   public List<Block> values() {
     return List.of(
-      get(), getSlab(), getStairs(), getFence(),
-      getLog(), getStrippedLog(), getWood(), getStrippedWood(),
-      getFenceGate(), getDoor(), getTrapdoor(),
-      getPressurePlate(), getButton(),
-      getSign(), getWallSign(), getHangingSign(), getWallHangingSign());
+        get(), getSlab(), getStairs(), getFence(),
+        getLog(), getStrippedLog(), getWood(), getStrippedWood(),
+        getFenceGate(), getDoor(), getTrapdoor(),
+        getPressurePlate(), getButton(),
+        getSign(), getWallSign(), getHangingSign(), getWallHangingSign());
   }
 
   @Override
@@ -204,5 +209,7 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
   }
 
   /** Variants of wood for the register function */
-	public enum WoodVariant { LOG, WOOD, PLANKS }
+  public enum WoodVariant {
+    LOG, WOOD, PLANKS
+  }
 }

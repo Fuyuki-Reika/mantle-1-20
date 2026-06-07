@@ -21,7 +21,8 @@ public record RegistryTagSource<T>(Registry<T> registry) implements TagSource<T>
 
   @Override
   public String folder() {
-    return TagManager.getTagDir(key());
+    // TagManager.getTagDir removed in 1.21.1, manually construct the tag directory
+    return "tags/" + key().location().getPath();
   }
 
   /* Tags */
@@ -35,7 +36,6 @@ public record RegistryTagSource<T>(Registry<T> registry) implements TagSource<T>
   public Stream<TagKey<T>> tagKeys() {
     return registry.getTagNames();
   }
-
 
   /* Tag entries */
 
@@ -60,7 +60,6 @@ public record RegistryTagSource<T>(Registry<T> registry) implements TagSource<T>
     return holder.stream().filter(Holder::isBound).map(h -> registry.getKey(h.value())).toList();
   }
 
-
   /* Entries */
 
   @Nullable
@@ -75,7 +74,8 @@ public record RegistryTagSource<T>(Registry<T> registry) implements TagSource<T>
 
   @Override
   public Stream<TagKey<T>> tagsFor(T value) {
-    return registry.getHolder(registry.getId(value)).stream().flatMap(Holder::getTagKeys);
+    // Holder::getTagKeys changed to Holder::tags in 1.21.1
+    return registry.getHolder(registry.getId(value)).stream().flatMap(Holder::tags);
   }
 
   @Override

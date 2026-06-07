@@ -8,64 +8,57 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.capabilities.Capability;
-import net.neoforged.neoforge.capabilities.CapabilityManager;
-import net.neoforged.neoforge.capabilities.CapabilityToken;
-import net.neoforged.neoforge.capabilities.ICapabilityProvider;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-
-import net.neoforged.neoforge.common.util.NonNullFunction;
-import net.neoforged.neoforge.event.AttachCapabilitiesEvent;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.network.packet.SwingArmPacket;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import static slimeknights.mantle.util.LogicHelper.orElseNull;
+import java.util.function.Function;
 
 /**
  * Logic to handle offhand having its own cooldown
+ * 
+ * @deprecated Capability system redesigned in NeoForge 1.21.1, this feature is
+ *             no longer supported
  */
+@Deprecated(forRemoval = true, since = "NeoForge 21.1")
 @RequiredArgsConstructor
-public class OffhandCooldownTracker implements ICapabilityProvider {
+@SuppressWarnings("unused")
+public class OffhandCooldownTracker {
   public static final ResourceLocation KEY = Mantle.getResource("offhand_cooldown");
   /** @deprecated use {@link #get(Player)} */
   @Deprecated(forRemoval = true)
-  public static final NonNullFunction<OffhandCooldownTracker, Float> COOLDOWN_TRACKER = OffhandCooldownTracker::getCooldown;
+  public static final Function<OffhandCooldownTracker, Float> COOLDOWN_TRACKER = OffhandCooldownTracker::getCooldown;
 
   /**
    * Capability instance for offhand cooldown
+   * 
+   * @deprecated Capability system removed in NeoForge 1.21.1
    */
-  public static final Capability<OffhandCooldownTracker> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {
-  });
+  @Deprecated(forRemoval = true, since = "NeoForge 21.1")
+  public static final Object CAPABILITY = null;
 
-  /** Registers the capability and subscribes to event listeners */
+  /**
+   * Registers the capability and subscribes to event listeners
+   * 
+   * @deprecated Capability system removed in NeoForge 1.21.1
+   */
+  @Deprecated(forRemoval = true, since = "NeoForge 21.1")
   public static void init() {
-    NeoForge.EVENT_BUS.addGenericListener(Entity.class, OffhandCooldownTracker::attachCapability);
-  }
-
-  /** Registers the capability with the event bus */
-  public static void register(RegisterCapabilitiesEvent event) {
-    event.register(OffhandCooldownTracker.class);
+    // No-op - capability system removed
   }
 
   /**
-   * Called to add the capability handler to all players
+   * Registers the capability with the event bus
    * 
-   * @param event Event
+   * @deprecated Capability system removed in NeoForge 1.21.1
    */
-  private static void attachCapability(AttachCapabilitiesEvent<Entity> event) {
-    Entity entity = event.getObject();
-    if (entity instanceof Player player) {
-      event.addCapability(KEY, new OffhandCooldownTracker(player));
-    }
+  @Deprecated(forRemoval = true, since = "NeoForge 21.1")
+  public static void register(Object event) {
+    // No-op - capability system removed
   }
 
-  /** Lazy optional of self for capability requirements */
-  private final LazyOptional<OffhandCooldownTracker> capabilityInstance = LazyOptional.of(() -> this);
   /** Player receiving cooldowns */
   @Nullable
   private final Player player;
@@ -80,10 +73,10 @@ public class OffhandCooldownTracker implements ICapabilityProvider {
    */
   private int enabled = 0;
 
-  @Nonnull
-  @Override
-  public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-    return cap == CAPABILITY ? this.capabilityInstance.cast() : LazyOptional.empty();
+  /** @deprecated Capability system removed in NeoForge 1.21.1 */
+  @Deprecated(forRemoval = true, since = "NeoForge 21.1")
+  public Object getCapability(Object cap, @Nullable Direction side) {
+    return null; // Capability system removed
   }
 
   /** Null safe way to get the player's ticks existed */
@@ -152,10 +145,15 @@ public class OffhandCooldownTracker implements ICapabilityProvider {
 
   /* Helpers */
 
-  /** Gets the tracker instance for the target entity */
+  /**
+   * Gets the tracker instance for the target entity
+   * 
+   * @deprecated Capability system removed, returns null
+   */
   @Nullable
+  @Deprecated(forRemoval = true, since = "NeoForge 21.1")
   public static OffhandCooldownTracker get(Player player) {
-    return orElseNull(player.getCapability(OffhandCooldownTracker.CAPABILITY));
+    return null; // Capability system removed
   }
 
   /**

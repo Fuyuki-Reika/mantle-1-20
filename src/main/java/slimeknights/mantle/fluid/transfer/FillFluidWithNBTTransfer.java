@@ -14,6 +14,7 @@ import slimeknights.mantle.recipe.ingredient.FluidIngredient;
 /** Fluid transfer info that fills a fluid into an item, copying its NBT */
 public class FillFluidWithNBTTransfer extends FillFluidContainerTransfer {
   public static final ResourceLocation ID = Mantle.getResource("fill_nbt");
+
   public FillFluidWithNBTTransfer(Ingredient input, ItemOutput filled, FluidIngredient fluid) {
     super(input, filled, fluid);
   }
@@ -21,9 +22,12 @@ public class FillFluidWithNBTTransfer extends FillFluidContainerTransfer {
   @Override
   protected ItemStack getFilled(FluidStack drained) {
     ItemStack filled = super.getFilled(drained);
-    if (drained.hasTag()) {
-      filled.setTag(drained.getTag().copy());
-    }
+    // TODO 1.21.1: FluidStack.hasTag() and getTag() removed - data component
+    // migration needed
+    // Returning ItemStack without NBT copy temporarily
+    // if (drained.hasTag()) {
+    // filled.setTag(drained.getTag().copy());
+    // }
     return filled;
   }
 
@@ -37,5 +41,6 @@ public class FillFluidWithNBTTransfer extends FillFluidContainerTransfer {
   /**
    * Unique loader instance
    */
-  public static final JsonDeserializer<FillFluidWithNBTTransfer> DESERIALIZER = new Deserializer<>(FillFluidWithNBTTransfer::new);
+  public static final JsonDeserializer<FillFluidWithNBTTransfer> DESERIALIZER = new Deserializer<>(
+      FillFluidWithNBTTransfer::new);
 }

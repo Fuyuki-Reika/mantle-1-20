@@ -84,11 +84,12 @@ public class FluidContainerTransferManager extends SimpleJsonResourceReloadListe
 
   /** For internal use only */
   public void init() {
-    MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, AddReloadListenerEvent.class, e -> {
+    // TODO 1.21.1: MinecraftForge.EVENT_BUS replaced with NeoForge.EVENT_BUS
+    NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, AddReloadListenerEvent.class, e -> {
       e.addListener(this);
       this.context = e.getConditionContext();
     });
-    MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, OnDatapackSyncEvent.class, e -> JsonHelper
+    NeoForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, OnDatapackSyncEvent.class, e -> JsonHelper
         .syncPackets(e, MantleNetwork.INSTANCE, new FluidContainerTransferPacket(this.getContainerItems())));
   }
 
@@ -96,10 +97,14 @@ public class FluidContainerTransferManager extends SimpleJsonResourceReloadListe
   @Nullable
   private IFluidContainerTransfer loadFluidTransfer(ResourceLocation key, JsonObject json) {
     try {
-      if (!json.has("conditions")
-          || CraftingHelper.processConditions(GsonHelper.getAsJsonArray(json, "conditions"), context)) {
-        return GSON.fromJson(json, IFluidContainerTransfer.class);
-      }
+      // TODO 1.21.1: CraftingHelper.processConditions() removed - condition
+      // processing needs new API
+      // Temporarily loading all transfers without condition checking
+      // if (!json.has("conditions")
+      // || CraftingHelper.processConditions(GsonHelper.getAsJsonArray(json,
+      // "conditions"), context)) {
+      return GSON.fromJson(json, IFluidContainerTransfer.class);
+      // }
     } catch (JsonSyntaxException e) {
       log.error("Failed to load fluid container transfer info from {}", key, e);
     }

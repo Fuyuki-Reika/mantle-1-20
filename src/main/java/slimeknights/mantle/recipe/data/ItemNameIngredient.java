@@ -3,26 +3,34 @@ package slimeknights.mantle.recipe.data;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import lombok.RequiredArgsConstructor;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.neoforged.neoforge.common.crafting.AbstractIngredient;
-import net.neoforged.neoforge.common.crafting.IIngredientSerializer;
-import net.neoforged.neoforge.common.crafting.VanillaIngredientSerializer;
+import net.neoforged.neoforge.common.crafting.ICustomIngredient;
+import net.neoforged.neoforge.common.crafting.IngredientType;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
- * Ingredient for a non-NBT sensitive item from another mod, should never be used outside datagen
+ * Ingredient for a non-NBT sensitive item from another mod, should never be
+ * used outside datagen
  */
-public class ItemNameIngredient extends AbstractIngredient {
+public class ItemNameIngredient implements ICustomIngredient {
+  /** MapCodec for serialization */
+  public static final MapCodec<ItemNameIngredient> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+      ResourceLocation.CODEC.listOf().fieldOf("names").forGetter(i -> i.names))
+      .apply(instance, ItemNameIngredient::new));
+
   private final List<ResourceLocation> names;
+
   protected ItemNameIngredient(List<ResourceLocation> names) {
-    super(names.stream().map(NamedValue::new));
     this.names = names;
   }
 
@@ -38,7 +46,19 @@ public class ItemNameIngredient extends AbstractIngredient {
 
   @Override
   public boolean test(@Nullable ItemStack stack) {
-    throw new UnsupportedOperationException();
+    if (stack == null || stack.isEmpty()) {
+      return false;
+    }
+    ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+    return names.contains(itemId);
+  }
+
+  @Override
+  public Stream<ItemStack> getItems() {
+    return names.stream()
+        .map(BuiltInRegistries.ITEM::get)
+        .filter(item -> item != null)
+        .map(ItemStack::new);
   }
 
   /** Creates a JSON object for a name */
@@ -48,7 +68,8 @@ public class ItemNameIngredient extends AbstractIngredient {
     return json;
   }
 
-  @Override
+  // TODO 1.21.1: toJson() no longer in ICustomIngredient interface, removed
+  // @Override
   public JsonElement toJson() {
     if (names.size() == 1) {
       return forName(names.get(0));
@@ -66,24 +87,9 @@ public class ItemNameIngredient extends AbstractIngredient {
   }
 
   @Override
-  public IIngredientSerializer<? extends Ingredient> getSerializer() {
-    return VanillaIngredientSerializer.INSTANCE;
-  }
-
-  @RequiredArgsConstructor
-  public static class NamedValue implements Ingredient.Value {
-    private final ResourceLocation name;
-
-    @Override
-    public Collection<ItemStack> getItems() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public JsonObject serialize() {
-      JsonObject json = new JsonObject();
-      json.addProperty("item", name.toString());
-      return json;
-    }
+  public IngredientType<?> getType() {
+    // This is a datagen-only helper, so we return a placeholder type
+    // In practice, this serializes as vanilla ingredient JSON
+    throw new UnsupportedOperationException("ItemNameIngredient is for datagen only");
   }
 }

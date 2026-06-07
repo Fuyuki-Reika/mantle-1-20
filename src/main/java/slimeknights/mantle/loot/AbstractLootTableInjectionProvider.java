@@ -19,7 +19,8 @@ public abstract class AbstractLootTableInjectionProvider extends GenericDataProv
   private final CompletableFuture<HolderLookup.Provider> lookupProvider;
   private final String domain;
 
-  protected AbstractLootTableInjectionProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, String domain) {
+  protected AbstractLootTableInjectionProvider(PackOutput output,
+      CompletableFuture<HolderLookup.Provider> lookupProvider, String domain) {
     super(output, Target.DATA_PACK, LootTableInjector.FOLDER);
     this.lookupProvider = lookupProvider;
     this.domain = domain;
@@ -28,16 +29,22 @@ public abstract class AbstractLootTableInjectionProvider extends GenericDataProv
   /** Method to add all relevant tables */
   protected abstract void addTables();
 
+  // TODO 1.21.1: Disabled due to LootTableInjection.LOADABLE being unavailable
   @Override
   public final CompletableFuture<?> run(CachedOutput output) {
-    addTables();
-    return lookupProvider.thenCompose(provider -> allOf(builders.stream().map(builder -> {
-      JsonObject json = LootTableInjection.LOADABLE.serialize(builder.build()).getAsJsonObject();
-      if (!builder.conditions.isEmpty()) {
-        ICondition.writeConditions(provider, json, builder.conditions);
-      }
-      return saveJson(output, new ResourceLocation(domain, builder.path), json);
-    })));
+    throw new UnsupportedOperationException(
+        "Loot table injection data generation temporarily disabled - needs NeoForge 1.21.1 loot API migration");
+    // addTables();
+    // return lookupProvider.thenCompose(provider ->
+    // allOf(builders.stream().map(builder -> {
+    // JsonObject json =
+    // LootTableInjection.LOADABLE.serialize(builder.build()).getAsJsonObject();
+    // if (!builder.conditions.isEmpty()) {
+    // ICondition.writeConditions(provider, json, builder.conditions);
+    // }
+    // return saveJson(output, ResourceLocation.fromNamespaceAndPath(domain,
+    // builder.path), json);
+    // })));
   }
 
   /** Creates a new injection */
@@ -48,18 +55,22 @@ public abstract class AbstractLootTableInjectionProvider extends GenericDataProv
   }
 
   /** Creates a new injection for the Minecraft domain */
+  // TODO 1.21.1: ResourceLocation constructor changed - use parse for potentially
+  // namespaced strings
   protected LootTableInjection.Builder inject(String path, String name, ICondition... conditions) {
-    return inject(path, new ResourceLocation(name), conditions);
+    return inject(path, ResourceLocation.parse(name), conditions);
   }
 
   /** Creates a new injection for the Minecraft domain */
+  // TODO 1.21.1: ResourceLocation constructor changed - use fromNamespaceAndPath
   protected LootTableInjection.Builder injectChest(String name, ICondition... conditions) {
-    return inject(name, new ResourceLocation("chests/" + name), conditions);
+    return inject(name, ResourceLocation.fromNamespaceAndPath("minecraft", "chests/" + name), conditions);
   }
 
   /** Creates a new injection for the Minecraft domain */
+  // TODO 1.21.1: ResourceLocation constructor changed - use fromNamespaceAndPath
   protected LootTableInjection.Builder injectGameplay(String name, ICondition... conditions) {
-    return inject(name, new ResourceLocation("gameplay/" + name), conditions);
+    return inject(name, ResourceLocation.fromNamespaceAndPath("minecraft", "gameplay/" + name), conditions);
   }
 
   /** Internal builder tuple */

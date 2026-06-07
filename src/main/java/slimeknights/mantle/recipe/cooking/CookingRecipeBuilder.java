@@ -17,8 +17,11 @@ import slimeknights.mantle.recipe.helper.ItemOutput;
 
 import java.util.function.Consumer;
 
-/** Builder for {@link SmeltingResultRecipe}, {@link BlastingResultRecipe}, {@link SmokingResultRecipe}, and {@link CampfireResultRecipe} */
-@SuppressWarnings({"unchecked", "unused"})
+/**
+ * Builder for {@link SmeltingResultRecipe}, {@link BlastingResultRecipe},
+ * {@link SmokingResultRecipe}, and {@link CampfireResultRecipe}
+ */
+@SuppressWarnings({ "unchecked", "unused" })
 @CanIgnoreReturnValue
 public class CookingRecipeBuilder<T extends CookingRecipeBuilder<T>> extends AbstractRecipeBuilder<T> {
   protected final ItemOutput result;
@@ -57,11 +60,14 @@ public class CookingRecipeBuilder<T extends CookingRecipeBuilder<T>> extends Abs
     return builder(result, 1);
   }
 
-
   /**
-   * Sets the type of {@link #save(Consumer, ResourceLocation)} for the sake of {@link net.neoforged.common.crafting.ConditionalRecipe}.
-   * Note you can also just directly use {@link #saveSmelting(Consumer, ResourceLocation)}, {@link #saveBlasting(Consumer, ResourceLocation)},
-   * {@link #saveSmoking(Consumer, ResourceLocation)}, and {@link #saveCampfire(Consumer, ResourceLocation)} directly.
+   * Sets the type of {@link #save(Consumer, ResourceLocation)} for the sake of
+   * {@link net.neoforged.common.crafting.ConditionalRecipe}.
+   * Note you can also just directly use
+   * {@link #saveSmelting(Consumer, ResourceLocation)},
+   * {@link #saveBlasting(Consumer, ResourceLocation)},
+   * {@link #saveSmoking(Consumer, ResourceLocation)}, and
+   * {@link #saveCampfire(Consumer, ResourceLocation)} directly.
    */
   public T type(CookingType type) {
     this.type = type;
@@ -90,21 +96,26 @@ public class CookingRecipeBuilder<T extends CookingRecipeBuilder<T>> extends Abs
     return (T) this;
   }
 
-  /** Sets the cooking time for this recipe relative to smelting. Note its halved for {@link CookingType#BLASTING} and {@link CookingType#SMOKING} and tripled for {@link CookingType#CAMPFIRE} */
+  /**
+   * Sets the cooking time for this recipe relative to smelting. Note its halved
+   * for {@link CookingType#BLASTING} and {@link CookingType#SMOKING} and tripled
+   * for {@link CookingType#CAMPFIRE}
+   */
   public T cookingTime(int cookingTime) {
     this.cookingTime = cookingTime;
     return (T) this;
   }
 
-
   /** Helper to save a recipe */
   @SuppressWarnings("unchecked")
-  private <R extends Recipe<?>> T save(RecipeOutput output, ResourceLocation id, RecordLoadable<R> loadable, Function7<ResourceLocation,String,CookingBookCategory,Ingredient,ItemOutput,Float,Integer,R> constructor, int cookingTime) {
+  private <R extends Recipe<?>> T save(RecipeOutput output, ResourceLocation id, RecordLoadable<R> loadable,
+      Function7<ResourceLocation, String, CookingBookCategory, Ingredient, ItemOutput, Float, Integer, R> constructor,
+      int cookingTime) {
     if (ingredient == Ingredient.EMPTY) {
       throw new IllegalStateException("Ingredient must be set");
     }
-    ResourceLocation advancementID = buildOptionalAdvancement(id, "cooking");
-    output.accept(new LoadableFinishedRecipe<>(constructor.apply(id, group, category, ingredient, result, experience, cookingTime), loadable, advancementID));
+    R recipe = constructor.apply(id, group, category, ingredient, result, experience, cookingTime);
+    output.accept(id, recipe, buildOptionalAdvancement(id, "cooking"));
     return (T) this;
   }
 
@@ -143,6 +154,12 @@ public class CookingRecipeBuilder<T extends CookingRecipeBuilder<T>> extends Abs
     }
   }
 
-  /** Helper to change the cooking type in {@link #save(Consumer, ResourceLocation)} for the sake of {@link net.neoforged.common.crafting.ConditionalRecipe} */
-  public enum CookingType { SMELTING, BLASTING, SMOKING, CAMPFIRE }
+  /**
+   * Helper to change the cooking type in
+   * {@link #save(Consumer, ResourceLocation)} for the sake of
+   * {@link net.neoforged.common.crafting.ConditionalRecipe}
+   */
+  public enum CookingType {
+    SMELTING, BLASTING, SMOKING, CAMPFIRE
+  }
 }

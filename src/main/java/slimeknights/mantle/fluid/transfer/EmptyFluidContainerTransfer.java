@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
+import com.mojang.serialization.JsonOps;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -34,7 +35,10 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer.With
   protected final ItemOutput result;
   protected final FluidOutput fluid;
 
-  /** @deprecated use {@link #EmptyFluidContainerTransfer(Ingredient, ItemOutput, FluidOutput)} */
+  /**
+   * @deprecated use
+   *             {@link #EmptyFluidContainerTransfer(Ingredient, ItemOutput, FluidOutput)}
+   */
   @Deprecated(forRemoval = true)
   public EmptyFluidContainerTransfer(Ingredient input, ItemOutput result, FluidStack fluid) {
     this(input, result, FluidOutput.fromStack(fluid));
@@ -59,7 +63,8 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer.With
 
   @Nullable
   @Override
-  public TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler, TransferDirection direction) {
+  public TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler,
+      TransferDirection direction) {
     if (!direction.canEmpty()) {
       return null;
     }
@@ -69,7 +74,8 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer.With
       int actual = handler.fill(contained.copy(), FluidAction.EXECUTE);
       if (actual > 0) {
         if (actual != this.fluid.getAmount()) {
-          Mantle.logger.error("Wrong amount filled from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), this.fluid.getAmount(), actual);
+          Mantle.logger.error("Wrong amount filled from {}, expected {}, filled {}",
+              BuiltInRegistries.ITEM.getKey(stack.getItem()), this.fluid.getAmount(), actual);
         }
         return new TransferResult(result.copy(), contained, false);
       }
@@ -81,7 +87,9 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer.With
   public JsonObject serialize(JsonSerializationContext context) {
     JsonObject json = new JsonObject();
     json.addProperty("type", ID.toString());
-    json.add("input", input.toJson());
+    // TODO 1.21.1: Ingredient.toJson() removed - use Ingredient.CODEC_NONEMPTY to
+    // serialize
+    json.add("input", Ingredient.CODEC_NONEMPTY.encodeStart(JsonOps.INSTANCE, input).getOrThrow());
     if (!result.isEmpty()) {
       json.add("result", result.serialize(false));
     }
@@ -90,7 +98,8 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer.With
   }
 
   /** Unique loader instance */
-  public static final JsonDeserializer<EmptyFluidContainerTransfer> DESERIALIZER = new Deserializer<>(EmptyFluidContainerTransfer::new);
+  public static final JsonDeserializer<EmptyFluidContainerTransfer> DESERIALIZER = new Deserializer<>(
+      EmptyFluidContainerTransfer::new);
 
   /** Gets the result for the fluid transfer. */
   static ItemOutput getResult(JsonObject json) {
@@ -105,11 +114,16 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer.With
   /**
    * Generic deserializer
    */
-  public record Deserializer<T extends EmptyFluidContainerTransfer>(TriFunction<Ingredient,ItemOutput,FluidOutput,T> factory) implements JsonDeserializer<T> {
+  public record Deserializer<T extends EmptyFluidContainerTransfer>(
+      TriFunction<Ingredient, ItemOutput, FluidOutput, T> factory) implements JsonDeserializer<T> {
     @Override
-    public T deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public T deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context)
+        throws JsonParseException {
       JsonObject json = element.getAsJsonObject();
-      Ingredient input = Ingredient.fromJson(JsonHelper.getElement(json, "input"));
+      // TODO 1.21.1: Ingredient.fromJson() removed - use Ingredient.CODEC_NONEMPTY to
+      // deserialize
+      Ingredient input = Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, JsonHelper.getElement(json, "input"))
+          .getOrThrow();
       ItemOutput result = getResult(json);
       FluidOutput fluid = FluidOutput.Loadable.REQUIRED.getIfPresent(json, "fluid");
       return factory.apply(input, result, fluid);

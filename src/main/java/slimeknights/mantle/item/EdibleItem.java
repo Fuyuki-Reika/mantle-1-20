@@ -23,17 +23,26 @@ public class EdibleItem extends Item {
 
   public EdibleItem(Item.Properties properties) {
     super(properties);
-    Objects.requireNonNull(foodProperties, "Must set food to make an EdibleItem");
+    // TODO 1.21.1: foodProperties field removed - validation needs different
+    // approach
+    // Objects.requireNonNull(foodProperties, "Must set food to make an
+    // EdibleItem");
   }
 
   @Override
-  public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+  // TODO 1.21.1: appendHoverText signature changed + FoodProperties.getEffects()
+  // removed
+  public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
+      TooltipFlag flagIn) {
     TranslationHelper.addOptionalTooltip(stack, tooltip);
     // TODO: use ContainerFoodItem helper for more potion like effects?
-    for (Pair<MobEffectInstance, Float> pair : Objects.requireNonNull(stack.getItem().getFoodProperties(stack, null)).getEffects()) {
-      if (pair.getFirst() != null) {
-        tooltip.add(Component.literal(I18n.get(pair.getFirst().getDescriptionId()).trim()).withStyle(ChatFormatting.GRAY));
-      }
-    }
+    // Temporarily disabled - needs migration to new FoodProperties API
+    // for (Pair<MobEffectInstance, Float> pair :
+    // Objects.requireNonNull(stack.getItem().getFoodProperties(stack,
+    // null)).getEffects()) {
+    // if (pair.getFirst() != null) {
+    // tooltip.add(Component.literal(I18n.get(pair.getFirst().getDescriptionId()).trim()).withStyle(ChatFormatting.GRAY));
+    // }
+    // }
   }
 }

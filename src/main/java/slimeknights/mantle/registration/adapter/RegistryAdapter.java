@@ -39,7 +39,8 @@ public class RegistryAdapter<T> {
    * @param name Name for location
    */
   public ResourceLocation getResource(String name) {
-    return new ResourceLocation(modId, name);
+    // TODO 1.21.1: Use fromNamespaceAndPath() instead of private constructor
+    return ResourceLocation.fromNamespaceAndPath(modId, name);
   }
 
   /**
@@ -89,7 +90,8 @@ public class RegistryAdapter<T> {
    * @return Registry entry
    */
   public <I extends T> I register(I entry, ResourceLocation location) {
-    registry.register(location, entry);
+    // TODO 1.21.1: Registry.register is now static, takes registry as first param
+    Registry.register(registry, location, entry);
     return entry;
   }
 }

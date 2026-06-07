@@ -36,14 +36,17 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class EntityIngredientRenderer implements IIngredientRenderer<EntityIngredient.EntityInput> {
   private static final ResourceLocation MISSING = Mantle.getResource("textures/item/missingno.png");
-  /** Entity types that will not render, as they either errored or are the wrong type */
+  /**
+   * Entity types that will not render, as they either errored or are the wrong
+   * type
+   */
   private static final Set<EntityType<?>> IGNORED_ENTITIES = new HashSet<>();
 
   /** Square size of the renderer in pixels */
   private final int size;
 
   /** Cache of entities for each entity type */
-  private final Map<EntityType<?>,Entity> ENTITY_MAP = new HashMap<>();
+  private final Map<EntityType<?>, Entity> ENTITY_MAP = new HashMap<>();
 
   @Override
   public int getWidth() {
@@ -67,7 +70,8 @@ public class EntityIngredientRenderer implements IIngredientRenderer<EntityIngre
         if (type == EntityType.PLAYER) {
           entity = Minecraft.getInstance().player;
         } else {
-          // entity is created with the client world, but the entity map is thrown away when JEI restarts so they should be okay I think
+          // entity is created with the client world, but the entity map is thrown away
+          // when JEI restarts so they should be okay I think
           entity = ENTITY_MAP.computeIfAbsent(type, t -> t.create(world));
         }
         // only can draw living entities, plus non-living ones don't get recipes anyways
@@ -77,11 +81,15 @@ public class EntityIngredientRenderer implements IIngredientRenderer<EntityIngre
           float height = entity.getBbHeight();
           float width = entity.getBbWidth();
           if (height > 2 || width > 2) {
-            scale = (int)(size / Math.max(height, width));
+            scale = (int) (size / Math.max(height, width));
           }
-          // catch exceptions drawing the entity to be safe, any caught exceptions blacklist the entity
+          // catch exceptions drawing the entity to be safe, any caught exceptions
+          // blacklist the entity
           try {
-            InventoryScreen.renderEntityInInventoryFollowsMouse(graphics, size / 2, size, scale, 0, 10, livingEntity);
+            // TODO 1.21.1: renderEntityInInventoryFollowsMouse signature changed - added
+            // mouse tracking parameters
+            InventoryScreen.renderEntityInInventoryFollowsMouse(graphics, size / 2, size, scale, 0, 10, 0f, 0f, 0f,
+                livingEntity);
             return;
           } catch (Exception e) {
             Mantle.logger.error("Error drawing entity " + BuiltInRegistries.ENTITY_TYPE.getKey(type), e);
@@ -108,7 +116,8 @@ public class EntityIngredientRenderer implements IIngredientRenderer<EntityIngre
     List<Component> tooltip = new ArrayList<>();
     tooltip.add(type.type().getDescription());
     if (flag.isAdvanced()) {
-      tooltip.add((Component.literal(BuiltInRegistries.ENTITY_TYPE.getKey(type.type()).toString())).withStyle(ChatFormatting.DARK_GRAY));
+      tooltip.add((Component.literal(BuiltInRegistries.ENTITY_TYPE.getKey(type.type()).toString()))
+          .withStyle(ChatFormatting.DARK_GRAY));
     }
     return tooltip;
   }

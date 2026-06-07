@@ -6,7 +6,7 @@ import net.minecraft.data.PackOutput.Target;
 import net.minecraft.core.Registry;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import net.neoforged.neoforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import slimeknights.mantle.data.GenericDataProvider;
 import slimeknights.mantle.registration.object.FluidObject;
 import slimeknights.mantle.util.JsonHelper;
@@ -38,7 +38,9 @@ public abstract class AbstractFluidTextureProvider extends GenericDataProvider {
   @Override
   public final CompletableFuture<?> run(CachedOutput cache) {
     ensureTexturesAdded();
-    Registry<FluidType> fluidTypeRegistry = NeoForgeRegistries.FLUID_TYPES.get();
+    // TODO 1.21.1: NeoForgeRegistries.FLUID_TYPES.get() no longer exists - use
+    // registry directly
+    Registry<FluidType> fluidTypeRegistry = NeoForgeRegistries.FLUID_TYPES;
 
     // ensure we added textures for all our fluid types
     if (modId != null) {
@@ -85,7 +87,7 @@ public abstract class AbstractFluidTextureProvider extends GenericDataProvider {
   }
 
   /** Create a new builder for the give fluid type */
-  public FluidTexture.Builder texture(RegistryObject<? extends FluidType> fluid) {
+  public FluidTexture.Builder texture(DeferredHolder<FluidType, ? extends FluidType> fluid) {
     return texture(fluid.get());
   }
 
@@ -100,7 +102,7 @@ public abstract class AbstractFluidTextureProvider extends GenericDataProvider {
   }
 
   /** Marks the given fluid type to be ignored by this texture provider */
-  public void skip(RegistryObject<? extends FluidType> fluid) {
+  public void skip(DeferredHolder<FluidType, ? extends FluidType> fluid) {
     skip(fluid.get());
   }
 }

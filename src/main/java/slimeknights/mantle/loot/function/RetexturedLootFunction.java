@@ -18,16 +18,27 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Applies the data for a retextured block to the dropped item. No configuration needed.
+ * Applies the data for a retextured block to the dropped item. No configuration
+ * needed.
  */
 @SuppressWarnings("WeakerAccess")
 public class RetexturedLootFunction extends LootItemConditionalFunction {
-  public static final MapCodec<RetexturedLootFunction> CODEC = 
-      LootItemConditionalFunction.CONDITIONAL_CODEC
-          .xmap(RetexturedLootFunction::new, function -> function.predicates);
+  // TODO 1.21.1: LootItemConditionalFunction.CONDITIONAL_CODEC removed - loot
+  // function API changed
+  // May need to implement Serializer instead of using CODEC pattern
+  public static final MapCodec<RetexturedLootFunction> CODEC = MapCodec.unit(() -> {
+    throw new UnsupportedOperationException(
+        "RetexturedLootFunction CODEC temporarily disabled - needs NeoForge 1.21.1 loot API migration");
+  });
+  /*
+   * public static final MapCodec<RetexturedLootFunction> CODEC =
+   * LootItemConditionalFunction.CONDITIONAL_CODEC
+   * .xmap(RetexturedLootFunction::new, function -> function.predicates);
+   */
 
   /**
    * Creates a new instance from the given conditions
+   * 
    * @param conditions Conditions list
    */
   public RetexturedLootFunction(List<LootItemCondition> conditions) {

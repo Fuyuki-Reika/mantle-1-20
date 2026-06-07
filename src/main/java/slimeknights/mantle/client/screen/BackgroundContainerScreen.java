@@ -11,6 +11,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 
 /**
  * Generic container screen that simply draws the given background
+ * 
  * @param <T> Container type
  */
 @SuppressWarnings("WeakerAccess")
@@ -22,12 +23,14 @@ public class BackgroundContainerScreen<T extends AbstractContainerMenu> extends 
 
 	/**
 	 * Creates a new screen instance
+	 * 
 	 * @param container  Container class
 	 * @param inventory  Player inventory
 	 * @param name       Container name
 	 * @param background Container background
 	 */
-	public BackgroundContainerScreen(T container, Inventory inventory, Component name, int height, ResourceLocation background) {
+	public BackgroundContainerScreen(T container, Inventory inventory, Component name, int height,
+			ResourceLocation background) {
 		super(container, inventory, name);
 		this.background = background;
 		this.imageHeight = height;
@@ -42,7 +45,9 @@ public class BackgroundContainerScreen<T extends AbstractContainerMenu> extends 
 
 	@Override
 	public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground(graphics);
+		// renderBackground signature changed in 1.21.1 to include mouseX, mouseY,
+		// partialTicks
+		this.renderBackground(graphics, mouseX, mouseY, partialTicks);
 		super.render(graphics, mouseX, mouseY, partialTicks);
 		this.renderTooltip(graphics, mouseX, mouseY);
 	}
@@ -54,22 +59,26 @@ public class BackgroundContainerScreen<T extends AbstractContainerMenu> extends 
 	}
 
 	@RequiredArgsConstructor(staticName = "of")
-	public static class Factory<T extends AbstractContainerMenu> implements ScreenConstructor<T,BackgroundContainerScreen<T>> {
+	public static class Factory<T extends AbstractContainerMenu>
+			implements ScreenConstructor<T, BackgroundContainerScreen<T>> {
 		private final ResourceLocation background;
 		private final int height;
 
 		/**
 		 * Creates a factory from the container name
+		 * 
 		 * @param height Screen height
 		 * @param name   Name of this container
 		 */
 		public static <T extends AbstractContainerMenu> Factory<T> ofName(int height, ResourceLocation name) {
-			return of(new ResourceLocation(name.getNamespace(), String.format("textures/gui/%s.png", name.getPath())), height);
+			// ResourceLocation constructor is private in 1.21.1, use fromNamespaceAndPath
+			return of(ResourceLocation.fromNamespaceAndPath(name.getNamespace(),
+					String.format("textures/gui/%s.png", name.getPath())), height);
 		}
 
-    @Override
-    public BackgroundContainerScreen<T> create(T menu, Inventory inventory, Component title) {
-      return new BackgroundContainerScreen<>(menu, inventory, title, height, background);
-    }
+		@Override
+		public BackgroundContainerScreen<T> create(T menu, Inventory inventory, Component title) {
+			return new BackgroundContainerScreen<>(menu, inventory, title, height, background);
+		}
 	}
 }

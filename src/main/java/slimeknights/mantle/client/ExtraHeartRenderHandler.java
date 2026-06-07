@@ -24,9 +24,9 @@ import slimeknights.mantle.config.Config.HeartRenderer;
 import java.util.Random;
 
 public class ExtraHeartRenderHandler {
-  private static final ResourceLocation ICON_HEARTS = new ResourceLocation(Mantle.modId,
+  private static final ResourceLocation ICON_HEARTS = ResourceLocation.fromNamespaceAndPath(Mantle.modId,
       "textures/gui/extra_hearts.png");
-  private static final ResourceLocation ICON_VANILLA = Gui.GUI_ICONS_LOCATION;
+  private static final ResourceLocation ICON_VANILLA = ResourceLocation.withDefaultNamespace("textures/gui/icons.png");
   /** Number of heart color variants */
   private static final int HEART_VARIANTS = 12;
   /** Number of heart color variants */
@@ -88,14 +88,13 @@ public class ExtraHeartRenderHandler {
       return;
     }
     // ensure its visible
-    if (!mc.gui.shouldDrawSurvivalElements() || mc.options.hideGui) {
+    if (mc.options.hideGui) {
       return;
     }
     Entity renderViewEnity = this.mc.getCameraEntity();
     if (!(renderViewEnity instanceof Player player)) {
       return;
     }
-    gui.setupOverlayRenderState(true, false);
 
     this.mc.getProfiler().push("health");
 
@@ -126,7 +125,7 @@ public class ExtraHeartRenderHandler {
     // setup window size
     Window window = this.mc.getWindow();
     int left = window.getGuiScaledWidth() / 2 - 91;
-    int top = window.getGuiScaledHeight() - gui.leftHeight;
+    int top = window.getGuiScaledHeight() - mc.gui.leftHeight;
 
     // grab max health as the max of it or the health we will display
     // cap it to 20, as this just determines heart count
@@ -230,18 +229,14 @@ public class ExtraHeartRenderHandler {
 
     // prepare the GUI for the event
     RenderSystem.setShaderTexture(0, ICON_VANILLA);
-    gui.leftHeight += ROW_HEIGHT;
+    mc.gui.leftHeight += ROW_HEIGHT;
     if (!compactAbsorption && absorb > 0) {
-      gui.leftHeight += absorptionOffset;
+      mc.gui.leftHeight += absorptionOffset;
     }
 
     event.setCanceled(true);
     RenderSystem.disableBlend();
     this.mc.getProfiler().pop();
-    // noinspection UnstableApiUsage I do what I want (more accurately, we override
-    // the renderer but want to let others still respond in post)
-    NeoForge.EVENT_BUS.post(new RenderGuiOverlayEvent.Post(event.getWindow(), graphics, event.getPartialTick(),
-        VanillaGuiOverlay.PLAYER_HEALTH.type()));
   }
 
   /** Computes the color U offset for a given heart index */

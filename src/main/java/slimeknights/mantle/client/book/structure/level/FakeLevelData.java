@@ -2,6 +2,7 @@
 // See: https://github.com/BluSunrize/ImmersiveEngineering/blob/1.18/src/main/java/blusunrize/immersiveengineering/common/util/fakeworld/FakeSpawnInfo.java
 package slimeknights.mantle.client.book.structure.level;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.storage.WritableLevelData;
@@ -15,42 +16,54 @@ public class FakeLevelData implements WritableLevelData {
   private int spawnZ;
   private float spawnAngle;
 
+  // TODO 1.21.1: WritableLevelData spawn API consolidated into setSpawn(BlockPos,
+  // float)
   @Override
+  public void setSpawn(BlockPos pos, float angle) {
+    this.spawnX = pos.getX();
+    this.spawnY = pos.getY();
+    this.spawnZ = pos.getZ();
+    this.spawnAngle = angle;
+  }
+
+  // TODO 1.21.1: New getSpawnPos() method returns BlockPos
+  @Override
+  public BlockPos getSpawnPos() {
+    return new BlockPos(this.spawnX, this.spawnY, this.spawnZ);
+  }
+
+  // TODO 1.21.1: Individual spawn setters no longer part of interface, removed
+  // @Override
   public void setXSpawn(int x) {
     this.spawnX = x;
   }
 
-  @Override
   public void setYSpawn(int y) {
     this.spawnY = y;
   }
 
-  @Override
   public void setZSpawn(int z) {
     this.spawnZ = z;
   }
 
-  @Override
   public void setSpawnAngle(float angle) {
     this.spawnAngle = angle;
   }
 
-  @Override
+  // TODO 1.21.1: Individual spawn getters no longer part of interface, removed
+  // @Override
   public int getXSpawn() {
     return this.spawnX;
   }
 
-  @Override
   public int getYSpawn() {
     return this.spawnY;
   }
 
-  @Override
   public int getZSpawn() {
     return this.spawnZ;
   }
 
-  @Override
   public float getSpawnAngle() {
     return this.spawnAngle;
   }

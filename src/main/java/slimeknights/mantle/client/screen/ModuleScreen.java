@@ -9,7 +9,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 
 // a sub-gui. Mostly the same as a separate ContainerScreen, but doesn't do the calls that affect the game as if this were the only gui
-public abstract class ModuleScreen<P extends MultiModuleScreen<?>, C extends AbstractContainerMenu> extends AbstractContainerScreen<C> {
+public abstract class ModuleScreen<P extends MultiModuleScreen<?>, C extends AbstractContainerMenu>
+    extends AbstractContainerScreen<C> {
 
   protected final P parent;
 
@@ -21,7 +22,8 @@ public abstract class ModuleScreen<P extends MultiModuleScreen<?>, C extends Abs
   public int yOffset = 0;
   public int xOffset = 0;
 
-  public ModuleScreen(P parent, C container, Inventory playerInventory, Component title, boolean right, boolean bottom) {
+  public ModuleScreen(P parent, C container, Inventory playerInventory, Component title, boolean right,
+      boolean bottom) {
     super(container, playerInventory, title);
 
     this.parent = parent;
@@ -35,6 +37,14 @@ public abstract class ModuleScreen<P extends MultiModuleScreen<?>, C extends Abs
 
   public int guiBottom() {
     return this.topPos + this.imageHeight;
+  }
+
+  public int getLeftPos() {
+    return this.leftPos;
+  }
+
+  public int getTopPos() {
+    return this.topPos;
   }
 
   public Rect2i getArea() {
@@ -74,7 +84,9 @@ public abstract class ModuleScreen<P extends MultiModuleScreen<?>, C extends Abs
 
   public boolean isMouseOverFullSlot(double mouseX, double mouseY) {
     for (Slot slot : this.menu.slots) {
-      if (this.parent.isHovering(slot, mouseX, mouseY) && slot.hasItem()) {
+      // Use the int-based isHovering method since Slot-based method signature changed
+      // in 1.21.1
+      if (this.parent.isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY) && slot.hasItem()) {
         return true;
       }
     }

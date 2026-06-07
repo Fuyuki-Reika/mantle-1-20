@@ -39,7 +39,8 @@ public class GeneratePackHelper {
   public static Path getDatapackPath(MinecraftServer server, String packName) {
     // if we have JSON Things, do a global datapack
     if (ModList.get().isLoaded("jsonthings")) {
-      return server.getServerDirectory().toPath().resolve("thingpacks/" + packName);
+      // getServerDirectory() returns Path directly in 1.21.1
+      return server.getServerDirectory().resolve("thingpacks/" + packName);
     }
     // TODO: consider option to put in the standard datapacks folder via config
     // property
@@ -76,7 +77,12 @@ public class GeneratePackHelper {
   /** Saves a JSON that removes the given resource using forge conditions */
   public static boolean saveConditionRemove(Path path, String conditionKey) {
     JsonObject json = new JsonObject();
-    json.add(conditionKey, CraftingHelper.serialize(new ICondition[] { FalseCondition.INSTANCE }));
+    // TODO: CraftingHelper.serialize method removed in 1.21.1 - manually creating
+    // false condition JSON
+    // FalseCondition format: {"type": "neoforge:false"}
+    JsonObject falseCondition = new JsonObject();
+    falseCondition.addProperty("type", "neoforge:false");
+    json.add(conditionKey, falseCondition);
     return saveJson(json, path);
   }
 

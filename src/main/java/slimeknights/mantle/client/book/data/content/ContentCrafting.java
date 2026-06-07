@@ -115,51 +115,54 @@ public class ContentCrafting extends PageContent {
   public void load() {
     super.load();
 
-    if (!StringUtils.isEmpty(recipe) && ResourceLocation.isValidResourceLocation(recipe)) {
+    if (!StringUtils.isEmpty(recipe) && ResourceLocation.tryParse(recipe) != null) {
       int w = 0, h = 0;
 
       Level level = Minecraft.getInstance().level;
       assert level != null;
-      Recipe<?> recipe = level.getRecipeManager().byKey(new ResourceLocation(this.recipe)).orElse(null);
-      if (recipe instanceof CraftingRecipe) {
-        if (grid_size.equalsIgnoreCase("auto")) {
-          if (recipe.canCraftInDimensions(2, 2)) {
-            grid_size = "small";
-          } else {
-            grid_size = "large";
-          }
-        }
-
-        switch (grid_size.toLowerCase()) {
-          case "large" -> w = h = 3;
-          case "small" -> w = h = 2;
-        }
-
-        if (!recipe.canCraftInDimensions(w, h)) {
-          throw new BookLoadException("Recipe " + this.recipe + " cannot fit in a " + w + "x" + h + " crafting grid");
-        }
-
-        result = IngredientData.getItemStackData(recipe.getResultItem(level.registryAccess()));
-
-        NonNullList<Ingredient> ingredients = recipe.getIngredients();
-
-        if (recipe instanceof ShapedRecipe shaped) {
-          grid = new IngredientData[shaped.getHeight()][shaped.getWidth()];
-
-          for (int y = 0; y < grid.length; y++) {
-            for (int x = 0; x < grid[y].length; x++) {
-              grid[y][x] = IngredientData.getItemStackData(
-                  NonNullList.of(ItemStack.EMPTY, ingredients.get(x + y * grid[y].length).getItems()));
+      var recipeHolder = level.getRecipeManager().byKey(ResourceLocation.parse(this.recipe)).orElse(null);
+      if (recipeHolder != null) {
+        Recipe<?> recipe = recipeHolder.value();
+        if (recipe instanceof CraftingRecipe) {
+          if (grid_size.equalsIgnoreCase("auto")) {
+            if (recipe.canCraftInDimensions(2, 2)) {
+              grid_size = "small";
+            } else {
+              grid_size = "large";
             }
           }
 
-          return;
-        }
+          switch (grid_size.toLowerCase()) {
+            case "large" -> w = h = 3;
+            case "small" -> w = h = 2;
+          }
 
-        grid = new IngredientData[h][w];
-        for (int i = 0; i < ingredients.size(); i++) {
-          grid[i / h][i % w] = IngredientData
-              .getItemStackData(NonNullList.of(ItemStack.EMPTY, ingredients.get(i).getItems()));
+          if (!recipe.canCraftInDimensions(w, h)) {
+            throw new BookLoadException("Recipe " + this.recipe + " cannot fit in a " + w + "x" + h + " crafting grid");
+          }
+
+          result = IngredientData.getItemStackData(recipe.getResultItem(level.registryAccess()));
+
+          NonNullList<Ingredient> ingredients = recipe.getIngredients();
+
+          if (recipe instanceof ShapedRecipe shaped) {
+            grid = new IngredientData[shaped.getHeight()][shaped.getWidth()];
+
+            for (int y = 0; y < grid.length; y++) {
+              for (int x = 0; x < grid[y].length; x++) {
+                grid[y][x] = IngredientData.getItemStackData(
+                    NonNullList.of(ItemStack.EMPTY, ingredients.get(x + y * grid[y].length).getItems()));
+              }
+            }
+
+            return;
+          }
+
+          grid = new IngredientData[h][w];
+          for (int i = 0; i < ingredients.size(); i++) {
+            grid[i / h][i % w] = IngredientData
+                .getItemStackData(NonNullList.of(ItemStack.EMPTY, ingredients.get(i).getItems()));
+          }
         }
       }
     }

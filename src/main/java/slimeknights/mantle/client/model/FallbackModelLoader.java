@@ -23,7 +23,8 @@ import net.neoforged.fml.ModList;
 import java.util.function.Function;
 
 /**
- * Loads the first model from a list of models that has a loaded mod ID, ideal for optional CTM model support
+ * Loads the first model from a list of models that has a loaded mod ID, ideal
+ * for optional CTM model support
  */
 @RequiredArgsConstructor
 public enum FallbackModelLoader implements IGeometryLoader<FallbackModelLoader.BlockModelWrapper> {
@@ -46,7 +47,7 @@ public enum FallbackModelLoader implements IGeometryLoader<FallbackModelLoader.B
       if (entry.has("fallback_mod_id")) {
         modId = GsonHelper.getAsString(entry, "fallback_mod_id");
       } else if (entry.has("loader")) {
-        ResourceLocation loader = new ResourceLocation(GsonHelper.getAsString(entry, "loader"));
+        ResourceLocation loader = ResourceLocation.parse(GsonHelper.getAsString(entry, "loader"));
         modId = loader.getNamespace();
       }
 
@@ -54,7 +55,8 @@ public enum FallbackModelLoader implements IGeometryLoader<FallbackModelLoader.B
       if (modId == null || ModList.get().isLoaded(modId)) {
         try {
           // use a model wrapper to ensure the child model gets the proper context
-          // this means its not possible to extend the fallback model, but that is not normally possible with loaders
+          // this means its not possible to extend the fallback model, but that is not
+          // normally possible with loaders
           return new BlockModelWrapper(context.deserialize(entry, BlockModel.class));
         } catch (JsonSyntaxException e) {
           // wrap exceptions to make it more clear what failed
@@ -64,21 +66,26 @@ public enum FallbackModelLoader implements IGeometryLoader<FallbackModelLoader.B
     }
 
     // no model was successful, sadness
-    throw new JsonSyntaxException("Failed to load fallback model, all " + models.size() + " variants had a failed condition");
+    throw new JsonSyntaxException(
+        "Failed to load fallback model, all " + models.size() + " variants had a failed condition");
   }
 
   /**
-   * Wrapper around a single block model, redirects all standard calls to vanilla logic
-   * Final baked model will still be the original instance, which is what is important
+   * Wrapper around a single block model, redirects all standard calls to vanilla
+   * logic
+   * Final baked model will still be the original instance, which is what is
+   * important
    */
   record BlockModelWrapper(BlockModel model) implements IUnbakedGeometry<BlockModelWrapper> {
     @Override
-    public BakedModel bake(IGeometryBakingContext owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
-      return model.bake(baker, model, spriteGetter, modelTransform, modelLocation, true);
+    public BakedModel bake(IGeometryBakingContext owner, ModelBaker baker,
+        Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides) {
+      // BlockModel.bake() removed boolean parameter in 1.21.1
+      return model.bake(baker, spriteGetter, modelTransform);
     }
 
     @Override
-    public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, IGeometryBakingContext context) {
+    public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, IGeometryBakingContext context) {
       model.resolveParents(modelGetter);
     }
   }

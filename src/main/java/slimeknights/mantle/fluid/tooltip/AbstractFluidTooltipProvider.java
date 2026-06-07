@@ -21,10 +21,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 /** Provider for fluid tooltip information */
-@SuppressWarnings({"unused", "SameParameterValue"})  // API
+@SuppressWarnings({ "unused", "SameParameterValue" }) // API
 public abstract class AbstractFluidTooltipProvider extends GenericDataProvider {
-  private final Map<ResourceLocation,ResourceLocation> redirects = new HashMap<>();
-  private final Map<ResourceLocation,FluidUnitListBuilder> builders = new HashMap<>();
+  private final Map<ResourceLocation, ResourceLocation> redirects = new HashMap<>();
+  private final Map<ResourceLocation, FluidUnitListBuilder> builders = new HashMap<>();
   private final String modId;
 
   public AbstractFluidTooltipProvider(PackOutput output, String modId) {
@@ -39,20 +39,21 @@ public abstract class AbstractFluidTooltipProvider extends GenericDataProvider {
   public final CompletableFuture<?> run(CachedOutput cache) {
     addFluids();
     return allOf(Stream.concat(
-      builders.entrySet().stream().map(entry -> saveJson(cache, entry.getKey(), entry.getValue().build())),
-      redirects.entrySet().stream().map(entry -> {
-      JsonObject json = new JsonObject();
-      json.addProperty("redirect", entry.getValue().toString());
-      return saveJson(cache, entry.getKey(), json);
-    })));
+        builders.entrySet().stream().map(entry -> saveJson(cache, entry.getKey(), entry.getValue().build())),
+        redirects.entrySet().stream().map(entry -> {
+          JsonObject json = new JsonObject();
+          json.addProperty("redirect", entry.getValue().toString());
+          return saveJson(cache, entry.getKey(), json);
+        })));
   }
-
 
   /* Helpers */
 
   /** Creates a ResourceLocation for the local mod */
   protected ResourceLocation id(String name) {
-    return new ResourceLocation(modId, name);
+    // TODO 1.21.1: ResourceLocation(String, String) constructor is private - use
+    // fromNamespaceAndPath
+    return ResourceLocation.fromNamespaceAndPath(modId, name);
   }
 
   /** Adds a fluid to the builder */
@@ -120,7 +121,10 @@ public abstract class AbstractFluidTooltipProvider extends GenericDataProvider {
 
     /** Adds a unit local to the given mod */
     public FluidUnitListBuilder addUnit(String key, String domain, int amount) {
-      return addUnitRaw(Util.makeDescriptionId("gui", new ResourceLocation(domain, "fluid." + key)), amount);
+      // TODO 1.21.1: ResourceLocation(String, String) constructor is private - use
+      // fromNamespaceAndPath
+      return addUnitRaw(Util.makeDescriptionId("gui", ResourceLocation.fromNamespaceAndPath(domain, "fluid." + key)),
+          amount);
     }
 
     /** Builds the final instance */

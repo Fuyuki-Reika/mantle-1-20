@@ -12,8 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Builder for {@link slimeknights.mantle.client.model.util.ColoredBlockModel}, used as a base for other model builders.
- * @param <T>  Builder type
+ * Builder for {@link slimeknights.mantle.client.model.util.ColoredBlockModel},
+ * used as a base for other model builders.
+ * 
+ * @param <T> Builder type
  */
 public class ColoredModelBuilder<T extends ModelBuilder<T>> extends CustomLoaderBuilder<T> {
   private final List<ColorData> colors = new ArrayList<>();
@@ -23,7 +25,7 @@ public class ColoredModelBuilder<T extends ModelBuilder<T>> extends CustomLoader
   }
 
   protected ColoredModelBuilder(ResourceLocation loaderId, T parent, ExistingFileHelper existingFileHelper) {
-    super(loaderId, parent, existingFileHelper);
+    super(loaderId, parent, existingFileHelper, true);
   }
 
   /** Adds a full color data for the next element */

@@ -15,8 +15,9 @@ import java.util.List;
 /** Builder for {@link slimeknights.mantle.client.model.FallbackModelLoader} */
 public class FallbackModelBuilder<T extends ModelBuilder<T>> extends CustomLoaderBuilder<T> {
   private final List<DomainModel<T>> models = new ArrayList<>();
+
   public FallbackModelBuilder(ResourceLocation loaderId, T parent, ExistingFileHelper existingFileHelper) {
-    super(Mantle.getResource("fallback"), parent, existingFileHelper);
+    super(Mantle.getResource("fallback"), parent, existingFileHelper, true);
   }
 
   /** Adds a fallback model with a domain restriction */

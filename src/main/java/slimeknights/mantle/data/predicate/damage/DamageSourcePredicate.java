@@ -23,14 +23,19 @@ public interface DamageSourcePredicate extends IJsonPredicate<DamageSource> {
   /** Predicate that matches no sources */
   DamageSourcePredicate NONE = simple(source -> false);
   /** Loader for item predicates */
-  TagPredicateRegistry<DamageType, DamageSource> LOADER = new TagPredicateRegistry<>("Damage Source Predicate", ANY, NONE, Loadables.DAMAGE_TYPE_TAG, (tag, source) -> source.is(tag));
+  TagPredicateRegistry<DamageType, DamageSource> LOADER = new TagPredicateRegistry<>("Damage Source Predicate", ANY,
+      NONE, Loadables.DAMAGE_TYPE_TAG, (tag, source) -> source.is(tag));
 
+  // TODO 1.21.1: DamageSource.isIndirect() removed - check if direct() is
+  // non-null to determine if direct
   /** Damage that is caused by an entity using another entity */
-  DamageSourcePredicate IS_INDIRECT = simple(DamageSource::isIndirect);
+  DamageSourcePredicate IS_INDIRECT = simple(
+      source -> source.getEntity() != null && source.getDirectEntity() != source.getEntity());
   /** Damage that is caused by an entity */
   DamageSourcePredicate HAS_ENTITY = simple(source -> source.getEntity() != null);
   /** Damage that protection works against */
-  DamageSourcePredicate CAN_PROTECT = simple(source -> !source.is(DamageTypeTags.BYPASSES_EFFECTS) && !source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS) && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY));
+  DamageSourcePredicate CAN_PROTECT = simple(source -> !source.is(DamageTypeTags.BYPASSES_EFFECTS)
+      && !source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS) && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY));
 
   @Override
   default IJsonPredicate<DamageSource> inverted() {
@@ -51,7 +56,6 @@ public interface DamageSourcePredicate extends IJsonPredicate<DamageSource> {
       }
     });
   }
-
 
   /* Helper methods */
 

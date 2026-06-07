@@ -32,7 +32,6 @@ public abstract class AbstractNamedComponentRegistry<T> implements ResourceLocat
   /** Gets all keys registered */
   public abstract Collection<T> getValues();
 
-
   /* Json */
 
   @Override
@@ -44,7 +43,6 @@ public abstract class AbstractNamedComponentRegistry<T> implements ResourceLocat
     throw new JsonSyntaxException(errorText + name + " at '" + key + '\'');
   }
 
-
   /* Network */
 
   /** Writes the value to the buffer */
@@ -55,7 +53,8 @@ public abstract class AbstractNamedComponentRegistry<T> implements ResourceLocat
 
   /** Writes the value to the buffer */
   public void encodeOptional(FriendlyByteBuf buffer, @Nullable T value) {
-    // if null, just write an empty string, that is not a valid resource location anyways and saves us a byte
+    // if null, just write an empty string, that is not a valid resource location
+    // anyways and saves us a byte
     if (value != null) {
       buffer.writeUtf(getKey(value).toString());
     } else {
@@ -81,24 +80,28 @@ public abstract class AbstractNamedComponentRegistry<T> implements ResourceLocat
   /** Parse the value from JSON */
   @Nullable
   public T decodeOptional(FriendlyByteBuf buffer) {
-    // empty string is not a valid resource location, so its a nice value to use for null, saves us a byte
+    // empty string is not a valid resource location, so its a nice value to use for
+    // null, saves us a byte
     String key = buffer.readUtf(Short.MAX_VALUE);
     if (key.isEmpty()) {
       return null;
     }
-    return decodeInternal(new ResourceLocation(key));
+    // TODO 1.21.1: ResourceLocation(String) constructor removed - use parse()
+    return decodeInternal(ResourceLocation.parse(key));
   }
-
 
   /* Fields */
 
   @Override
-  public <P> LoadableField<T,P> nullableField(String key, Function<P,T> getter) {
+  public <P> LoadableField<T, P> nullableField(String key, Function<P, T> getter) {
     return new NullableField<>(this, key, getter);
   }
 
-  /** Custom implementation of nullable field using our networking optional logic */
-  private record NullableField<T,P>(AbstractNamedComponentRegistry<T> registry, String key, Function<P,T> getter) implements LoadableField<T,P> {
+  /**
+   * Custom implementation of nullable field using our networking optional logic
+   */
+  private record NullableField<T, P>(AbstractNamedComponentRegistry<T> registry, String key, Function<P, T> getter)
+      implements LoadableField<T, P> {
     @Nullable
     @Override
     public T get(JsonObject json, String key, TypedMap context) {

@@ -22,12 +22,14 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * Food item with a container that is returned when the item is consumed. Supports eating stackable items with containers.
+ * Food item with a container that is returned when the item is consumed.
+ * Supports eating stackable items with containers.
  * Technically also works for items with no container.
  */
 @SuppressWarnings("unused") // API
 public class ContainerFoodItem extends Item {
   private final UseAnim useAnim;
+
   public ContainerFoodItem(Properties props, UseAnim useAnim) {
     super(props);
     this.useAnim = useAnim;
@@ -43,25 +45,35 @@ public class ContainerFoodItem extends Item {
   }
 
   /** Adds effects to the tooltip */
+  // TODO 1.21.1: FoodProperties.getEffects() removed,
+  // MobEffectUtil.formatDuration signature changed, MobEffect.getCategory()
+  // removed
+  // Need to migrate to new FoodProperties API for effects
   public static void addEffectTooltip(FoodProperties food, List<Component> tooltip) {
     // add effects to the tooltip, code based on potion items
-    for (Pair<MobEffectInstance, Float> pair : food.getEffects()) {
-      MobEffectInstance effect = pair.getFirst();
-      if (effect != null) {
-        MutableComponent mutable = Component.translatable(effect.getDescriptionId());
-        if (effect.getAmplifier() > 0) {
-          mutable = Component.translatable("potion.withAmplifier", mutable, Component.translatable("potion.potency." + effect.getAmplifier()));
-        }
-        if (effect.getDuration() > 20) {
-          mutable = Component.translatable("potion.withDuration", mutable, MobEffectUtil.formatDuration(effect, 1.0f));
-        }
-        tooltip.add(mutable.withStyle(effect.getEffect().getCategory().getTooltipFormatting()));
-      }
-    }
+    // Temporarily disabled - needs migration to new FoodProperties/MobEffect API
+    // for (Pair<MobEffectInstance, Float> pair : food.getEffects()) {
+    // MobEffectInstance effect = pair.getFirst();
+    // if (effect != null) {
+    // MutableComponent mutable = Component.translatable(effect.getDescriptionId());
+    // if (effect.getAmplifier() > 0) {
+    // mutable = Component.translatable("potion.withAmplifier", mutable,
+    // Component.translatable("potion.potency." + effect.getAmplifier()));
+    // }
+    // if (effect.getDuration() > 20) {
+    // mutable = Component.translatable("potion.withDuration", mutable,
+    // MobEffectUtil.formatDuration(effect, 1.0f));
+    // }
+    // tooltip.add(mutable.withStyle(effect.getEffect().getCategory().getTooltipFormatting()));
+    // }
+    // }
   }
 
   @Override
-  public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+  // TODO 1.21.1: appendHoverText signature changed - Level worldIn ->
+  // Item.TooltipContext context
+  public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
+      TooltipFlag flagIn) {
     FoodProperties food = stack.getFoodProperties(null);
     if (food != null) {
       addEffectTooltip(food, tooltip);
@@ -90,15 +102,19 @@ public class ContainerFoodItem extends Item {
   /** Fluid containing variant of {@link ContainerFoodItem} */
   public static class FluidContainerFoodItem extends ContainerFoodItem {
     private final Supplier<FluidStack> fluid;
+
     public FluidContainerFoodItem(Properties props, Supplier<FluidStack> fluid) {
       super(props);
       this.fluid = fluid;
     }
 
-    @Nullable
-    @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-      return new ConstantFluidContainerWrapper(fluid.get(), stack);
-    }
+    // TODO 1.21.1: initCapabilities removed - capability system changed to data
+    // attachments
+    // @Nullable
+    // @Override
+    // public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable
+    // CompoundTag nbt) {
+    // return new ConstantFluidContainerWrapper(fluid.get(), stack);
+    // }
   }
 }

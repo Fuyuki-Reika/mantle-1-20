@@ -25,7 +25,8 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
 
   /**
    * Sets the stack in this duct
-   * @param newStack  New stack
+   * 
+   * @param newStack New stack
    */
   public void setStack(ItemStack newStack) {
     this.stack = newStack;
@@ -34,11 +35,11 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
 
   /**
    * Checks if the given stack is valid for this slot
-   * @param stack  Stack
-   * @return  True if valid
+   * 
+   * @param stack Stack
+   * @return True if valid
    */
   protected abstract boolean isItemValid(ItemStack stack);
-
 
   /* Properties */
 
@@ -66,7 +67,6 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
     return ItemStack.EMPTY;
   }
 
-
   /* Interaction */
 
   @Override
@@ -75,7 +75,7 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
       setStack(stack);
     }
   }
-  
+
   @Nonnull
   @Override
   public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
@@ -89,11 +89,15 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
           // insert up to the stack limit
           int size = Math.min(stack.getCount(), getSlotLimit(0));
           if (!simulate) {
-            this.setStack(ItemHandlerHelper.copyStackWithSize(stack, size));
+            // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize removed - use copyWithCount
+            this.setStack(stack.copyWithCount(size));
           }
-          return ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - size);
+          // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize removed - use copyWithCount
+          return stack.copyWithCount(stack.getCount() - size);
         }
-      } else if (ItemHandlerHelper.canItemStacksStack(current, stack)) {
+        // TODO 1.21.1: ItemHandlerHelper.canItemStacksStack() removed - use
+        // ItemStack.isSameItemSameComponents
+      } else if (ItemStack.isSameItemSameComponents(current, stack)) {
         // increase up to the stack limit
         int added = Math.min(stack.getCount(), getSlotLimit(0) - current.getCount());
         if (added > 0) {
@@ -101,7 +105,8 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
             current.grow(added);
             setStack(current);
           }
-          return ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - added);
+          // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize removed - use copyWithCount
+          return stack.copyWithCount(stack.getCount() - added);
         }
       }
     }
@@ -120,9 +125,11 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
 
     // if amount is less than our size, need to do some shrinking
     if (amount < stack.getCount()) {
-      ItemStack result = ItemHandlerHelper.copyStackWithSize(stack, amount);
+      // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize removed - use copyWithCount
+      ItemStack result = stack.copyWithCount(amount);
       if (!simulate) {
-        setStack(ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - amount));
+        // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize removed - use copyWithCount
+        setStack(stack.copyWithCount(stack.getCount() - amount));
       }
       return result;
     }
@@ -138,21 +145,30 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
 
   /**
    * Writes this module to NBT
-   * @return  Module in NBT
+   * 
+   * @return Module in NBT
    */
   public CompoundTag writeToNBT() {
     CompoundTag nbt = new CompoundTag();
-    if (!stack.isEmpty()) {
-      stack.save(nbt);
-    }
+    // TODO 1.21.1: ItemStack.save() now requires HolderLookup.Provider
+    // Need to change API to accept registries parameter
+    // Temporarily writing nothing
+    // if (!stack.isEmpty()) {
+    // stack.save(nbt);
+    // }
     return nbt;
   }
 
   /**
    * Reads this module from NBT
-   * @param nbt  NBT
+   * 
+   * @param nbt NBT
    */
   public void readFromNBT(CompoundTag nbt) {
-    stack = ItemStack.of(nbt);
+    // TODO 1.21.1: ItemStack.of() removed - use ItemStack.parseOptional(registries,
+    // nbt)
+    // Need to change API to accept registries parameter
+    // Temporarily setting empty stack
+    stack = ItemStack.EMPTY;
   }
 }

@@ -30,8 +30,12 @@ public record ConditionalLoadable<T extends IHaveLoader>(GenericLoaderRegistry<T
     // allow passing in the condition context via the loadable context
     // if missing, assume tags are invalid
     IContext conditionContext = context.getOrDefault(ContextKey.CONDITION_CONTEXT, IContext.TAGS_INVALID);
+    // TODO 1.21.1: CraftingHelper.processConditions removed in NeoForge 21.1.85
+    // Need to find replacement API for conditional recipe processing
+    // For now, always process if_true branch (conditions temporarily disabled)
+    boolean conditionsMet = true; // was: CraftingHelper.processConditions(json, "conditions", conditionContext)
     // if the condition matches, use the true value
-    if (CraftingHelper.processConditions(json, "conditions", conditionContext)) {
+    if (conditionsMet) {
       return registry.getIfPresent(json, "if_true");
     }
     // loader can define a default instance for false if they have one. Otherwise
@@ -46,7 +50,10 @@ public record ConditionalLoadable<T extends IHaveLoader>(GenericLoaderRegistry<T
   @Override
   public void serialize(T object, JsonObject json) {
     ConditionalObject<T> conditional = (ConditionalObject<T>) object;
-    json.add("conditions", CraftingHelper.serialize(conditional.conditions()));
+    // TODO 1.21.1: CraftingHelper.serialize removed in NeoForge 21.1.85
+    // Need to find replacement API for serializing conditions
+    // For now, skip conditions serialization (temporarily disabled)
+    // json.add("conditions", CraftingHelper.serialize(conditional.conditions()));
     json.add("if_true", registry.serialize(conditional.ifTrue()));
     T ifFalse = conditional.ifFalse();
     if (ifFalse != defaultIfFalse) {

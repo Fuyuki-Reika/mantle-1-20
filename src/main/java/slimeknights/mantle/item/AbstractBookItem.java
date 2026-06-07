@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
@@ -25,10 +26,15 @@ import slimeknights.mantle.util.RegistryHelper;
 import javax.annotation.Nullable;
 import java.util.List;
 
-/** Item implementing all standard book behaviors, just requires calling methods from {@link slimeknights.mantle.client.book.data.BookData} in a few abstract methods. */
-@SuppressWarnings("unused")  // API
+/**
+ * Item implementing all standard book behaviors, just requires calling methods
+ * from {@link slimeknights.mantle.client.book.data.BookData} in a few abstract
+ * methods.
+ */
+@SuppressWarnings("unused") // API
 public abstract class AbstractBookItem extends LecternBookItem {
-  private static final Component CLICK_TO_OPEN = Mantle.makeComponent("item", "book.click_to_open").withStyle(ChatFormatting.YELLOW, ChatFormatting.ITALIC);
+  private static final Component CLICK_TO_OPEN = Mantle.makeComponent("item", "book.click_to_open")
+      .withStyle(ChatFormatting.YELLOW, ChatFormatting.ITALIC);
 
   public AbstractBookItem(Properties properties) {
     super(properties);
@@ -40,35 +46,43 @@ public abstract class AbstractBookItem extends LecternBookItem {
   /** Checks if the given menu supports opening the menu */
   public static boolean isValidContainer(AbstractContainerMenu menu) {
     // player inventory has a null type, which throws when used through the getter
-    if (menu.menuType == null) {
+    // TODO 1.21.1: menuType field is now private - use getType() getter
+    if (menu.getType() == null) {
       return true;
     }
-    // because vanilla set the throw precedent, add protection for other cases, just in case
+    // because vanilla set the throw precedent, add protection for other cases, just
+    // in case
     // the try here is basically free
     try {
       return RegistryHelper.contains(BuiltInRegistries.MENU, MantleTags.MenuTypes.REPLACEABLE, menu.getType());
-    }
-    catch (UnsupportedOperationException e) {
+    } catch (UnsupportedOperationException e) {
       return false;
     }
   }
 
   @Override
-  public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag flag) {
+  // TODO 1.21.1: appendHoverText signature changed - Level world ->
+  // Item.TooltipContext context
+  public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
     // if the stack is in the player inventory, show the right click to open tooltip
-    if (world != null && world.isClientSide) {
-      Player player = SafeClientAccess.getPlayer();
-      if (player != null && isValidContainer(player.containerMenu)) {
-        Inventory inventory = player.getInventory();
-        if (inventory.items.contains(stack) || inventory.offhand.contains(stack)) {
-          tooltip.add(CLICK_TO_OPEN);
-        }
-      }
-    }
-    super.appendHoverText(stack, world, tooltip, flag);
+    // TODO 1.21.1: TooltipContext doesn't provide Level - need to refactor to get
+    // level differently
+    // Temporarily disabling level-dependent tooltip
+    // if (world != null && world.isClientSide) {
+    // Player player = SafeClientAccess.getPlayer();
+    // if (player != null && isValidContainer(player.containerMenu)) {
+    // Inventory inventory = player.getInventory();
+    // if (inventory.items.contains(stack) || inventory.offhand.contains(stack)) {
+    // tooltip.add(CLICK_TO_OPEN);
+    // }
+    // }
+    // }
+    super.appendHoverText(stack, context, tooltip, flag);
   }
 
-  /** Called on the client to open the screen when used on right click in the hand */
+  /**
+   * Called on the client to open the screen when used on right click in the hand
+   */
   public void openScreen(Player player, InteractionHand hand, ItemStack stack) {
     getBook(stack).openGui(hand, stack);
   }
@@ -88,9 +102,12 @@ public abstract class AbstractBookItem extends LecternBookItem {
   }
 
   @Override
-  public boolean overrideOtherStackedOnMe(ItemStack stack, ItemStack held, Slot slot, ClickAction action, Player player, SlotAccess access) {
-    // on right-clicking the book with empty held, if this container allows we close and reopen the book page
-    if (action == ClickAction.SECONDARY && held.isEmpty() && slot.container == player.getInventory() && slot.allowModification(player) && isValidContainer(player.containerMenu)) {
+  public boolean overrideOtherStackedOnMe(ItemStack stack, ItemStack held, Slot slot, ClickAction action, Player player,
+      SlotAccess access) {
+    // on right-clicking the book with empty held, if this container allows we close
+    // and reopen the book page
+    if (action == ClickAction.SECONDARY && held.isEmpty() && slot.container == player.getInventory()
+        && slot.allowModification(player) && isValidContainer(player.containerMenu)) {
       if (player.level().isClientSide) {
         player.containerMenu.resumeRemoteUpdates();
         player.closeContainer();

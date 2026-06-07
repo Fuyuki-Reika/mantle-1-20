@@ -11,9 +11,14 @@ import slimeknights.mantle.util.typed.TypedMap;
 
 import javax.annotation.Nullable;
 
-/** Common logic for {@link RegistryLoadable} and {@link LazyRegistryLoadable} */
+/**
+ * Common logic for {@link RegistryLoadable} and {@link LazyRegistryLoadable}
+ */
 public interface BaseRegistryLoadable<T> extends ResourceLocationLoadable<T> {
-  /** Gets the registry associated with this loadable. Null if the registry cannot be located */
+  /**
+   * Gets the registry associated with this loadable. Null if the registry cannot
+   * be located
+   */
   @Nullable
   Registry<T> registry();
 
@@ -29,7 +34,8 @@ public interface BaseRegistryLoadable<T> extends ResourceLocationLoadable<T> {
         return value;
       }
     }
-    throw new JsonSyntaxException("Unable to parse " + key + " as registry " + registryId() + " does not contain ID " + name);
+    throw new JsonSyntaxException(
+        "Unable to parse " + key + " as registry " + registryId() + " does not contain ID " + name);
   }
 
   @Override
@@ -63,7 +69,7 @@ public interface BaseRegistryLoadable<T> extends ResourceLocationLoadable<T> {
     if (registry == null) {
       throw new EncoderException("Registry " + registryId() + " cannot be located");
     }
-    buffer.writeId(registry, object);
+    // TODO 1.21.1: writeId removed, manually write ID using registry.getId()
+    buffer.writeVarInt(registry.getId(object));
   }
 }
-

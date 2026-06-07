@@ -23,7 +23,7 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig.Type;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -104,8 +104,12 @@ public class Mantle {
 
   /* Proxies for sides, used for graphics processing */
   public Mantle(IEventBus bus) {
-    ModLoadingContext.get().registerConfig(Type.CLIENT, Config.CLIENT_SPEC);
-    ModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_SPEC);
+    // TODO 1.21.1: Config registration API changed in NeoForge 21.1.85 - need to
+    // find new method
+    // ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT,
+    // Config.CLIENT_SPEC);
+    // ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON,
+    // Config.SERVER_SPEC);
 
     FluidContainerTransferManager.INSTANCE.init();
     MantleTags.init();
@@ -139,12 +143,14 @@ public class Mantle {
   private void register(RegisterEvent event) {
     ResourceKey<?> key = event.getRegistryKey();
     if (key == Registries.RECIPE_SERIALIZER) {
-      CraftingHelper.register(TagEmptyCondition.SERIALIZER);
-      CraftingHelper.register(TagFilledCondition.SERIALIZER);
-      CraftingHelper.register(TagCombinationCondition.SERIALIZER);
-      CraftingHelper.register(FluidContainerIngredient.ID, FluidContainerIngredient.SERIALIZER);
-      CraftingHelper.register(getResource("potion"), PotionIngredient.SERIALIZER);
-      CraftingHelper.register(getResource("potion_display"), PotionDisplayIngredient.SERIALIZER);
+      // TODO 1.21.1: CraftingHelper.register() for conditions may be removed -
+      // conditions now use codec() approach
+      // CraftingHelper.register(TagEmptyCondition.SERIALIZER.getID(),
+      // TagEmptyCondition.SERIALIZER);
+      // CraftingHelper.register(TagFilledCondition.SERIALIZER.getID(),
+      // TagFilledCondition.SERIALIZER);
+      // CraftingHelper.register(TagCombinationCondition.SERIALIZER.getID(),
+      // TagCombinationCondition.SERIALIZER);
 
       // fluid container transfer
       FluidContainerTransferManager.TRANSFER_LOADERS.registerDeserializer(EmptyFluidContainerTransfer.ID,
@@ -206,11 +212,15 @@ public class Mantle {
         LivingEntityPredicate.LOADER.register(getResource("mob_type"), MobTypePredicate.LOADER);
         LivingEntityPredicate.LOADER.register(getResource("has_enchantment"), HasEnchantmentEntityPredicate.LOADER);
         // register mob types (Mob Category in 1.21)
-        MobTypePredicate.MOB_TYPES.register(new ResourceLocation("undefined"), MobCategory.MISC);
-        MobTypePredicate.MOB_TYPES.register(new ResourceLocation("undead"), MobCategory.UNDEAD);
-        MobTypePredicate.MOB_TYPES.register(new ResourceLocation("arthropod"), MobCategory.ARTHROPOD);
-        MobTypePredicate.MOB_TYPES.register(new ResourceLocation("illager"), MobCategory.MONSTER);
-        MobTypePredicate.MOB_TYPES.register(new ResourceLocation("water"), MobCategory.WATER_CREATURE);
+        MobTypePredicate.MOB_TYPES.register(ResourceLocation.parse("undefined"), MobCategory.MISC);
+        // TODO 1.21.1: UNDEAD and ARTHROPOD removed from MobCategory - need to
+        // determine correct replacement
+        // MobTypePredicate.MOB_TYPES.register(ResourceLocation.parse("undead"),
+        // MobCategory.UNDEAD);
+        // MobTypePredicate.MOB_TYPES.register(ResourceLocation.parse("arthropod"),
+        // MobCategory.ARTHROPOD);
+        MobTypePredicate.MOB_TYPES.register(ResourceLocation.parse("illager"), MobCategory.MONSTER);
+        MobTypePredicate.MOB_TYPES.register(ResourceLocation.parse("water"), MobCategory.WATER_CREATURE);
 
         // damage predicates
         // simple
@@ -226,7 +236,7 @@ public class Mantle {
       }
     } else if (key == Registries.BLOCK_ENTITY_TYPE) {
       BlockEntityTypeRegistryAdapter adapter = new BlockEntityTypeRegistryAdapter(
-          Objects.requireNonNull(event.getForgeRegistry()));
+          net.minecraft.core.registries.BuiltInRegistries.BLOCK_ENTITY_TYPE);
       Set<Block> signs = MantleSignBlockEntity.buildSignBlocks();
       if (!signs.isEmpty()) {
         adapter.register(MantleSignBlockEntity::new, signs, "sign");
@@ -237,7 +247,10 @@ public class Mantle {
       }
     } else if (key == Registries.COMMAND_ARGUMENT_TYPE) {
       ResourceOrTagKeyArgument.Info<?> info = new ResourceOrTagKeyArgument.Info<>();
-      NeoForgeRegistries.COMMAND_ARGUMENT_TYPES.register(getResource("resource_or_tag_key"), info);
+      // TODO 1.21.1: NeoForgeRegistries.COMMAND_ARGUMENT_TYPES removed - need to find
+      // new registration approach
+      // NeoForgeRegistries.COMMAND_ARGUMENT_TYPES.register(getResource("resource_or_tag_key"),
+      // info);
       ArgumentTypeInfos.registerByClass(RegistrationHelper.genericArgumentType(ResourceOrTagKeyArgument.class), info);
     } else {
       MantleLoot.registerGlobalLootModifiers(event);
@@ -265,7 +278,7 @@ public class Mantle {
    * @return Resource location instance
    */
   public static ResourceLocation getResource(String name) {
-    return new ResourceLocation(modId, name);
+    return ResourceLocation.fromNamespaceAndPath(modId, name);
   }
 
   /**
@@ -276,7 +289,7 @@ public class Mantle {
    * @return Resource location instance
    */
   public static ResourceLocation commonResource(String name) {
-    return new ResourceLocation(COMMON, name);
+    return ResourceLocation.fromNamespaceAndPath(COMMON, name);
   }
 
   /**

@@ -2,6 +2,7 @@ package slimeknights.mantle.block.entity;
 
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.Block;
@@ -17,12 +18,15 @@ import javax.annotation.Nonnull;
 import static slimeknights.mantle.util.RetexturedHelper.TAG_TEXTURE;
 
 /**
- * Standard implementation for {@link IRetexturedBlockEntity}, use alongside {@link RetexturedBlock} and {@link slimeknights.mantle.item.RetexturedBlockItem}
+ * Standard implementation for {@link IRetexturedBlockEntity}, use alongside
+ * {@link RetexturedBlock} and
+ * {@link slimeknights.mantle.item.RetexturedBlockItem}
  */
 public class DefaultRetexturedBlockEntity extends MantleBlockEntity implements IRetexturedBlockEntity {
   @Nonnull
   @Getter
   private Block texture = Blocks.AIR;
+
   public DefaultRetexturedBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
     super(type, pos, state);
   }
@@ -62,8 +66,8 @@ public class DefaultRetexturedBlockEntity extends MantleBlockEntity implements I
   }
 
   @Override
-  public void load(CompoundTag tags) {
-    super.load(tags);
+  protected void loadAdditional(CompoundTag tags, HolderLookup.Provider registries) {
+    super.loadAdditional(tags, registries);
     if (tags.contains(TAG_TEXTURE, Tag.TAG_STRING)) {
       texture = RetexturedHelper.getBlock(tags.getString(TAG_TEXTURE));
       RetexturedHelper.onTextureUpdated(this);

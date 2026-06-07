@@ -21,17 +21,17 @@ public class StringActionProcessor {
     protocols.put(id, protocol);
   }
 
-  //Format: modid:action param
+  // Format: modid:action param
   public static void process(@Nullable String action, BookScreen book) {
     if (action == null || !action.contains(PROTOCOL_SEPARATOR)) {
       return;
     }
 
     String id = action.substring(0, action.indexOf(PROTOCOL_SEPARATOR));
-    if(!id.contains(":"))
+    if (!id.contains(":"))
       id = "mantle:" + id;
 
-    ResourceLocation protoId = new ResourceLocation(id);
+    ResourceLocation protoId = ResourceLocation.parse(id);
     String protoParam = action.substring(action.indexOf(PROTOCOL_SEPARATOR) + PROTOCOL_SEPARATOR.length());
 
     if (protocols.containsKey(protoId)) {

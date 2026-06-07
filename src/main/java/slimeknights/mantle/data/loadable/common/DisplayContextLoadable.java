@@ -22,35 +22,40 @@ public enum DisplayContextLoadable implements ResourceLocationLoadable<ItemDispl
 
   @Override
   public ItemDisplayContext fromKey(ResourceLocation name, String key, TypedMap context) {
-    Registry<ItemDisplayContext> registry = NeoForgeRegistries.DISPLAY_CONTEXTS.get();
-    if (registry.containsKey(name)) {
-      ItemDisplayContext value = registry.get(name);
-      if (value != null) {
-        return value;
+    // TODO 1.21.1: NeoForgeRegistries.DISPLAY_CONTEXTS removed - ItemDisplayContext
+    // likely now vanilla enum
+    // Temporary: try to match by name string
+    for (ItemDisplayContext ctx : ItemDisplayContext.values()) {
+      if (ctx.getSerializedName().equals(name.toString()) || ctx.getSerializedName().equals(name.getPath())) {
+        return ctx;
       }
     }
     throw new JsonSyntaxException(
-        "Unable to parse " + key + " as the ItemDisplayContext registry does not contain ID " + name);
+        "Unable to parse " + key + " as no ItemDisplayContext matches name " + name);
   }
 
   @Override
   public ResourceLocation getKey(ItemDisplayContext object) {
-    Registry<ItemDisplayContext> registry = NeoForgeRegistries.DISPLAY_CONTEXTS.get();
-    ResourceLocation location = registry.getKey(object);
-    if (location == null) {
-      throw new RuntimeException("ItemDisplayContext registry does not contain object " + object);
-    }
-    return location;
+    // TODO 1.21.1: NeoForgeRegistries.DISPLAY_CONTEXTS removed - using serialized
+    // name
+    return ResourceLocation.withDefaultNamespace(object.getSerializedName());
   }
 
   @Override
   public ItemDisplayContext decode(FriendlyByteBuf buffer, TypedMap context) {
-    return buffer.readRegistryIdUnsafe(NeoForgeRegistries.DISPLAY_CONTEXTS.get());
+    // TODO 1.21.1: NeoForgeRegistries.DISPLAY_CONTEXTS removed - reading by ordinal
+    int ordinal = buffer.readVarInt();
+    ItemDisplayContext[] values = ItemDisplayContext.values();
+    if (ordinal >= 0 && ordinal < values.length) {
+      return values[ordinal];
+    }
+    throw new RuntimeException("Invalid ItemDisplayContext ordinal: " + ordinal);
   }
 
   @Override
   public void encode(FriendlyByteBuf buffer, ItemDisplayContext value) {
-    buffer.writeRegistryIdUnsafe(NeoForgeRegistries.DISPLAY_CONTEXTS.get(), value);
+    // TODO 1.21.1: NeoForgeRegistries.DISPLAY_CONTEXTS removed - writing by ordinal
+    buffer.writeVarInt(value.ordinal());
   }
 
   @Override

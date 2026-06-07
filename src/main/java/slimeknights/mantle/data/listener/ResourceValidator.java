@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /** Utility that handles checking if a resource exists in any resource pack. */
-@SuppressWarnings("unused")  // API
+@SuppressWarnings("unused") // API
 public class ResourceValidator implements IEarlySafeManagerReloadListener, Predicate<ResourceLocation> {
   private final String folder;
   private final int trim;
@@ -17,9 +17,10 @@ public class ResourceValidator implements IEarlySafeManagerReloadListener, Predi
 
   /**
    * Gets a resource validator instance
-   * @param folder     Folder to search
-   * @param trim       Text to trim off resource locations
-   * @param extension  File extension
+   * 
+   * @param folder    Folder to search
+   * @param trim      Text to trim off resource locations
+   * @param extension File extension
    */
   public ResourceValidator(String folder, String trim, String extension) {
     this.folder = folder;
@@ -36,7 +37,9 @@ public class ResourceValidator implements IEarlySafeManagerReloadListener, Predi
       return loc.getPath().endsWith(extension);
     }).keySet().stream().map((location) -> {
       String path = location.getPath();
-      return new ResourceLocation(location.getNamespace(), path.substring(trim, path.length() - extensionLength));
+      // TODO 1.21.1: ResourceLocation(String, String) constructor is private
+      return ResourceLocation.fromNamespaceAndPath(location.getNamespace(),
+          path.substring(trim, path.length() - extensionLength));
     }).collect(Collectors.toUnmodifiableSet());
   }
 

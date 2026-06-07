@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
-@SuppressWarnings("unused")  // API
+@SuppressWarnings("unused") // API
 public class BookData implements IDataItem, BookScreenOpener {
 
   public transient int unnamedSectionCounter = 0;
@@ -89,7 +89,8 @@ public class BookData implements IDataItem, BookScreenOpener {
 
         if (repo.resourceExists(appearanceLocation)) {
           try {
-            this.appearance = BookLoader.getGson().fromJson(repo.resourceToString(repo.getResource(appearanceLocation)), AppearanceData.class);
+            this.appearance = BookLoader.getGson().fromJson(repo.resourceToString(repo.getResource(appearanceLocation)),
+                AppearanceData.class);
           } catch (Exception e) {
             Mantle.logger.error("Failed to load book appearance from {}.", appearanceLocation, e);
           }
@@ -125,7 +126,8 @@ public class BookData implements IDataItem, BookScreenOpener {
       // set unicode font if requested
       if (this.appearance.uniformFont) {
         this.fontRenderer = BookScreen.getUniformFont();
-      // font is cached in the book data so we need to clear it; but don't clear it if set to another font instance
+        // font is cached in the book data so we need to clear it; but don't clear it if
+        // set to another font instance
       } else if (this.fontRenderer == BookScreen.getUniformFont()) {
         this.fontRenderer = null;
       }
@@ -137,7 +139,8 @@ public class BookData implements IDataItem, BookScreenOpener {
           continue;
         }
 
-        List<SectionData> matchingSections = this.sections.stream().filter(sect -> section.name.equalsIgnoreCase(sect.name)).toList();
+        List<SectionData> matchingSections = this.sections.stream()
+            .filter(sect -> section.name.equalsIgnoreCase(sect.name)).toList();
 
         if (matchingSections.size() < 2) {
           continue;
@@ -169,7 +172,8 @@ public class BookData implements IDataItem, BookScreenOpener {
         transformer.transform(this);
       }
 
-      // Loads orphaned sections, unless something went wrong, that would only be sections added by a transformer
+      // Loads orphaned sections, unless something went wrong, that would only be
+      // sections added by a transformer
       for (SectionData section : this.sections) {
         if (section.source == null) {
           section.source = BookRepository.DUMMY;
@@ -324,7 +328,10 @@ public class BookData implements IDataItem, BookScreenOpener {
     return pages;
   }
 
-  /** Gets the number of pages the book can be on, effectively half the individual page count */
+  /**
+   * Gets the number of pages the book can be on, effectively half the individual
+   * page count
+   */
   public int getFullPageCount(@Nullable BookScreen.AdvancementCache advancementCache) {
     return (int) Math.ceil((this.getPageCount(advancementCache) - 1) / 2F) + 1;
   }
@@ -350,65 +357,75 @@ public class BookData implements IDataItem, BookScreenOpener {
 
   /**
    * Generic method to open the book GUI
-   * @param title        Screen title
-   * @param page         Starting page
-   * @param pageUpdater  Function to call to save the page
+   * 
+   * @param title       Screen title
+   * @param page        Starting page
+   * @param pageUpdater Function to call to save the page
    */
   public void openGui(Component title, String page, @Nullable Consumer<String> pageUpdater) {
     this.openGui(title, page, pageUpdater, null);
   }
 
   /**
-   * Generic method to open the book GUI in a situation when the book can be picked up (i.e. lectern)
-   * @param title        Screen title
-   * @param page         Starting page
-   * @param pageUpdater  Function to call to save the page
+   * Generic method to open the book GUI in a situation when the book can be
+   * picked up (i.e. lectern)
+   * 
+   * @param title       Screen title
+   * @param page        Starting page
+   * @param pageUpdater Function to call to save the page
    */
-  public void openGui(Component title, String page, @Nullable Consumer<String> pageUpdater, @Nullable Consumer<?> bookPickup) {
+  public void openGui(Component title, String page, @Nullable Consumer<String> pageUpdater,
+      @Nullable Consumer<?> bookPickup) {
     this.load();
     Minecraft.getInstance().setScreen(new BookScreen(title, this, page, pageUpdater, bookPickup));
   }
 
   /**
    * Opens the GUI for a held book
-   * @param hand   Hand containing the book
-   * @param stack  Book stack
+   * 
+   * @param hand  Hand containing the book
+   * @param stack Book stack
    */
   @Override
   public void openGui(InteractionHand hand, ItemStack stack) {
     String page = BookHelper.getCurrentSavedPage(stack);
-    openGui(stack.getHoverName(), page, newPage -> BookLoader.updateSavedPage(Minecraft.getInstance().player, hand, newPage));
+    openGui(stack.getHoverName(), page,
+        newPage -> BookLoader.updateSavedPage(Minecraft.getInstance().player, hand, newPage));
   }
 
   /**
    * Opens the GUI for a held book
-   * @param slot   Slot containing the book
-   * @param stack  Book stack
+   * 
+   * @param slot  Slot containing the book
+   * @param stack Book stack
    */
   @Override
   public void openGui(int slot, ItemStack stack) {
     String page = BookHelper.getCurrentSavedPage(stack);
-    openGui(stack.getHoverName(), page, newPage -> BookLoader.updateSavedPage(Minecraft.getInstance().player, slot, newPage));
+    openGui(stack.getHoverName(), page,
+        newPage -> BookLoader.updateSavedPage(Minecraft.getInstance().player, slot, newPage));
   }
 
   /**
    * Opens the GUI for a lectern containing the book
-   * @param pos    Position of the lectern
-   * @param stack  Item in the lectern
+   * 
+   * @param pos   Position of the lectern
+   * @param stack Item in the lectern
    */
   @Override
   @SuppressWarnings("unused") // API
   public void openGui(BlockPos pos, ItemStack stack) {
     String page = BookHelper.getCurrentSavedPage(stack);
 
-    Consumer<?> bookPickup = (v) -> MantleNetwork.INSTANCE.network.sendToServer(new DropLecternBookPacket(pos));
+    Consumer<?> bookPickup = (v) -> MantleNetwork.INSTANCE.sendToServer(new DropLecternBookPacket(pos));
 
     openGui(stack.getHoverName(), page, newPage -> BookLoader.updateSavedPage(pos, newPage), bookPickup);
   }
 
   /**
    * Adds a new repository to the book
-   * @param repository  Repository to add
+   * 
+   * @param repository Repository to add
    */
   @SuppressWarnings("unused") // API
   public void addRepository(@Nullable BookRepository repository) {
@@ -419,7 +436,8 @@ public class BookData implements IDataItem, BookScreenOpener {
 
   /**
    * Adds a new transformer to the book
-   * @param transformer  Transformer to add
+   * 
+   * @param transformer Transformer to add
    */
   public void addTransformer(@Nullable BookTransformer transformer) {
     if (transformer != null && !this.transformers.contains(transformer)) {

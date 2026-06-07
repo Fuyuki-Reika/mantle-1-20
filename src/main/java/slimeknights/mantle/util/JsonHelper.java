@@ -21,6 +21,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+// TODO 1.21.1: PacketDistributor.PacketTarget import - verify if needed
+// import net.neoforged.neoforge.network.PacketDistributor.PacketTarget;
 import org.jetbrains.annotations.Contract;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.data.loadable.Loadable;
@@ -314,7 +316,8 @@ public class JsonHelper {
         .getNamespaces().stream()
         .filter(ResourceLocation::isValidNamespace)
         .flatMap(namespace -> {
-          ResourceLocation location = new ResourceLocation(namespace, path);
+          // TODO 1.21.1: ResourceLocation(String, String) constructor is private
+          ResourceLocation location = ResourceLocation.fromNamespaceAndPath(namespace, path);
           return manager.getResourceStack(location).stream()
               .map(preferredPath != null ? resource -> {
                 Mantle.logger.warn("Using deprecated path {} in pack {} - use {}:{} instead", location,
@@ -336,10 +339,13 @@ public class JsonHelper {
     // on a dedicated server, the client is running a separate game instance, this
     // is where we send packets, plus fully loaded should already be true
     // this event is not fired when connecting to a server
-    if (!player.connection.connection.isMemoryConnection()) {
-      PacketTarget target = PacketDistributor.PLAYER.with(() -> player);
+    // TODO 1.21.1: connection.connection is protected - use getConnection() instead
+    if (!player.connection.getConnection().isMemoryConnection()) {
+      // TODO 1.21.1: PacketDistributor API changed in NeoForge 21.1.85
+      // Old API: network.send(PacketDistributor.PLAYER.with(() -> player), packet)
+      // New API: PacketDistributor.sendToPlayer(player, packet)
       for (ISimplePacket packet : packets) {
-        network.send(target, packet);
+        PacketDistributor.sendToPlayer(player, packet);
       }
     }
   }
@@ -398,13 +404,17 @@ public class JsonHelper {
 
   /** Parses the given JSON element using the passed codec */
   public static <T> T parse(Codec<T> codec, JsonElement json) throws JsonParseException {
+    // TODO 1.21.1: DataResult.getOrThrow signature changed - no longer takes
+    // boolean and Consumer
     return codec.parse(new Dynamic<>(JsonOps.INSTANCE, json))
-        .getOrThrow(false, Mantle.logger::error);
+        .getOrThrow();
   }
 
   /** Serializes the given object using the passed codec */
   public static <T> JsonElement serialize(Codec<T> codec, T object) {
-    return codec.encodeStart(JsonOps.INSTANCE, object).getOrThrow(false, Mantle.logger::error);
+    // TODO 1.21.1: DataResult.getOrThrow signature changed - no longer takes
+    // boolean and Consumer
+    return codec.encodeStart(JsonOps.INSTANCE, object).getOrThrow();
   }
 
   /* Block States */

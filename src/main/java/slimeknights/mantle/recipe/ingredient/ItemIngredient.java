@@ -20,10 +20,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-/** Abstract ingredient that matches a list of items or a tag, mirroring the vanilla syntax */
+/**
+ * Abstract ingredient that matches a list of items or a tag, mirroring the
+ * vanilla syntax
+ */
 public abstract class ItemIngredient implements ICustomIngredient {
   /** Field for the item tag */
-  protected static final LoadableField<TagKey<Item>,ItemIngredient> TAG_FIELD = new UnsyncedField<>(Loadables.ITEM_TAG.nullableField("tag", i -> i.tag));
+  protected static final LoadableField<TagKey<Item>, ItemIngredient> TAG_FIELD = new UnsyncedField<>(
+      Loadables.ITEM_TAG.nullableField("tag", i -> i.tag));
 
   protected final List<Item> items;
   @Nullable
@@ -53,10 +57,11 @@ public abstract class ItemIngredient implements ICustomIngredient {
 
   @Override
   public Stream<ItemStack> getItems() {
+    // TODO 1.21.1: Ingredient.getItems() returns ItemStack[] not Stream - convert
+    // to stream
     return Stream.concat(
         items.stream().map(ItemStack::new),
-        tag != null ? Ingredient.of(tag).getItems() : Stream.empty()
-    );
+        tag != null ? Stream.of(Ingredient.of(tag).getItems()) : Stream.empty());
   }
 
   @Override
@@ -68,7 +73,7 @@ public abstract class ItemIngredient implements ICustomIngredient {
   }
 
   /** Custom field that syncs the item tag as items to the client */
-  public enum ItemsField implements RecordField<List<Item>,ItemIngredient> {
+  public enum ItemsField implements RecordField<List<Item>, ItemIngredient> {
     INSTANCE;
 
     private static final Loadable<List<Item>> ITEM_LIST = Loadables.ITEM.list(ArrayLoadable.COMPACT_OR_EMPTY);

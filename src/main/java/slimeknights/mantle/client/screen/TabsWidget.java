@@ -10,7 +10,8 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class TabsWidget extends Widget {
 
-  private static final ResourceLocation creativeInventoryTabs = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
+  private static final ResourceLocation creativeInventoryTabs = ResourceLocation
+      .withDefaultNamespace("textures/gui/container/creative_inventory/tabs.png");
 
   private final ElementScreen[] tabActive = new ElementScreen[3];
   private final ElementScreen[] tab = new ElementScreen[3];
@@ -28,7 +29,8 @@ public class TabsWidget extends Widget {
   private boolean clicked = false;
   private boolean leftMouseDown = false;
 
-  public TabsWidget(MultiModuleScreen<?> parent, ElementScreen tabLeft, ElementScreen tabCenter, ElementScreen tabRight, ElementScreen activeLeft, ElementScreen activeCenter, ElementScreen activeRight) {
+  public TabsWidget(MultiModuleScreen<?> parent, ElementScreen tabLeft, ElementScreen tabCenter, ElementScreen tabRight,
+      ElementScreen activeLeft, ElementScreen activeCenter, ElementScreen activeRight) {
     this.parent = parent;
 
     this.tab[0] = tabLeft;
@@ -135,7 +137,8 @@ public class TabsWidget extends Widget {
         actualTab = toDraw[1];
       }
 
-      // todo: draw all the tabs first and then all the itemstacks so it doesn't have to switch texture in between all the time
+      // todo: draw all the tabs first and then all the itemstacks so it doesn't have
+      // to switch texture in between all the time
       // is above TODO still valid since mojang now auto-stitches every time?
       actualTab.draw(graphics, x, y);
 

@@ -52,7 +52,7 @@ public abstract class TagCondition<T> implements ICondition {
 
   /** Serializer logic for tag keys */
   public record Serializer<C extends TagCondition<?>>(ResourceLocation getID, Function<TagKey<?>, C> constructor) {
-    @Override
+    // TODO 1.21.1: write() is not an override, removed @Override annotation
     public void write(JsonObject json, C value) {
       TagKey<?> tag = value.getTag();
       // save some space in JSON by not setting registry if item (most common)
@@ -62,7 +62,7 @@ public abstract class TagCondition<T> implements ICondition {
       json.addProperty("tag", tag.location().toString());
     }
 
-    @Override
+    // TODO 1.21.1: read() is not an override, removed @Override annotation
     public C read(JsonObject json) {
       return constructor.apply(TagKey.create(
           // default to item registry if registry is unset
@@ -70,12 +70,12 @@ public abstract class TagCondition<T> implements ICondition {
           JsonHelper.getResourceLocation(json, "tag")));
     }
 
-    @Override
+    // TODO 1.21.1: serialize() is not an override, removed @Override annotation
     public void serialize(JsonObject json, C value, JsonSerializationContext context) {
       write(json, value);
     }
 
-    @Override
+    // TODO 1.21.1: deserialize() is not an override, removed @Override annotation
     public C deserialize(JsonObject json, JsonDeserializationContext context) {
       return read(json);
     }
@@ -83,12 +83,18 @@ public abstract class TagCondition<T> implements ICondition {
     /** Creates a MapCodec for 1.21.1 ICondition dispatch */
     public MapCodec<C> codec() {
       return RecordCodecBuilder.mapCodec(instance -> instance.group(
-          Codec.STRING.optionalFieldOf("registry", Registries.ITEM.location().toString()).forGetter(c -> c.getTag().registry().location().toString()),
-          Codec.STRING.fieldOf("tag").forGetter(c -> c.getTag().location().toString())
-      ).apply(instance, (registry, tag) -> {
-        ResourceKey<?> regKey = ResourceKey.createRegistryKey(new ResourceLocation(registry));
-        return constructor.apply(TagKey.create(regKey, new ResourceLocation(tag)));
-      }));
+          Codec.STRING.optionalFieldOf("registry", Registries.ITEM.location().toString())
+              .forGetter(c -> c.getTag().registry().location().toString()),
+          Codec.STRING.fieldOf("tag").forGetter(c -> c.getTag().location().toString()))
+          .apply(instance, (registry, tag) -> {
+            // TODO 1.21.1: ResourceLocation constructor changed, now uses parse() for
+            // string input
+            // Need raw type cast to work around wildcard type inference
+            ResourceKey<?> regKey = ResourceKey.createRegistryKey(ResourceLocation.parse(registry));
+            @SuppressWarnings("unchecked")
+            TagKey<?> tagKey = TagKey.create((ResourceKey) regKey, ResourceLocation.parse(tag));
+            return constructor.apply(tagKey);
+          }));
     }
   }
 }

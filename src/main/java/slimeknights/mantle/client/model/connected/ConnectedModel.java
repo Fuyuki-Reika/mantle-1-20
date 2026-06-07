@@ -68,27 +68,33 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
   /** Loader instance */
   public static IGeometryLoader<ConnectedModel> LOADER = ConnectedModel::deserialize;
 
-  /** Property of the connections cache key. Contains a 6 bit number with each bit representing a direction */
+  /**
+   * Property of the connections cache key. Contains a 6 bit number with each bit
+   * representing a direction
+   */
   private static final ModelProperty<Byte> CONNECTIONS = new ModelProperty<>();
 
   /** Parent model */
   private final SimpleBlockModel model;
   /** Map of texture name to index of suffixes (indexed as 0bENWS) */
-  private final Map<String,String[]> connectedTextures;
+  private final Map<String, String[]> connectedTextures;
   /** Function to run to check if this block connects to another */
-  private final BiPredicate<BlockState,BlockState> connectionPredicate;
+  private final BiPredicate<BlockState, BlockState> connectionPredicate;
   /** List of sides to check when getting block directions */
   private final Set<Direction> sides;
 
-  /** Map of full texture name to the resulting material, filled during {@link #resolveParents(Function, IGeometryBakingContext)} */
-  private Map<String,Material> extraTextures;
+  /**
+   * Map of full texture name to the resulting material, filled during
+   * {@link #resolveParents(Function, IGeometryBakingContext)}
+   */
+  private Map<String, Material> extraTextures;
 
   @Override
-  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, IGeometryBakingContext owner) {
+  public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, IGeometryBakingContext owner) {
     model.resolveParents(modelGetter, owner);
     // for all connected textures, add suffix textures
     Map<String, Material> extraTextures = new HashMap<>();
-    for (Entry<String,String[]> entry : connectedTextures.entrySet()) {
+    for (Entry<String, String[]> entry : connectedTextures.entrySet()) {
       // fetch data from the base texture
       String name = entry.getKey();
       // skip if missing
@@ -115,7 +121,7 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
           if (owner.hasMaterial(suffixedName)) {
             mat = owner.getMaterial(suffixedName);
           } else {
-            mat = new Material(atlas, new ResourceLocation(namespace, path + "/" + suffix));
+            mat = new Material(atlas, ResourceLocation.fromNamespaceAndPath(namespace, path + "/" + suffix));
           }
           // cache the texture name, we use it a lot in rebaking
           extraTextures.put(suffixedName, mat);
@@ -127,8 +133,9 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
   }
 
   @Override
-  public BakedModel bake(IGeometryBakingContext owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
-    BakedModel baked = model.bake(owner, baker, spriteGetter, transform, overrides, location);
+  public BakedModel bake(IGeometryBakingContext owner, ModelBaker baker,
+      Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides) {
+    BakedModel baked = model.bake(owner, baker, spriteGetter, transform, overrides);
     return new Baked(this, new ExtraTextureContext(owner, extraTextures), transform, baked);
   }
 
@@ -138,8 +145,9 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
     private final IGeometryBakingContext owner;
     private final ModelState transforms;
     private final BakedModel[] cache = new BakedModel[64];
-    private final Map<String,String> nameMappingCache = new ConcurrentHashMap<>();
+    private final Map<String, String> nameMappingCache = new ConcurrentHashMap<>();
     private final ModelTextureIteratable modelTextures;
+
     public Baked(ConnectedModel parent, IGeometryBakingContext owner, ModelState transforms, BakedModel baked) {
       super(baked);
       this.parent = parent;
@@ -152,9 +160,11 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
 
     /**
      * Gets the direction rotated
-     * @param direction  Original direction to rotate
-     * @param rotation   Rotation origin, aka the face of the block we are looking at. As a result, UP is identity
-     * @return  Rotated direction
+     * 
+     * @param direction Original direction to rotate
+     * @param rotation  Rotation origin, aka the face of the block we are looking
+     *                  at. As a result, UP is identity
+     * @return Rotated direction
      */
     private static Direction rotateDirection(Direction direction, Direction rotation) {
       if (rotation == Direction.UP) {
@@ -168,7 +178,8 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
         // X is normal
         return direction;
       }
-      // sides all just have the next side for left and right, and consistent up and down
+      // sides all just have the next side for left and right, and consistent up and
+      // down
       return switch (direction) {
         case NORTH -> Direction.UP;
         case SOUTH -> Direction.DOWN;
@@ -180,14 +191,16 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
 
     /**
      * Gets a transform function based on the block part UV and block face
-     * @param face   Block face in question
-     * @param uv     Block UV data
-     * @return  Direction transform function
+     * 
+     * @param face Block face in question
+     * @param uv   Block UV data
+     * @return Direction transform function
      */
-    private static Function<Direction,Direction> getTransform(Direction face, BlockFaceUV uv) {
+    private static Function<Direction, Direction> getTransform(Direction face, BlockFaceUV uv) {
       // TODO: how do I apply UV lock?
-      // final transform switches from face (NSWE) to world direction, the rest are composed in to apply first
-      Function<Direction,Direction> transform = (d) -> rotateDirection(d, face);
+      // final transform switches from face (NSWE) to world direction, the rest are
+      // composed in to apply first
+      Function<Direction, Direction> transform = (d) -> rotateDirection(d, face);
 
       // flipping
       boolean flipV = uv.uvs[1] > uv.uvs[3];
@@ -228,7 +241,7 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
       // otherwise, iterate into the parent models, trying to find a match
       String check = key;
       String found = "";
-      for(Map<String, Either<Material, String>> textures : modelTextures) {
+      for (Map<String, Either<Material, String>> textures : modelTextures) {
         Either<Material, String> either = textures.get(check);
         if (either != null) {
           // if no name, its not connected
@@ -248,9 +261,11 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
     }
 
     /**
-     * Gets the name of this texture that supports connected textures, or null if never is connected
-     * @param key  Name of the part texture
-     * @return  Name of the connected texture
+     * Gets the name of this texture that supports connected textures, or null if
+     * never is connected
+     * 
+     * @param key Name of the part texture
+     * @return Name of the connected texture
      */
     private String getConnectedName(String key) {
       if (key.charAt(0) == '#') {
@@ -265,12 +280,13 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
 
     /**
      * Gets the texture suffix
-     * @param texture      Texture name, must be a connected texture
-     * @param connections  Connections byte
-     * @param transform    Rotations to apply to faces
-     * @return  Key used to cache it
+     * 
+     * @param texture     Texture name, must be a connected texture
+     * @param connections Connections byte
+     * @param transform   Rotations to apply to faces
+     * @return Key used to cache it
      */
-    private String getTextureSuffix(String texture, byte connections, Function<Direction,Direction> transform) {
+    private String getTextureSuffix(String texture, byte connections, Function<Direction, Direction> transform) {
       int key = 0;
       for (Direction dir : Plane.HORIZONTAL) {
         int flag = 1 << transform.apply(dir).get3DDataValue();
@@ -290,15 +306,17 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
 
     /**
      * Gets the model based on the connections in the given model data
-     * @param connections  Array of face connections, true at indexes of connected sides
-     * @return  Model with connections applied
+     * 
+     * @param connections Array of face connections, true at indexes of connected
+     *                    sides
+     * @return Model with connections applied
      */
     private BakedModel applyConnections(byte connections) {
       // copy each element with updated faces
       List<BlockElement> elements = Lists.newArrayList();
       for (BlockElement part : parent.model.getElements()) {
-        Map<Direction,BlockElementFace> partFaces = new EnumMap<>(Direction.class);
-        for (Map.Entry<Direction,BlockElementFace> entry : part.faces.entrySet()) {
+        Map<Direction, BlockElementFace> partFaces = new EnumMap<>(Direction.class);
+        for (Map.Entry<Direction, BlockElementFace> entry : part.faces.entrySet()) {
           // first, determine which texture to use on this side
           Direction dir = entry.getKey();
           BlockElementFace original = entry.getValue();
@@ -306,14 +324,15 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
 
           // follow the texture name back to the original name
           // if it never reaches a connected texture, skip
-          String connectedTexture = getConnectedName(original.texture);
+          String connectedTexture = getConnectedName(original.texture());
           if (!connectedTexture.isEmpty()) {
             // if empty string, we can keep the old face
-            String suffix = getTextureSuffix(connectedTexture, connections, getTransform(dir, original.uv));
+            String suffix = getTextureSuffix(connectedTexture, connections, getTransform(dir, original.uv()));
             if (!suffix.isEmpty()) {
               // suffix the texture
               String fullTexture = connectedTexture + suffix;
-              face = new BlockElementFace(original.cullForDirection, original.tintIndex, "#" + fullTexture, original.uv);
+              face = new BlockElementFace(original.cullForDirection(), original.tintIndex(), "#" + fullTexture,
+                  original.uv());
             }
           }
           // add the updated face
@@ -328,9 +347,12 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
     }
 
     /**
-     * Gets an array of directions to whether a block exists on the side, indexed using direction indexes
-     * @param predicate  Function that returns true if the block is connected on the given side
-     * @return  Boolean array of data
+     * Gets an array of directions to whether a block exists on the side, indexed
+     * using direction indexes
+     * 
+     * @param predicate Function that returns true if the block is connected on the
+     *                  given side
+     * @return Boolean array of data
      */
     private static byte getConnections(Predicate<Direction> predicate) {
       byte connections = 0;
@@ -353,20 +375,24 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
       // gather connections data
       Transformation rotation = transforms.getRotation();
       return tileData.derive()
-                     .with(CONNECTIONS, getConnections(dir -> parent.sides.contains(dir) && parent.connectionPredicate.test(state, world.getBlockState(pos.relative(rotation.rotateTransform(dir))))))
-                     .build();
+          .with(CONNECTIONS,
+              getConnections(dir -> parent.sides.contains(dir) && parent.connectionPredicate.test(state,
+                  world.getBlockState(pos.relative(rotation.rotateTransform(dir))))))
+          .build();
     }
 
     /**
      * Shared logic to get quads from a connections array
-     * @param connections  Byte with 6 bits for the 6 different sides
-     * @param state        Block state instance
-     * @param side         Cullface
-     * @param rand         Random instance
-     * @param data         Model data instance
-     * @return             Model quads for the given side
+     * 
+     * @param connections Byte with 6 bits for the 6 different sides
+     * @param state       Block state instance
+     * @param side        Cullface
+     * @param rand        Random instance
+     * @param data        Model data instance
+     * @return Model quads for the given side
      */
-    protected synchronized List<BakedQuad> getCachedQuads(byte connections, @Nullable BlockState state, @Nullable Direction side, RandomSource rand, ModelData data, @Nullable RenderType renderType) {
+    protected synchronized List<BakedQuad> getCachedQuads(byte connections, @Nullable BlockState state,
+        @Nullable Direction side, RandomSource rand, ModelData data, @Nullable RenderType renderType) {
       // bake a new model if the orientation is not yet baked
       if (cache[connections] == null) {
         cache[connections] = applyConnections(connections);
@@ -378,7 +404,8 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
 
     @Nonnull
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand, ModelData data, @Nullable RenderType renderType) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand,
+        ModelData data, @Nullable RenderType renderType) {
       // try model data first
       Byte connections = data.get(CONNECTIONS);
       // if model data failed, try block state
@@ -417,9 +444,10 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
     }
 
     // build texture list
-    Map<String,String[]> connectedTextures = new HashMap<>(connected.size());
-    for (Entry<String,JsonElement> entry : connected.entrySet()) {
-      // don't validate texture as it may be contained in a child model that is not yet loaded
+    Map<String, String[]> connectedTextures = new HashMap<>(connected.size());
+    for (Entry<String, JsonElement> entry : connected.entrySet()) {
+      // don't validate texture as it may be contained in a child model that is not
+      // yet loaded
       // get type, put in map
       String name = entry.getKey();
       connectedTextures.put(name, ConnectedModelRegistry.deserializeType(entry.getValue(), "textures[" + name + "]"));
@@ -443,7 +471,7 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
     }
 
     // other data
-    BiPredicate<BlockState,BlockState> predicate = ConnectedModelRegistry.deserializePredicate(data, "predicate");
+    BiPredicate<BlockState, BlockState> predicate = ConnectedModelRegistry.deserializePredicate(data, "predicate");
 
     // final model instance
     return new ConnectedModel(model, Map.copyOf(connectedTextures), predicate, sides);

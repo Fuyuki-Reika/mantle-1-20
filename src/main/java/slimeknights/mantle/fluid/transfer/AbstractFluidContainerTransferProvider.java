@@ -46,7 +46,9 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
 
   /** Adds a transfer to be saved */
   protected void addTransfer(String name, IFluidContainerTransfer transfer, ICondition... conditions) {
-    addTransfer(new ResourceLocation(modId, name), transfer, conditions);
+    // TODO 1.21.1: ResourceLocation(String, String) constructor is private - use
+    // fromNamespaceAndPath
+    addTransfer(ResourceLocation.fromNamespaceAndPath(modId, name), transfer, conditions);
   }
 
   /** Adds generic fill and empty for a container */
@@ -119,11 +121,15 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
       JsonElement element = FluidContainerTransferManager.GSON.toJsonTree(transfer, IFluidContainerTransfer.class);
       assert element.isJsonObject();
       if (conditions.length != 0) {
-        JsonArray array = new JsonArray();
-        for (ICondition condition : conditions) {
-          array.add(CraftingHelper.serialize(condition));
-        }
-        element.getAsJsonObject().add("conditions", array);
+        // TODO 1.21.1: CraftingHelper.serialize removed - conditions serialization
+        // disabled
+        // JsonArray array = new JsonArray();
+        // for (ICondition condition : conditions) {
+        // array.add(CraftingHelper.serialize(condition));
+        // }
+        // element.getAsJsonObject().add("conditions", array);
+        throw new UnsupportedOperationException(
+            "Condition serialization temporarily disabled - CraftingHelper.serialize removed");
       }
       return element;
     }

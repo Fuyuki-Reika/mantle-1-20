@@ -20,18 +20,27 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import slimeknights.mantle.loot.MantleLoot;
 import slimeknights.mantle.util.JsonHelper;
 
+import java.util.Optional;
 import java.util.Set;
 
-/** Variant of {@link net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition} that allows using a tag for block type instead of a block */
+/**
+ * Variant of
+ * {@link net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition}
+ * that allows using a tag for block type instead of a block
+ */
 @RequiredArgsConstructor
 public class BlockTagLootCondition implements LootItemCondition {
   public static final SerializerImpl SERIALIZER = new SerializerImpl();
 
   private final TagKey<Block> tag;
-  private final StatePropertiesPredicate properties;
+  // TODO 1.21.1: StatePropertiesPredicate now wrapped in Optional -
+  // Builder.build() returns Optional
+  private final Optional<StatePropertiesPredicate> properties;
 
   public BlockTagLootCondition(TagKey<Block> tag) {
-    this(tag, StatePropertiesPredicate.ANY);
+    // TODO 1.21.1: StatePropertiesPredicate.ANY removed - use
+    // Builder.properties().build() for empty predicate
+    this(tag, StatePropertiesPredicate.Builder.properties().build());
   }
 
   public BlockTagLootCondition(TagKey<Block> tag, StatePropertiesPredicate.Builder builder) {
@@ -41,7 +50,9 @@ public class BlockTagLootCondition implements LootItemCondition {
   @Override
   public boolean test(LootContext context) {
     BlockState state = context.getParamOrNull(LootContextParams.BLOCK_STATE);
-    return state != null && state.is(tag) && this.properties.matches(state);
+    // TODO 1.21.1: StatePropertiesPredicate now wrapped in Optional - unwrap with
+    // map()
+    return state != null && state.is(tag) && this.properties.map(p -> p.matches(state)).orElse(true);
   }
 
   @Override
@@ -54,30 +65,48 @@ public class BlockTagLootCondition implements LootItemCondition {
     return MantleLoot.BLOCK_TAG_CONDITION;
   }
 
-  private static class SerializerImpl {
-    @Override
+  // TODO 1.21.1: Made SerializerImpl public to allow external codec() access from
+  // MantleLoot
+  public static class SerializerImpl {
+    // TODO 1.21.1: JSON serialization methods temporarily disabled -
+    // serializeToJson() and fromJson() removed
+    // Modern loot system uses codec() instead of JSON serialization
     public void serialize(JsonObject json, BlockTagLootCondition loot, JsonSerializationContext context) {
-      json.addProperty("tag", loot.tag.location().toString());
-      if (loot.properties != StatePropertiesPredicate.ANY) {
-        json.add("properties", loot.properties.serializeToJson());
-      }
+      throw new UnsupportedOperationException(
+          "BlockTagLootCondition JSON serialization disabled - use codec() instead");
+      /*
+       * json.addProperty("tag", loot.tag.location().toString());
+       * // TODO 1.21.1: properties now Optional - use isPresent() instead of ANY
+       * comparison
+       * if (loot.properties.isPresent()) {
+       * json.add("properties", loot.properties.get().serializeToJson());
+       * }
+       */
     }
 
-    @Override
     public BlockTagLootCondition deserialize(JsonObject json, JsonDeserializationContext context) {
-      TagKey<Block> tag = TagKey.create(Registries.BLOCK, JsonHelper.getResourceLocation(json, "tag"));
-      StatePropertiesPredicate predicate = StatePropertiesPredicate.ANY;
-      if (json.has("properties")) {
-        predicate = StatePropertiesPredicate.fromJson(json.get("properties"));
-      }
-      return new BlockTagLootCondition(tag, predicate);
+      throw new UnsupportedOperationException(
+          "BlockTagLootCondition JSON deserialization disabled - use codec() instead");
+      /*
+       * TagKey<Block> tag = TagKey.create(Registries.BLOCK,
+       * JsonHelper.getResourceLocation(json, "tag"));
+       * // TODO 1.21.1: properties now Optional - use Optional.empty() instead of ANY
+       * Optional<StatePropertiesPredicate> predicate = Optional.empty();
+       * if (json.has("properties")) {
+       * predicate =
+       * Optional.of(StatePropertiesPredicate.fromJson(json.get("properties")));
+       * }
+       * return new BlockTagLootCondition(tag, predicate);
+       */
     }
 
     public MapCodec<BlockTagLootCondition> codec() {
       return RecordCodecBuilder.mapCodec(instance -> instance.group(
           TagKey.codec(Registries.BLOCK).fieldOf("tag").forGetter(c -> c.tag),
-          StatePropertiesPredicate.CODEC.optionalFieldOf("properties", StatePropertiesPredicate.ANY).forGetter(c -> c.properties)
-      ).apply(instance, BlockTagLootCondition::new));
+          // TODO 1.21.1: CODEC returns Optional, use optionalFieldOf with
+          // Optional.empty()
+          StatePropertiesPredicate.CODEC.optionalFieldOf("properties").forGetter(c -> c.properties))
+          .apply(instance, BlockTagLootCondition::new));
     }
   }
 }

@@ -1,6 +1,7 @@
 package slimeknights.mantle.loot;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.AccessLevel;
@@ -23,28 +24,49 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 /** Loot modifier to inject an additional loot entry into an existing table */
+// TODO 1.21.1: codec() method removed - signature changed in
+// IGlobalLootModifier interface
+// MantleCodecs.LOOT_ENTRY and LOOT_FUNCTIONS also removed, entire class needs
+// API migration
+// Class no longer properly registers with loot system but can still be
+// instantiated for legacy code
 public class AddEntryLootModifier extends LootModifier {
-  public static final Codec<AddEntryLootModifier> CODEC = RecordCodecBuilder.create(inst -> codecStart(inst).and(inst.group(
-    ILootModifierCondition.CODEC.listOf().fieldOf("post_conditions").forGetter(m -> m.modifierConditions),
-    MantleCodecs.LOOT_ENTRY.fieldOf("entry").forGetter(m -> m.entry),
-    MantleCodecs.LOOT_FUNCTIONS.fieldOf("functions").forGetter(m -> m.functions))).apply(inst, AddEntryLootModifier::new));
+  // Codec temporarily disabled - references removed MantleCodecs fields
+  public static final MapCodec<AddEntryLootModifier> CODEC = MapCodec.unit(() -> {
+    throw new UnsupportedOperationException(
+        "AddEntryLootModifier temporarily disabled - needs NeoForge 1.21.1 loot API migration");
+  });
+  /*
+   * public static final Codec<AddEntryLootModifier> CODEC =
+   * RecordCodecBuilder.create(inst -> codecStart(inst).and(inst.group(
+   * ILootModifierCondition.CODEC.listOf().fieldOf("post_conditions").forGetter(m
+   * -> m.modifierConditions),
+   * MantleCodecs.LOOT_ENTRY.fieldOf("entry").forGetter(m -> m.entry),
+   * MantleCodecs.LOOT_FUNCTIONS.fieldOf("functions").forGetter(m ->
+   * m.functions))).apply(inst, AddEntryLootModifier::new));
+   */
 
   /** Additional conditions that can consider the previously generated loot */
   private final List<ILootModifierCondition> modifierConditions;
   /** Entry for generating loot */
-	private final LootPoolEntryContainer entry;
-  /** Functions to apply to the entry, allows adding functions to parented loot entries such as alternatives */
-	private final LootItemFunction[] functions;
+  private final LootPoolEntryContainer entry;
+  /**
+   * Functions to apply to the entry, allows adding functions to parented loot
+   * entries such as alternatives
+   */
+  private final LootItemFunction[] functions;
   /** Functions merged into a single function for ease of use */
-	private final BiFunction<ItemStack, LootContext, ItemStack> combinedFunctions;
+  private final BiFunction<ItemStack, LootContext, ItemStack> combinedFunctions;
 
-	protected AddEntryLootModifier(LootItemCondition[] conditionsIn, List<ILootModifierCondition> modifierConditions, LootPoolEntryContainer entry, LootItemFunction[] functions) {
-		super(conditionsIn);
+  protected AddEntryLootModifier(LootItemCondition[] conditionsIn, List<ILootModifierCondition> modifierConditions,
+      LootPoolEntryContainer entry, LootItemFunction[] functions) {
+    super(conditionsIn);
     this.modifierConditions = modifierConditions;
     this.entry = entry;
-		this.functions = functions;
-		this.combinedFunctions = LootItemFunctions.compose(functions);
-	}
+    this.functions = functions;
+    // TODO 1.21.1: LootItemFunctions.compose now expects List instead of array
+    this.combinedFunctions = LootItemFunctions.compose(List.of(functions));
+  }
 
   /** Creates a builder for this loot modifier */
   public static Builder builder(LootPoolEntryContainer entry) {
@@ -57,8 +79,8 @@ public class AddEntryLootModifier extends LootModifier {
   }
 
   @Nonnull
-	@Override
-	protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
+  @Override
+  protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
     // if any condition fails, exit immediately
     for (ILootModifierCondition modifierCondition : modifierConditions) {
       if (!modifierCondition.test(generatedLoot, context)) {
@@ -68,11 +90,12 @@ public class AddEntryLootModifier extends LootModifier {
     // generate the actual entry
     Consumer<ItemStack> consumer = LootItemFunction.decorate(this.combinedFunctions, generatedLoot::add, context);
     entry.expand(context, generator -> generator.createItemStack(consumer, context));
-		return generatedLoot;
-	}
+    return generatedLoot;
+  }
 
+  // TODO 1.21.1: codec() return type changed from Codec to MapCodec
   @Override
-  public Codec<? extends IGlobalLootModifier> codec() {
+  public MapCodec<? extends IGlobalLootModifier> codec() {
     return CODEC;
   }
 
@@ -101,7 +124,8 @@ public class AddEntryLootModifier extends LootModifier {
 
     /** Builds the final modifier */
     public AddEntryLootModifier build() {
-      return new AddEntryLootModifier(getConditions(), modifierConditions, entry, functions.toArray(new LootItemFunction[0]));
+      return new AddEntryLootModifier(getConditions(), modifierConditions, entry,
+          functions.toArray(new LootItemFunction[0]));
     }
   }
 }

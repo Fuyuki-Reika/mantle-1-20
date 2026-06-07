@@ -19,22 +19,40 @@ import slimeknights.mantle.util.JsonHelper;
 import java.util.List;
 import java.util.function.Consumer;
 
-/** Loot entry that returns the preferred item from a tag. See {@link TagPreference} */
+/**
+ * Loot entry that returns the preferred item from a tag. See
+ * {@link TagPreference}
+ */
 public class TagPreferenceLootEntry extends LootPoolSingletonContainer {
   private final TagKey<Item> tag;
-  protected TagPreferenceLootEntry(TagKey<Item> tag, int weight, int quality, List<LootItemCondition> conditions, List<LootItemFunction> functions) {
+
+  protected TagPreferenceLootEntry(TagKey<Item> tag, int weight, int quality, List<LootItemCondition> conditions,
+      List<LootItemFunction> functions) {
     super(weight, quality, conditions, functions);
     this.tag = tag;
   }
 
   /** Codec for serialization/deserialization */
-  public static final MapCodec<TagPreferenceLootEntry>CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-      TagKey.codec(Registries.ITEM).fieldOf("tag").forGetter(e -> e.tag),
-      Codec.INT.fieldOf("weight").forGetter(e -> e.weight),
-      Codec.INT.fieldOf("quality").forGetter(e -> e.quality),
-      LootItemCondition.DIRECT_CODEC.listOf().optionalFieldOf("conditions", List.of()).forGetter(e -> e.conditions),
-      LootItemFunction.DIRECT_CODEC.listOf().optionalFieldOf("functions", List.of()).forGetter(e -> e.functions)
-  ).apply(instance, TagPreferenceLootEntry::new));
+  // TODO 1.21.1: CODEC disabled - parent class fields (weight, quality,
+  // conditions, functions) no longer accessible
+  // Loot entry serialization may have changed API pattern - needs
+  // reimplementation
+  public static final MapCodec<TagPreferenceLootEntry> CODEC = MapCodec.unit(() -> {
+    throw new UnsupportedOperationException(
+        "TagPreferenceLootEntry CODEC temporarily disabled - needs NeoForge 1.21.1 loot API migration");
+  });
+  /*
+   * public static final MapCodec<TagPreferenceLootEntry>CODEC =
+   * RecordCodecBuilder.mapCodec(instance -> instance.group(
+   * TagKey.codec(Registries.ITEM).fieldOf("tag").forGetter(e -> e.tag),
+   * Codec.INT.fieldOf("weight").forGetter(e -> e.weight),
+   * Codec.INT.fieldOf("quality").forGetter(e -> e.quality),
+   * LootItemCondition.DIRECT_CODEC.listOf().optionalFieldOf("conditions",
+   * List.of()).forGetter(e -> e.conditions),
+   * LootItemFunction.DIRECT_CODEC.listOf().optionalFieldOf("functions",
+   * List.of()).forGetter(e -> e.functions)
+   * ).apply(instance, TagPreferenceLootEntry::new));
+   */
 
   @Override
   public LootPoolEntryType getType() {
@@ -49,6 +67,7 @@ public class TagPreferenceLootEntry extends LootPoolSingletonContainer {
   /** Creates a new builder */
   @SuppressWarnings("unused") // API
   public static Builder<?> tagPreference(TagKey<Item> tag) {
-    return simpleBuilder((weight, quality, conditions, functions) -> new TagPreferenceLootEntry(tag, weight, quality, conditions, functions));
+    return simpleBuilder((weight, quality, conditions, functions) -> new TagPreferenceLootEntry(tag, weight, quality,
+        conditions, functions));
   }
 }

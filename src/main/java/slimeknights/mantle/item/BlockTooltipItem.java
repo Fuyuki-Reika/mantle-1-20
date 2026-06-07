@@ -18,8 +18,11 @@ public class BlockTooltipItem extends BlockItem {
   }
 
   @Override
-  public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-    super.appendHoverText(stack, worldIn, tooltip, flagIn);
+  // TODO 1.21.1: appendHoverText signature changed - Level worldIn ->
+  // Item.TooltipContext context
+  public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
+      TooltipFlag flagIn) {
+    super.appendHoverText(stack, context, tooltip, flagIn);
     TranslationHelper.addOptionalTooltip(stack, tooltip);
   }
 }

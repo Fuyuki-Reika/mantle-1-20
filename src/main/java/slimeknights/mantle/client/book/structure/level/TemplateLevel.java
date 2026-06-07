@@ -47,27 +47,34 @@ public class TemplateLevel extends Level {
 
   private final Map<String, MapItemSavedData> maps = new HashMap<>();
   private final Scoreboard scoreboard = new Scoreboard();
-  private final RecipeManager recipeManager = new RecipeManager();
+  // TODO 1.21.1: RecipeManager constructor requires Provider
+  private final RecipeManager recipeManager = new RecipeManager(this.registryAccess());
   private final TemplateChunkSource chunkSource;
 
   public TemplateLevel(List<StructureBlockInfo> blocks, Predicate<BlockPos> shouldShow) {
     super(
-      new FakeLevelData(), Level.OVERWORLD, Objects.requireNonNull(Minecraft.getInstance().level).registryAccess(),
-      Objects.requireNonNull(Minecraft.getInstance().level).registryAccess().registryOrThrow(Registries.DIMENSION_TYPE).getHolderOrThrow(BuiltinDimensionTypes.OVERWORLD),
-      () -> InactiveProfiler.INSTANCE, true, false, 0, 0
-    );
+        new FakeLevelData(), Level.OVERWORLD, Objects.requireNonNull(Minecraft.getInstance().level).registryAccess(),
+        Objects.requireNonNull(Minecraft.getInstance().level).registryAccess()
+            .registryOrThrow(Registries.DIMENSION_TYPE).getHolderOrThrow(BuiltinDimensionTypes.OVERWORLD),
+        () -> InactiveProfiler.INSTANCE, true, false, 0, 0);
 
     this.chunkSource = new TemplateChunkSource(blocks, this, shouldShow);
   }
 
   @Override
-  public void sendBlockUpdated(@Nonnull BlockPos pos, @Nonnull BlockState oldState, @Nonnull BlockState newState, int flags) {}
+  public void sendBlockUpdated(@Nonnull BlockPos pos, @Nonnull BlockState oldState, @Nonnull BlockState newState,
+      int flags) {
+  }
 
   @Override
-  public void playSeededSound(@Nullable Player pPlayer, double pX, double pY, double pZ, Holder<SoundEvent> pSound, SoundSource pSource, float pVolume, float pPitch, long pSeed) {}
+  public void playSeededSound(@Nullable Player pPlayer, double pX, double pY, double pZ, Holder<SoundEvent> pSound,
+      SoundSource pSource, float pVolume, float pPitch, long pSeed) {
+  }
 
   @Override
-  public void playSeededSound(@Nullable Player pPlayer, Entity pEntity, Holder<SoundEvent> pSound, SoundSource pCategory, float pVolume, float pPitch, long pSeed) {}
+  public void playSeededSound(@Nullable Player pPlayer, Entity pEntity, Holder<SoundEvent> pSound,
+      SoundSource pCategory, float pVolume, float pPitch, long pSeed) {
+  }
 
   @Override
   public String gatherChunkSourceStats() {
@@ -81,23 +88,34 @@ public class TemplateLevel extends Level {
   }
 
   @Nullable
-  @Override
+  // TODO 1.21.1: getMapData() no longer overrides Level method - needs MapId
+  // parameter
   public MapItemSavedData getMapData(@Nonnull String mapName) {
     return this.maps.get(mapName);
   }
 
+  // TODO 1.21.1: getMapData(MapId) added to Level API
+  @Nullable
   @Override
-  public void setMapData(String mapId, MapItemSavedData mapDataIn) {
-    this.maps.put(mapId, mapDataIn);
+  public MapItemSavedData getMapData(net.minecraft.world.level.saveddata.maps.MapId mapId) {
+    return this.maps.get(mapId.toString());
+  }
+
+  // TODO 1.21.1: setMapData() now takes MapId instead of String
+  @Override
+  public void setMapData(net.minecraft.world.level.saveddata.maps.MapId mapId, MapItemSavedData mapDataIn) {
+    this.maps.put(mapId.toString(), mapDataIn);
+  }
+
+  // TODO 1.21.1: getFreeMapId() now returns MapId instead of int
+  @Override
+  public net.minecraft.world.level.saveddata.maps.MapId getFreeMapId() {
+    return new net.minecraft.world.level.saveddata.maps.MapId(this.maps.size());
   }
 
   @Override
-  public int getFreeMapId() {
-    return this.maps.size();
+  public void destroyBlockProgress(int breakerId, @Nonnull BlockPos pos, int progress) {
   }
-
-  @Override
-  public void destroyBlockProgress(int breakerId, @Nonnull BlockPos pos, int progress) {}
 
   @Nonnull
   @Override
@@ -135,14 +153,52 @@ public class TemplateLevel extends Level {
   }
 
   @Override
-  public void levelEvent(@Nullable Player player, int type, @Nonnull BlockPos pos, int data) {}
+  public void levelEvent(@Nullable Player player, int type, @Nonnull BlockPos pos, int data) {
+  }
 
+  // TODO 1.21.1: gameEvent() signature changed to use Holder<GameEvent> instead
+  // of GameEvent
   @Override
-  public void gameEvent(GameEvent pEvent, Vec3 pPosition, Context pContext) {}
+  public void gameEvent(net.minecraft.core.Holder<GameEvent> pEvent, Vec3 pPosition, Context pContext) {
+  }
 
   @Override
   public FeatureFlagSet enabledFeatures() {
     return FeatureFlagSet.of();
+  }
+
+  // TODO 1.21.1: getDayTimePerTick() added to Level API
+  @Override
+  public float getDayTimePerTick() {
+    return 0;
+  }
+
+  // TODO 1.21.1: getDayTimeFraction() added to Level API
+  @Override
+  public float getDayTimeFraction() {
+    return 0;
+  }
+
+  // TODO 1.21.1: setDayTimePerTick() added to Level API
+  @Override
+  public void setDayTimePerTick(float ticksPerDay) {
+  }
+
+  // TODO 1.21.1: setDayTimeFraction() added to Level API
+  @Override
+  public void setDayTimeFraction(float fraction) {
+  }
+
+  // TODO 1.21.1: potionBrewing() added to Level API
+  @Override
+  public net.minecraft.world.item.alchemy.PotionBrewing potionBrewing() {
+    return net.minecraft.world.item.alchemy.PotionBrewing.EMPTY;
+  }
+
+  // TODO 1.21.1: tickRateManager() added to Level API
+  @Override
+  public net.minecraft.world.TickRateManager tickRateManager() {
+    return new net.minecraft.world.TickRateManager();
   }
 
   @Override

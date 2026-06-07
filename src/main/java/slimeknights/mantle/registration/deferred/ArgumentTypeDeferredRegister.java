@@ -5,29 +5,34 @@ import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.registries.Registries;
-import net.neoforged.neoforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import slimeknights.mantle.registration.RegistrationHelper;
 
 import java.util.function.Supplier;
 
-/** Register for argument types that automatically handles registering with {@link ArgumentTypeInfos#registerByClass(Class, ArgumentTypeInfo)} */
+/**
+ * Register for argument types that automatically handles registering with
+ * {@link ArgumentTypeInfos#registerByClass(Class, ArgumentTypeInfo)}
+ */
 @SuppressWarnings("UnusedReturnValue")
-public class ArgumentTypeDeferredRegister extends DeferredRegisterWrapper<ArgumentTypeInfo<?,?>> {
+public class ArgumentTypeDeferredRegister extends DeferredRegisterWrapper<ArgumentTypeInfo<?, ?>> {
   public ArgumentTypeDeferredRegister(String modID) {
     super(Registries.COMMAND_ARGUMENT_TYPE, modID);
   }
 
   /**
    * Registers an argument type
-   * @param name           Name of the argument
-   * @param argumentClass  Class of the argument
-   * @param supplier       Supplier to the argument info
-   * @param <A>  Argument type
-   * @param <T>  Argument info template type
-   * @param <I>  Argument info type
-   * @return  Registry object
+   * 
+   * @param name          Name of the argument
+   * @param argumentClass Class of the argument
+   * @param supplier      Supplier to the argument info
+   * @param <A>           Argument type
+   * @param <T>           Argument info template type
+   * @param <I>           Argument info type
+   * @return Registry object
    */
-  public <A extends ArgumentType<?>,T extends ArgumentTypeInfo.Template<A>,I extends ArgumentTypeInfo<A,T>> RegistryObject<I> register(String name, Class<? super A> argumentClass, Supplier<I> supplier) {
+  public <A extends ArgumentType<?>, T extends ArgumentTypeInfo.Template<A>, I extends ArgumentTypeInfo<A, T>> DeferredHolder<ArgumentTypeInfo<?, ?>, I> register(
+      String name, Class<? super A> argumentClass, Supplier<I> supplier) {
     return register.register(name, () -> {
       I info = supplier.get();
       ArgumentTypeInfos.registerByClass(RegistrationHelper.genericArgumentType(argumentClass), info);
@@ -37,13 +42,17 @@ public class ArgumentTypeDeferredRegister extends DeferredRegisterWrapper<Argume
 
   /**
    * Registers a context free singleton argument
-   * @param name           Name of the argument
-   * @param argumentClass  Class of the argument
-   * @param supplier       Supplier to the argument default
-   * @param <A>  Argument type
-   * @return  Registry object
+   * 
+   * @param name          Name of the argument
+   * @param argumentClass Class of the argument
+   * @param supplier      Supplier to the argument default
+   * @param <A>           Argument type
+   * @return Registry object
    */
-  public <A extends ArgumentType<?>> RegistryObject<SingletonArgumentInfo<A>> registerSingleton(String name, Class<A> argumentClass, Supplier<A> supplier) {
-    return register(name, argumentClass, () -> SingletonArgumentInfo.contextFree(supplier));
+  @SuppressWarnings("unchecked")
+  public <A extends ArgumentType<?>> DeferredHolder<SingletonArgumentInfo<A>, SingletonArgumentInfo<A>> registerSingleton(
+      String name, Class<A> argumentClass, Supplier<A> supplier) {
+    return (DeferredHolder<SingletonArgumentInfo<A>, SingletonArgumentInfo<A>>) (DeferredHolder<?, ?>) register(name,
+        argumentClass, () -> SingletonArgumentInfo.contextFree(supplier));
   }
 }

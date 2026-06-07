@@ -17,12 +17,14 @@ import java.util.function.Function;
 /** Extension to Resource Location serializer to change the default mod ID. */
 @RequiredArgsConstructor
 public class ResourceLocationSerializer<T extends ResourceLocation> implements JsonDeserializer<T>, JsonSerializer<T> {
-  private final Function<String,T> constructor;
+  private final Function<String, T> constructor;
   private final String modId;
 
   /** Creates an instance for resource locations */
   public static ResourceLocationSerializer<ResourceLocation> resourceLocation(String modId) {
-    return new ResourceLocationSerializer<>(ResourceLocation::new, modId);
+    // TODO 1.21.1: ResourceLocation constructor is private, use parse() static
+    // method
+    return new ResourceLocationSerializer<>(ResourceLocation::parse, modId);
   }
 
   @Override

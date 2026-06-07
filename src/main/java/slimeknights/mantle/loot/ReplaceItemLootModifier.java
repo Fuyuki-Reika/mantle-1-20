@@ -1,6 +1,7 @@
 package slimeknights.mantle.loot;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.AccessLevel;
@@ -25,12 +26,23 @@ import java.util.function.BiFunction;
 
 /** Loot modifier to replace an item with another */
 public class ReplaceItemLootModifier extends LootModifier {
-  public static final Codec<ReplaceItemLootModifier> CODEC = RecordCodecBuilder.create(inst -> codecStart(inst).and(
-    inst.group(
-      MantleCodecs.INGREDIENT.fieldOf("original").forGetter(m -> m.original),
-      ItemOutput.REQUIRED_STACK_CODEC.fieldOf("replacement").forGetter(m -> m.replacement),
-      MantleCodecs.LOOT_FUNCTIONS.fieldOf("functions").forGetter(m -> m.functions)
-    )).apply(inst, ReplaceItemLootModifier::new));
+  // TODO 1.21.1: CODEC temporarily disabled - IGlobalLootModifier.codec() changed
+  // from Codec to MapCodec
+  // Also depends on MantleCodecs.LOOT_FUNCTIONS which is disabled
+  public static final MapCodec<ReplaceItemLootModifier> CODEC = MapCodec.unit(() -> {
+    throw new UnsupportedOperationException(
+        "ReplaceItemLootModifier codec disabled - needs NeoForge 1.21.1 codec API migration");
+  });
+  /*
+   * public static final Codec<ReplaceItemLootModifier> CODEC =
+   * RecordCodecBuilder.create(inst -> codecStart(inst).and(
+   * inst.group(
+   * MantleCodecs.INGREDIENT.fieldOf("original").forGetter(m -> m.original),
+   * ItemOutput.REQUIRED_STACK_CODEC.fieldOf("replacement").forGetter(m ->
+   * m.replacement),
+   * MantleCodecs.LOOT_FUNCTIONS.fieldOf("functions").forGetter(m -> m.functions)
+   * )).apply(inst, ReplaceItemLootModifier::new));
+   */
 
   /** Ingredient to test for the original item */
   private final Ingredient original;
@@ -41,12 +53,14 @@ public class ReplaceItemLootModifier extends LootModifier {
   /** Functions merged into a single function for ease of use */
   private final BiFunction<ItemStack, LootContext, ItemStack> combinedFunctions;
 
-  protected ReplaceItemLootModifier(LootItemCondition[] conditionsIn, Ingredient original, ItemOutput replacement, LootItemFunction[] functions) {
+  protected ReplaceItemLootModifier(LootItemCondition[] conditionsIn, Ingredient original, ItemOutput replacement,
+      LootItemFunction[] functions) {
     super(conditionsIn);
     this.original = original;
     this.replacement = replacement;
     this.functions = functions;
-    this.combinedFunctions = LootItemFunctions.compose(functions);
+    // TODO 1.21.1: LootItemFunctions.compose() now expects List instead of array
+    this.combinedFunctions = LootItemFunctions.compose(List.of(functions));
   }
 
   /** Creates a builder to create a loot modifier */
@@ -62,14 +76,18 @@ public class ReplaceItemLootModifier extends LootModifier {
       ItemStack stack = iterator.next();
       if (original.test(stack)) {
         ItemStack replacement = this.replacement.get();
-        iterator.set(combinedFunctions.apply(ItemHandlerHelper.copyStackWithSize(replacement, replacement.getCount() * stack.getCount()), context));
+        // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize() removed, use
+        // ItemStack.copyWithCount()
+        iterator.set(
+            combinedFunctions.apply(replacement.copyWithCount(replacement.getCount() * stack.getCount()), context));
       }
     }
     return generatedLoot;
   }
 
+  // TODO 1.21.1: codec() return type changed from Codec to MapCodec
   @Override
-  public Codec<? extends IGlobalLootModifier> codec() {
+  public MapCodec<? extends IGlobalLootModifier> codec() {
     return CODEC;
   }
 
@@ -90,7 +108,8 @@ public class ReplaceItemLootModifier extends LootModifier {
 
     /** Builds the final modifier */
     public ReplaceItemLootModifier build() {
-      return new ReplaceItemLootModifier(getConditions(), input, replacement, functions.toArray(new LootItemFunction[0]));
+      return new ReplaceItemLootModifier(getConditions(), input, replacement,
+          functions.toArray(new LootItemFunction[0]));
     }
   }
 }

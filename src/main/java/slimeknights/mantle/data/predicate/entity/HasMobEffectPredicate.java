@@ -1,5 +1,6 @@
 package slimeknights.mantle.data.predicate.entity;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.LivingEntity;
 import slimeknights.mantle.data.loadable.Loadables;
@@ -10,11 +11,13 @@ import slimeknights.mantle.data.predicate.IJsonPredicate;
  * Predicate that checks if an entity has the given mob effect.
  */
 public record HasMobEffectPredicate(MobEffect effect) implements LivingEntityPredicate {
-  public static final RecordLoadable<HasMobEffectPredicate> LOADER = RecordLoadable.create(Loadables.MOB_EFFECT.requiredField("effect", HasMobEffectPredicate::effect), HasMobEffectPredicate::new);
+  public static final RecordLoadable<HasMobEffectPredicate> LOADER = RecordLoadable
+      .create(Loadables.MOB_EFFECT.requiredField("effect", HasMobEffectPredicate::effect), HasMobEffectPredicate::new);
 
   @Override
   public boolean matches(LivingEntity living) {
-    return living.hasEffect(effect);
+    // TODO 1.21.1: hasEffect now requires Holder<MobEffect> - use wrapAsHolder
+    return living.hasEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(effect));
   }
 
   @Override

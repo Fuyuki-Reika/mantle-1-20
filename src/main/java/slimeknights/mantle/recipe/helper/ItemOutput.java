@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
@@ -28,7 +29,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * Class representing an item stack output. Supports both direct stacks and tag output, behaving like an ingredient used for output
+ * Class representing an item stack output. Supports both direct stacks and tag
+ * output, behaving like an ingredient used for output
  */
 public abstract class ItemOutput implements Supplier<ItemStack> {
   /* Codecs - just adding these as needed */
@@ -38,17 +40,18 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
   /** Empty instance */
   public static final ItemOutput EMPTY = new OfStack(ItemStack.EMPTY);
 
-
   /**
    * Gets the item output of this recipe
-   * @return  Item output
+   * 
+   * @return Item output
    */
   @Override
   public abstract ItemStack get();
 
   /**
    * Gets a copy of the result stack
-   * @return  Item output
+   * 
+   * @return Item output
    */
   public final ItemStack copy() {
     return get().copy();
@@ -62,7 +65,10 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
     return getCount() <= 0;
   }
 
-  /** Gets the tag for this output. Will be {@code null} if this is not a tag output. */
+  /**
+   * Gets the tag for this output. Will be {@code null} if this is not a tag
+   * output.
+   */
   @Nullable
   public TagKey<Item> getTag() {
     return null;
@@ -70,15 +76,17 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
   /**
    * Writes this output to JSON
-   * @param  writeCount  If true, serializes the count
-   * @return  Json element
+   * 
+   * @param writeCount If true, serializes the count
+   * @return Json element
    */
   public abstract JsonElement serialize(boolean writeCount);
 
   /**
    * Creates a new output for the given stack
-   * @param stack  Stack
-   * @return  Output
+   * 
+   * @param stack Stack
+   * @return Output
    */
   public static ItemOutput fromStack(ItemStack stack) {
     if (stack.isEmpty()) {
@@ -89,9 +97,10 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
   /**
    * Creates a new output for the given item
+   * 
    * @param item  Item
    * @param count Stack count
-   * @return  Output
+   * @return Output
    */
   public static ItemOutput fromItem(ItemLike item, int count) {
     return new OfItem(item.asItem(), count);
@@ -99,8 +108,9 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
   /**
    * Creates a new output for the given item
-   * @param item  Item
-   * @return  Output
+   * 
+   * @param item Item
+   * @return Output
    */
   public static ItemOutput fromItem(ItemLike item) {
     return fromItem(item, 1);
@@ -108,6 +118,7 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
   /**
    * Creates a new output for the given tag
+   * 
    * @param tag   Tag
    * @param count Stack count
    * @param nbt   Stack NBT
@@ -119,6 +130,7 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
   /**
    * Creates a new output for the given tag
+   * 
    * @param tag   Tag
    * @param count Stack count
    * @return Output
@@ -129,7 +141,8 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
   /**
    * Creates a new output for the given tag
-   * @param tag  Tag
+   * 
+   * @param tag Tag
    * @return Output
    */
   public static ItemOutput fromTag(TagKey<Item> tag) {
@@ -138,22 +151,30 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
   /**
    * Writes this output to the packet buffer
-   * @param buffer  Packet buffer instance
+   * 
+   * @param buffer Packet buffer instance
    */
   public void write(FriendlyByteBuf buffer) {
-    buffer.writeItem(get());
+    // TODO 1.21.1: buffer.writeItem() removed - use ItemStack.STREAM_CODEC
+    ItemStack.STREAM_CODEC.encode((RegistryFriendlyByteBuf) buffer, get());
   }
 
   /**
    * Reads an item output from the packet buffer
-   * @param buffer  Buffer instance
-   * @return  Item output
+   * 
+   * @param buffer Buffer instance
+   * @return Item output
    */
   public static ItemOutput read(FriendlyByteBuf buffer) {
-    return fromStack(buffer.readItem());
+    // TODO 1.21.1: buffer.readItem() removed - use ItemStack.STREAM_CODEC
+    return fromStack(ItemStack.STREAM_CODEC.decode((RegistryFriendlyByteBuf) buffer));
   }
 
-  /** Class for an output that is just an item, simplifies NBT for serializing as vanilla forces NBT to be set for tools and forge goes through extra steps when NBT is set */
+  /**
+   * Class for an output that is just an item, simplifies NBT for serializing as
+   * vanilla forces NBT to be set for tools and forge goes through extra steps
+   * when NBT is set
+   */
   @RequiredArgsConstructor
   private static class OfItem extends ItemOutput {
     private final Item item;
@@ -200,10 +221,12 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
     @Override
     public JsonElement serialize(boolean writeCount) {
+      // TODO 1.21.1: NBT loadables disabled - use non-NBT versions
+      // ItemStackLoadable.OPTIONAL_STACK_NBT and OPTIONAL_ITEM_NBT no longer exist
       if (writeCount) {
-        return ItemStackLoadable.OPTIONAL_STACK_NBT.serialize(stack);
+        return ItemStackLoadable.OPTIONAL_STACK.serialize(stack);
       }
-      return ItemStackLoadable.OPTIONAL_ITEM_NBT.serialize(stack);
+      return ItemStackLoadable.OPTIONAL_ITEM.serialize(stack);
     }
   }
 
@@ -220,20 +243,24 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
     @Override
     public ItemStack get() {
-      // cache the result from the tag preference to save effort, especially helpful if the tag becomes invalid
+      // cache the result from the tag preference to save effort, especially helpful
+      // if the tag becomes invalid
       // this object should only exist in recipes so no need to invalidate the cache
       if (cachedResult == null) {
         // if the preference is empty, do not cache it.
-        // This should only happen if someone scans recipes before tag are computed in which case we cache the wrong result.
+        // This should only happen if someone scans recipes before tag are computed in
+        // which case we cache the wrong result.
         // We protect against empty tags in our recipes via conditions.
         Optional<Item> preference = TagPreference.getPreference(tag);
         if (preference.isEmpty()) {
           return ItemStack.EMPTY;
         }
         cachedResult = new ItemStack(preference.orElseThrow(), count);
-        if (nbt != null) {
-          cachedResult.setTag(nbt.copy());
-        }
+        // TODO 1.21.1: ItemStack.setTag() removed - data components required
+        // Data component migration needed - commented out NBT application temporarily
+        // if (nbt != null) {
+        // cachedResult.setTag(nbt.copy());
+        // }
       }
       return cachedResult;
     }
@@ -267,16 +294,20 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
     private final boolean nonEmpty;
     private final boolean readCount;
-    private final RecordLoadable<ItemStack> stack;
+    // TODO 1.21.1: Changed from RecordLoadable to Loadable to support
+    // non-RecordLoadable ITEM variants
+    private final slimeknights.mantle.data.loadable.Loadable<ItemStack> stack;
+
     Loadable(boolean nonEmpty, boolean readCount) {
       this.nonEmpty = nonEmpty;
       this.readCount = readCount;
+      // TODO 1.21.1: NBT-based loadables disabled - use non-NBT versions
+      // ItemStackLoadable REQUIRED/OPTIONAL_STACK/ITEM_NBT no longer exist
       // figure out the stack serializer to use based on the two parameters
-      // we always do NBT, just those that vary
       if (nonEmpty) {
-        this.stack = readCount ? ItemStackLoadable.REQUIRED_STACK_NBT : ItemStackLoadable.REQUIRED_ITEM_NBT;
+        this.stack = readCount ? ItemStackLoadable.REQUIRED_STACK : ItemStackLoadable.REQUIRED_ITEM;
       } else {
-        this.stack = readCount ? ItemStackLoadable.OPTIONAL_STACK_NBT : ItemStackLoadable.OPTIONAL_ITEM_NBT;
+        this.stack = readCount ? ItemStackLoadable.OPTIONAL_STACK : ItemStackLoadable.OPTIONAL_ITEM;
       }
     }
 
@@ -291,7 +322,9 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
         }
         return fromTag(tag, count, NBTLoadable.ALLOW_STRING.getOrDefault(json, "nbt", null));
       }
-      return fromStack(stack.deserialize(json, context));
+      // TODO 1.21.1: stack is now Loadable not RecordLoadable - use convert() instead
+      // of deserialize()
+      return fromStack(stack.convert(json, "item", context));
     }
 
     @Override
@@ -308,7 +341,7 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
     public void serialize(ItemOutput object, JsonObject json) {
       JsonElement element = serialize(object);
       if (element.isJsonObject()) {
-        for (Entry<String,JsonElement> entry : element.getAsJsonObject().entrySet()) {
+        for (Entry<String, JsonElement> entry : element.getAsJsonObject().entrySet()) {
           json.add(entry.getKey(), entry.getValue());
         }
       } else {
@@ -335,21 +368,24 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
       stack.encode(buffer, object.get());
     }
 
-
     /* Defaulting behavior */
 
-    /** Gets the output, defaulting to empty. Note this will not stop you from getting empty with a non-empty loadable, thats on you for weirdly calling. */
+    /**
+     * Gets the output, defaulting to empty. Note this will not stop you from
+     * getting empty with a non-empty loadable, thats on you for weirdly calling.
+     */
     public ItemOutput getOrEmpty(JsonObject parent, String key) {
       return getOrDefault(parent, key, ItemOutput.EMPTY);
     }
 
     /** Creates a field defaulting to empty */
-    public <P> LoadableField<ItemOutput,P> emptyField(String key, boolean serializeDefault, Function<P,ItemOutput> getter) {
+    public <P> LoadableField<ItemOutput, P> emptyField(String key, boolean serializeDefault,
+        Function<P, ItemOutput> getter) {
       return defaultField(key, ItemOutput.EMPTY, serializeDefault, getter);
     }
 
     /** Creates a field defaulting to empty that does not serialize if empty */
-    public <P> LoadableField<ItemOutput,P> emptyField(String key, Function<P,ItemOutput> getter) {
+    public <P> LoadableField<ItemOutput, P> emptyField(String key, Function<P, ItemOutput> getter) {
       return emptyField(key, false, getter);
     }
   }

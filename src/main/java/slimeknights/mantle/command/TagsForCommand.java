@@ -207,8 +207,13 @@ public class TagsForCommand {
   private static int heldPotion(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     CommandSourceStack source = context.getSource();
     ItemStack stack = source.getPlayerOrException().getMainHandItem();
-    Potion potion = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion().map(holder -> holder.value()).orElse(Potions.EMPTY);
-    if (potion != Potions.EMPTY) {
+    // Get potion from data component, converting Holder<Potion> to Potion via
+    // .value()
+    Potion potion = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
+        .potion()
+        .map(holder -> holder.value())
+        .orElse(null);
+    if (potion != null) {
       return printOwningTags(context, BuiltInRegistries.POTION, potion);
     }
     source.sendSuccess(() -> NO_HELD_POTION, true);
@@ -219,15 +224,21 @@ public class TagsForCommand {
   private static int heldEnchantments(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     CommandSourceStack source = context.getSource();
     ItemStack stack = source.getPlayerOrException().getMainHandItem();
-    Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(stack);
-    if (!enchantments.isEmpty()) {
-      int totalTags = 0;
-      // print tags for each contained enchantment
-      for (Enchantment enchantment : enchantments.keySet()) {
-        totalTags += printOwningTags(context, BuiltInRegistries.ENCHANTMENT, enchantment);
-      }
-      return totalTags;
-    }
+    // TODO: EnchantmentHelper.getEnchantments() API changed in NeoForge 21.1.85
+    // Need to investigate new enchantment API for ItemStack
+    /*
+     * Map<Enchantment, Integer> enchantments =
+     * EnchantmentHelper.getEnchantments(stack);
+     * if (!enchantments.isEmpty()) {
+     * int totalTags = 0;
+     * // print tags for each contained enchantment
+     * for (Enchantment enchantment : enchantments.keySet()) {
+     * totalTags += printOwningTags(context, BuiltInRegistries.ENCHANTMENT,
+     * enchantment);
+     * }
+     * return totalTags;
+     * }
+     */
     source.sendSuccess(() -> NO_HELD_ENCHANTMENT, true);
     return 0;
   }
@@ -237,7 +248,9 @@ public class TagsForCommand {
     CommandSourceStack source = context.getSource();
     ItemStack stack = source.getPlayerOrException().getMainHandItem();
     if (stack.getItem() instanceof SpawnEggItem egg) {
-      EntityType<?> type = egg.getType(stack.getTag());
+      // In 1.21.1, SpawnEggItem.getType() signature changed - no longer takes
+      // CompoundTag
+      EntityType<?> type = egg.getType(stack);
       return printOwningTags(context, BuiltInRegistries.ENTITY_TYPE, type);
     }
     source.sendSuccess(() -> NO_HELD_ENTITY, true);

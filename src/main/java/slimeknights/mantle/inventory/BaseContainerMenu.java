@@ -235,7 +235,8 @@ public class BaseContainerMenu<TILE extends BlockEntity> extends AbstractContain
         slot = this.slots.get(k);
         itemstack1 = slot.getItem();
 
-        if (!itemstack1.isEmpty() && ItemStack.isSameItemSameTags(stack, itemstack1)
+        // isSameItemSameTags replaced with isSameItemSameComponents in 1.21.1
+        if (!itemstack1.isEmpty() && ItemStack.isSameItemSameComponents(stack, itemstack1)
             && this.canTakeItemForPickAll(stack, slot)) {
           int l = itemstack1.getCount() + stack.getCount();
           int limit = Math.min(stack.getMaxStackSize(), slot.getMaxStackSize(stack));

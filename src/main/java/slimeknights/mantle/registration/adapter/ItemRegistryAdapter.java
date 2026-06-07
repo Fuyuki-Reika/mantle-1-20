@@ -15,7 +15,7 @@ import net.minecraft.world.item.SignItem;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.common.ForgeSpawnEggItem;
+import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import slimeknights.mantle.item.BlockTooltipItem;
 import slimeknights.mantle.item.BurnableBlockItem;
 import slimeknights.mantle.item.BurnableHangingSignItem;
@@ -289,7 +289,7 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    * @return Bucket instance
    */
   public BucketItem registerBucket(Supplier<? extends Fluid> fluid, String baseName) {
-    return register(new BucketItem(fluid, RegistrationHelper.BUCKET_PROPS), baseName + "_bucket");
+    return register(new BucketItem(fluid.get(), RegistrationHelper.BUCKET_PROPS), baseName + "_bucket");
   }
 
   /**
@@ -304,6 +304,6 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    */
   public SpawnEggItem registerSpawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int primary, int secondary,
       String baseName) {
-    return register(new ForgeSpawnEggItem(type, primary, secondary, new Properties()), baseName + "_spawn_egg");
+    return register(new DeferredSpawnEggItem(type, primary, secondary, new Properties()), baseName + "_spawn_egg");
   }
 }

@@ -15,7 +15,8 @@ import java.util.function.Predicate;
 
 /**
  * Predicate matching an entity
- * TODO 1.21: separate out into {@code LivingEntityPredicate} and {@code EntityPredicate}
+ * TODO 1.21: separate out into {@code LivingEntityPredicate} and
+ * {@code EntityPredicate}
  */
 public interface LivingEntityPredicate extends IJsonPredicate<LivingEntity> {
   /** Predicate that matches all entities */
@@ -23,14 +24,15 @@ public interface LivingEntityPredicate extends IJsonPredicate<LivingEntity> {
   /** Predicate that matches all entities */
   LivingEntityPredicate NONE = simple(entity -> false);
   /** Loader for block state predicates */
-  RegistryPredicateRegistry<EntityType<?>,LivingEntity> LOADER = new RegistryPredicateRegistry<>("Entity Predicate", ANY, NONE, Loadables.ENTITY_TYPE, Entity::getType, "entities", Loadables.ENTITY_TYPE_TAG, (tag, entity) -> entity.getType().is(tag));
+  RegistryPredicateRegistry<EntityType<?>, LivingEntity> LOADER = new RegistryPredicateRegistry<>("Entity Predicate",
+      ANY, NONE, Loadables.ENTITY_TYPE, Entity::getType, "entities", Loadables.ENTITY_TYPE_TAG,
+      (tag, entity) -> entity.getType().is(tag));
 
   /** Gets an inverted condition */
   @Override
   default IJsonPredicate<LivingEntity> inverted() {
     return LOADER.invert(this);
   }
-
 
   /* Singletons */
 
@@ -57,10 +59,11 @@ public interface LivingEntityPredicate extends IJsonPredicate<LivingEntity> {
   /** Entities actively flying with an elytra */
   LivingEntityPredicate ELYTRA_FLYING = simple(LivingEntity::isFallFlying);
 
-
   // water
+  // TODO 1.21.1: wasEyeInWater field is now protected - use
+  // isEyeInFluid(FluidTags.WATER) instead
   /** Entities with eyes in water */
-  LivingEntityPredicate EYES_IN_WATER = simple(entity -> entity.wasEyeInWater);
+  LivingEntityPredicate EYES_IN_WATER = simple(entity -> entity.isEyeInFluid(net.minecraft.tags.FluidTags.WATER));
   /** Entities with feet in water */
   LivingEntityPredicate FEET_IN_WATER = simple(Entity::isInWater);
   /** Entities with head and feet are in water */
@@ -82,7 +85,6 @@ public interface LivingEntityPredicate extends IJsonPredicate<LivingEntity> {
       }
     });
   }
-
 
   /* Helper methods */
 

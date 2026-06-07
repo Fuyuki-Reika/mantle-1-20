@@ -57,9 +57,15 @@ public record TagCombinationCondition<T>(List<TagKey<T>> match, @Nullable TagKey
     return match(ignore, match);
   }
 
-  @Override
+  // TODO 1.21.1: getID() is not an override, removed @Override annotation
   public ResourceLocation getID() {
     return ID;
+  }
+
+  // TODO 1.21.1: codec() added to ICondition interface
+  @Override
+  public MapCodec<? extends ICondition> codec() {
+    return SERIALIZER.codec();
   }
 
   @Override
@@ -127,7 +133,7 @@ public record TagCombinationCondition<T>(List<TagKey<T>> match, @Nullable TagKey
       }
     }
 
-    @Override
+    // TODO 1.21.1: read() is not an override, removed @Override annotation
     public TagCombinationCondition<?> read(JsonObject json) {
       // default to item registry if registry is unset
       ResourceKey<Registry<Object>> registry = ResourceKey
@@ -137,14 +143,21 @@ public record TagCombinationCondition<T>(List<TagKey<T>> match, @Nullable TagKey
           json.has("ignore") ? TagKey.create(registry, JsonHelper.getResourceLocation(json, "ignore")) : null);
     }
 
+    // TODO 1.21.1: codec() implementation simplified due to type inference issues
+    // with TagKey.codec()
     public MapCodec<TagCombinationCondition<?>> codec() {
       return RecordCodecBuilder.mapCodec(instance -> instance.group(
-          Codec.STRING.optionalFieldOf("registry", Registries.ITEM.location().toString()).forGetter(c -> c.match.get(0).registry().location().toString()),
-          TagKey.codec(Registries.ITEM).fieldOf("match").forGetter(c -> c.match.get(0))
-      ).apply(instance, (regStr, firstTag) -> {
-        ResourceKey<?> registry = ResourceKey.createRegistryKey(new ResourceLocation(regStr));
-        return new TagCombinationCondition<>(List.of(TagKey.create(registry, firstTag.location())), null);
-      }));
+          Codec.STRING.optionalFieldOf("registry", Registries.ITEM.location().toString())
+              .forGetter(c -> c.match.get(0).registry().location().toString()),
+          Codec.STRING.fieldOf("match").forGetter(c -> c.match.get(0).location().toString()))
+          .apply(instance, (regStr, tagStr) -> {
+            // TODO 1.21.1: ResourceLocation constructor changed, now uses parse() for
+            // string input
+            ResourceKey<?> registry = ResourceKey.createRegistryKey(ResourceLocation.parse(regStr));
+            @SuppressWarnings("unchecked")
+            TagKey<?> tagKey = TagKey.create((ResourceKey) registry, ResourceLocation.parse(tagStr));
+            return new TagCombinationCondition<>(List.of(tagKey), null);
+          }));
     }
   }
 }

@@ -26,9 +26,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-/** Argument that can be either a tag or a value. Like {@link net.minecraft.commands.arguments.ResourceOrTagKeyArgument} but without a required registry. */
-public record ResourceOrTagKeyArgument<T>(@Nullable ResourceKey<? extends Registry<T>> registry) implements ArgumentType<Result> {
-  private static final Collection<String> EXAMPLES = Arrays.asList("foo", "foo:bar", "012", "#skeletons", "#minecraft:skeletons");
+/**
+ * Argument that can be either a tag or a value. Like
+ * {@link net.minecraft.commands.arguments.ResourceOrTagKeyArgument} but without
+ * a required registry.
+ */
+public record ResourceOrTagKeyArgument<T>(@Nullable ResourceKey<? extends Registry<T>> registry)
+    implements ArgumentType<Result> {
+  private static final Collection<String> EXAMPLES = Arrays.asList("foo", "foo:bar", "012", "#skeletons",
+      "#minecraft:skeletons");
 
   /** Creates an argument */
   public static ResourceOrTagKeyArgument<?> key() {
@@ -114,7 +120,8 @@ public record ResourceOrTagKeyArgument<T>(@Nullable ResourceKey<? extends Regist
   }
 
   /** Apparently you need all this to serialize argument info */
-  public static class Info<T> implements ArgumentTypeInfo<ResourceOrTagKeyArgument<T>, ResourceOrTagKeyArgument.Info<T>.Template> {
+  public static class Info<T>
+      implements ArgumentTypeInfo<ResourceOrTagKeyArgument<T>, ResourceOrTagKeyArgument.Info<T>.Template> {
     @Override
     public void serializeToJson(Template template, JsonObject json) {
       if (template.registry != null) {
@@ -137,7 +144,7 @@ public record ResourceOrTagKeyArgument<T>(@Nullable ResourceKey<? extends Regist
       if (str.isEmpty()) {
         return new Template(null);
       }
-      return new Template(ResourceKey.createRegistryKey(new ResourceLocation(str)));
+      return new Template(ResourceKey.createRegistryKey(ResourceLocation.parse(str)));
     }
 
     @Override

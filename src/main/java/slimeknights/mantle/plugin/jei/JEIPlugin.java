@@ -27,21 +27,26 @@ public class JEIPlugin implements IModPlugin {
 
   @Override
   public void registerIngredients(IModIngredientRegistration registration) {
-    registration.register(MantleJEIConstants.ENTITY_TYPE, Collections.emptyList(), new EntityIngredientHelper(), new EntityIngredientRenderer(16));
+    registration.register(MantleJEIConstants.ENTITY_TYPE, Collections.emptyList(), new EntityIngredientHelper(),
+        new EntityIngredientRenderer(16));
   }
 
   @Override
   public void registerVanillaCategoryExtensions(IVanillaCategoryExtensionRegistration registry) {
-    registry.getCraftingCategory().addCategoryExtension(ShapedRetexturedRecipe.class, RetexturableRecipeExtension::new);
+    // TODO 1.21.1: JEI API changed - addCategoryExtension() signature or method
+    // name changed, needs JEI documentation review
+    // registry.getCraftingCategory().addCategoryExtension(ShapedRetexturedRecipe.class,
+    // RetexturableRecipeExtension::new);
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   public void registerGuiHandlers(IGuiHandlerRegistration registration) {
     registration.addGuiContainerHandler(MultiModuleScreen.class, new MultiModuleContainerHandler());
   }
 
-  private static class MultiModuleContainerHandler<C extends MultiModuleContainerMenu<?>> implements IGuiContainerHandler<MultiModuleScreen<C>> {
+  private static class MultiModuleContainerHandler<C extends MultiModuleContainerMenu<?>>
+      implements IGuiContainerHandler<MultiModuleScreen<C>> {
     @Override
     public List<Rect2i> getGuiExtraAreas(MultiModuleScreen<C> guiContainer) {
       return guiContainer.getModuleAreas();

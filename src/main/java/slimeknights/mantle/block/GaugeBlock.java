@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -68,7 +69,8 @@ public class GaugeBlock extends Block {
   @SuppressWarnings("deprecation")
   @Deprecated
   @Override
-  public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
+  protected ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack, BlockState state, Level world,
+      BlockPos pos, Player player, InteractionHand hand,
       BlockHitResult hit) {
     // display adjacent tank contents
     if (!world.isClientSide()) {
@@ -95,7 +97,7 @@ public class GaugeBlock extends Block {
       }
     }
 
-    return InteractionResult.SUCCESS;
+    return ItemInteractionResult.SUCCESS;
   }
 
   /* Visuals */

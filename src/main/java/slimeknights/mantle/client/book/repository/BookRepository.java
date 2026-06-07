@@ -26,7 +26,9 @@ public abstract class BookRepository {
   /** Gets a resource from the given location */
   public abstract Optional<Resource> getLocation(@Nullable ResourceLocation loc);
 
-  /** Gets a resource from the given location, returning null if it does not exist */
+  /**
+   * Gets a resource from the given location, returning null if it does not exist
+   */
   @Nullable
   public Resource getResource(@Nullable ResourceLocation loc) {
     return getLocation(loc).orElse(null);
@@ -35,11 +37,11 @@ public abstract class BookRepository {
   /** Checks if the given resource exists */
   @SuppressWarnings("unused") // API
   public boolean resourceExists(@Nullable String location) {
-    if(location == null) {
+    if (location == null) {
       return false;
     }
 
-    return this.resourceExists(new ResourceLocation(location));
+    return this.resourceExists(ResourceLocation.parse(location));
   }
 
   /** Checks if the given resource exists */

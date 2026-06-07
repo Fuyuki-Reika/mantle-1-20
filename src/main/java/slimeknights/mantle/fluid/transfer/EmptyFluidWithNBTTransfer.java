@@ -11,14 +11,21 @@ import slimeknights.mantle.Mantle;
 import slimeknights.mantle.recipe.helper.FluidOutput;
 import slimeknights.mantle.recipe.helper.ItemOutput;
 
-/** Fluid transfer info that empties a fluid from an item, copying the fluid's NBT to the stack */
+/**
+ * Fluid transfer info that empties a fluid from an item, copying the fluid's
+ * NBT to the stack
+ */
 public class EmptyFluidWithNBTTransfer extends EmptyFluidContainerTransfer {
   public static final ResourceLocation ID = Mantle.getResource("empty_nbt");
+
   public EmptyFluidWithNBTTransfer(Ingredient input, ItemOutput filled, FluidOutput fluid) {
     super(input, filled, fluid);
   }
 
-  /** @deprecated use {@link #EmptyFluidWithNBTTransfer(Ingredient, ItemOutput, FluidOutput)} */
+  /**
+   * @deprecated use
+   *             {@link #EmptyFluidWithNBTTransfer(Ingredient, ItemOutput, FluidOutput)}
+   */
   @Deprecated(forRemoval = true)
   public EmptyFluidWithNBTTransfer(Ingredient input, ItemOutput filled, FluidStack fluid) {
     this(input, filled, FluidOutput.fromStack(fluid));
@@ -26,8 +33,12 @@ public class EmptyFluidWithNBTTransfer extends EmptyFluidContainerTransfer {
 
   @Override
   protected FluidStack getFluid(ItemStack stack) {
-    // TODO: merge NBT?
-    return new FluidStack(fluid.get().getFluid(), fluid.getAmount(), stack.getTag());
+    // TODO 1.21.1: ItemStack.getTag() and FluidStack NBT constructor removed
+    // Data component migration required - returning FluidStack without NBT
+    // temporarily
+    // return new FluidStack(fluid.get().getFluid(), fluid.getAmount(),
+    // stack.getTag());
+    return new FluidStack(fluid.get().getFluid(), fluid.getAmount());
   }
 
   @Override
@@ -38,5 +49,6 @@ public class EmptyFluidWithNBTTransfer extends EmptyFluidContainerTransfer {
   }
 
   /** Unique loader instance */
-  public static final JsonDeserializer<EmptyFluidContainerTransfer> DESERIALIZER = new Deserializer<>(EmptyFluidWithNBTTransfer::new);
+  public static final JsonDeserializer<EmptyFluidContainerTransfer> DESERIALIZER = new Deserializer<>(
+      EmptyFluidWithNBTTransfer::new);
 }

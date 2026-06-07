@@ -18,7 +18,8 @@ public record MobTypePredicate(MobCategory type) implements LivingEntityPredicat
 
   @Override
   public boolean matches(LivingEntity input) {
-    return input.getMobType() == type;
+    // TODO 1.21.1: getMobType() removed - use getType().getCategory()
+    return input.getType().getCategory() == type;
   }
 
   @Override

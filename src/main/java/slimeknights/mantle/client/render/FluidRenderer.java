@@ -27,12 +27,13 @@ import slimeknights.mantle.client.render.FluidCuboid.FluidFace;
 
 import java.util.List;
 
-@SuppressWarnings({"WeakerAccess", "unused"})
+@SuppressWarnings({ "WeakerAccess", "unused" })
 public class FluidRenderer {
   /**
    * Gets a block sprite from the given location
-   * @param sprite  Sprite name
-   * @return  Sprite location
+   * 
+   * @param sprite Sprite name
+   * @return Sprite location
    */
   public static TextureAtlasSprite getBlockSprite(ResourceLocation sprite) {
     return Minecraft.getInstance().getModelManager().getAtlas(InventoryMenu.BLOCK_ATLAS).getSprite(sprite);
@@ -40,12 +41,14 @@ public class FluidRenderer {
 
   /**
    * Takes the larger light value between combinedLight and the passed block light
-   * @param combinedLight  Sky light/block light lightmap value
-   * @param blockLight     New 0-15 block light value
-   * @return  Updated packed light including the new light value
+   * 
+   * @param combinedLight Sky light/block light lightmap value
+   * @param blockLight    New 0-15 block light value
+   * @return Updated packed light including the new light value
    */
   public static int withBlockLight(int combinedLight, int blockLight) {
-    // skylight from the combined plus larger block light between combined and parameter
+    // skylight from the combined plus larger block light between combined and
+    // parameter
     // not using methods from LightTexture to reduce number of operations
     return (combinedLight & 0xFFFF0000) | Math.max(blockLight << 4, combinedLight & 0xFFFF);
   }
@@ -54,9 +57,11 @@ public class FluidRenderer {
 
   /**
    * Forces the UV to be between 0 and 1
-   * @param value  Original value
-   * @param upper  If true, this is the larger UV. Needed to enforce integer values end up at 1
-   * @return  UV mapped between 0 and 1
+   * 
+   * @param value Original value
+   * @param upper If true, this is the larger UV. Needed to enforce integer values
+   *              end up at 1
+   * @return UV mapped between 0 and 1
    */
   private static float boundUV(float value, boolean upper) {
     value = value % 1;
@@ -64,53 +69,70 @@ public class FluidRenderer {
       // if it lands exactly on the 0 bound, map that to 1 instead for the larger UV
       return upper ? 1 : 0;
     }
-    // modulo returns a negative result if the input is negative, so add 1 to account for that
+    // modulo returns a negative result if the input is negative, so add 1 to
+    // account for that
     return value < 0 ? (value + 1) : value;
   }
 
   /**
    * Adds a quad to the renderer
-   * @param renderer    Renderer instnace
-   * @param matrix      Render matrix
-   * @param sprite      Sprite to render
-   * @param from        Quad start
-   * @param to          Quad end
-   * @param face        Face to render
-   * @param color       Color to use in rendering
-   * @param brightness  Face brightness
-   * @param flowing     If true, half texture coordinates
+   * 
+   * @param renderer   Renderer instnace
+   * @param matrix     Render matrix
+   * @param sprite     Sprite to render
+   * @param from       Quad start
+   * @param to         Quad end
+   * @param face       Face to render
+   * @param color      Color to use in rendering
+   * @param brightness Face brightness
+   * @param flowing    If true, half texture coordinates
    */
-  public static void putTexturedQuad(VertexConsumer renderer, Matrix4f matrix, TextureAtlasSprite sprite, Vector3f from, Vector3f to, Direction face, int color, int brightness, int rotation, boolean flowing) {
+  public static void putTexturedQuad(VertexConsumer renderer, Matrix4f matrix, TextureAtlasSprite sprite, Vector3f from,
+      Vector3f to, Direction face, int color, int brightness, int rotation, boolean flowing) {
     // start with texture coordinates
     float x1 = from.x(), y1 = from.y(), z1 = from.z();
     float x2 = to.x(), y2 = to.y(), z2 = to.z();
-    // choose UV based on the directions, some need to negate UV due to the direction
-    // note that we use -UV instead of 1-UV as its slightly simpler and the later logic deals with negatives
+    // choose UV based on the directions, some need to negate UV due to the
+    // direction
+    // note that we use -UV instead of 1-UV as its slightly simpler and the later
+    // logic deals with negatives
     float u1, u2, v1, v2;
     switch (face) {
       default -> { // DOWN
-        u1 = x1; u2 = x2;
-        v1 = z2; v2 = z1;
+        u1 = x1;
+        u2 = x2;
+        v1 = z2;
+        v2 = z1;
       }
       case UP -> {
-        u1 = x1; u2 = x2;
-        v1 = -z1; v2 = -z2;
+        u1 = x1;
+        u2 = x2;
+        v1 = -z1;
+        v2 = -z2;
       }
       case NORTH -> {
-        u1 = -x1; u2 = -x2;
-        v1 = y1; v2 = y2;
+        u1 = -x1;
+        u2 = -x2;
+        v1 = y1;
+        v2 = y2;
       }
       case SOUTH -> {
-        u1 = x2; u2 = x1;
-        v1 = y1; v2 = y2;
+        u1 = x2;
+        u2 = x1;
+        v1 = y1;
+        v2 = y2;
       }
       case WEST -> {
-        u1 = z2; u2 = z1;
-        v1 = y1; v2 = y2;
+        u1 = z2;
+        u2 = z1;
+        v1 = y1;
+        v2 = y2;
       }
       case EAST -> {
-        u1 = -z1; u2 = -z2;
-        v1 = y1; v2 = y2;
+        u1 = -z1;
+        u2 = -z2;
+        v1 = y1;
+        v2 = y2;
       }
     }
 
@@ -139,42 +161,58 @@ public class FluidRenderer {
     float minU, maxU, minV, maxV;
     double size = flowing ? 8 : 16;
     if ((rotation % 180) == 90) {
-      minU = sprite.getU(v1 * size);
-      maxU = sprite.getU(v2 * size);
-      minV = sprite.getV(u1 * size);
-      maxV = sprite.getV(u2 * size);
+      minU = sprite.getU((float) (v1 * size));
+      maxU = sprite.getU((float) (v2 * size));
+      minV = sprite.getV((float) (u1 * size));
+      maxV = sprite.getV((float) (u2 * size));
     } else {
-      minU = sprite.getU(u1 * size);
-      maxU = sprite.getU(u2 * size);
-      minV = sprite.getV(v1 * size);
-      maxV = sprite.getV(v2 * size);
+      minU = sprite.getU((float) (u1 * size));
+      maxU = sprite.getU((float) (u2 * size));
+      minV = sprite.getV((float) (v1 * size));
+      maxV = sprite.getV((float) (v2 * size));
     }
     // based on rotation, put coords into place
     float u3, u4, v3, v4;
-    switch(rotation) {
+    switch (rotation) {
       default -> { // 0
-        u1 = minU; v1 = maxV;
-        u2 = minU; v2 = minV;
-        u3 = maxU; v3 = minV;
-        u4 = maxU; v4 = maxV;
+        u1 = minU;
+        v1 = maxV;
+        u2 = minU;
+        v2 = minV;
+        u3 = maxU;
+        v3 = minV;
+        u4 = maxU;
+        v4 = maxV;
       }
       case 90 -> {
-        u1 = minU; v1 = minV;
-        u2 = maxU; v2 = minV;
-        u3 = maxU; v3 = maxV;
-        u4 = minU; v4 = maxV;
+        u1 = minU;
+        v1 = minV;
+        u2 = maxU;
+        v2 = minV;
+        u3 = maxU;
+        v3 = maxV;
+        u4 = minU;
+        v4 = maxV;
       }
       case 180 -> {
-        u1 = maxU; v1 = minV;
-        u2 = maxU; v2 = maxV;
-        u3 = minU; v3 = maxV;
-        u4 = minU; v4 = minV;
+        u1 = maxU;
+        v1 = minV;
+        u2 = maxU;
+        v2 = maxV;
+        u3 = minU;
+        v3 = maxV;
+        u4 = minU;
+        v4 = minV;
       }
       case 270 -> {
-        u1 = maxU; v1 = maxV;
-        u2 = minU; v2 = maxV;
-        u3 = minU; v3 = minV;
-        u4 = maxU; v4 = minV;
+        u1 = maxU;
+        v1 = maxV;
+        u2 = minU;
+        v2 = maxV;
+        u3 = minU;
+        v3 = minV;
+        u4 = maxU;
+        v4 = minV;
       }
     }
     // add quads
@@ -186,58 +224,60 @@ public class FluidRenderer {
     int b = color & 0xFF;
     switch (face) {
       case DOWN -> {
-        renderer.vertex(matrix, x1, y1, z2).color(r, g, b, a).uv(u1, v1).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x1, y1, z1).color(r, g, b, a).uv(u2, v2).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x2, y1, z1).color(r, g, b, a).uv(u3, v3).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x2, y1, z2).color(r, g, b, a).uv(u4, v4).uv2(light1, light2).endVertex();
+        renderer.addVertex(matrix, x1, y1, z2).setColor(r, g, b, a).setUv(u1, v1).setUv2(light1, light2);
+        renderer.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a).setUv(u2, v2).setUv2(light1, light2);
+        renderer.addVertex(matrix, x2, y1, z1).setColor(r, g, b, a).setUv(u3, v3).setUv2(light1, light2);
+        renderer.addVertex(matrix, x2, y1, z2).setColor(r, g, b, a).setUv(u4, v4).setUv2(light1, light2);
       }
       case UP -> {
-        renderer.vertex(matrix, x1, y2, z1).color(r, g, b, a).uv(u1, v1).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x1, y2, z2).color(r, g, b, a).uv(u2, v2).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x2, y2, z2).color(r, g, b, a).uv(u3, v3).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x2, y2, z1).color(r, g, b, a).uv(u4, v4).uv2(light1, light2).endVertex();
+        renderer.addVertex(matrix, x1, y2, z1).setColor(r, g, b, a).setUv(u1, v1).setUv2(light1, light2);
+        renderer.addVertex(matrix, x1, y2, z2).setColor(r, g, b, a).setUv(u2, v2).setUv2(light1, light2);
+        renderer.addVertex(matrix, x2, y2, z2).setColor(r, g, b, a).setUv(u3, v3).setUv2(light1, light2);
+        renderer.addVertex(matrix, x2, y2, z1).setColor(r, g, b, a).setUv(u4, v4).setUv2(light1, light2);
       }
       case NORTH -> {
-        renderer.vertex(matrix, x1, y1, z1).color(r, g, b, a).uv(u1, v1).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x1, y2, z1).color(r, g, b, a).uv(u2, v2).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x2, y2, z1).color(r, g, b, a).uv(u3, v3).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x2, y1, z1).color(r, g, b, a).uv(u4, v4).uv2(light1, light2).endVertex();
+        renderer.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a).setUv(u1, v1).setUv2(light1, light2);
+        renderer.addVertex(matrix, x1, y2, z1).setColor(r, g, b, a).setUv(u2, v2).setUv2(light1, light2);
+        renderer.addVertex(matrix, x2, y2, z1).setColor(r, g, b, a).setUv(u3, v3).setUv2(light1, light2);
+        renderer.addVertex(matrix, x2, y1, z1).setColor(r, g, b, a).setUv(u4, v4).setUv2(light1, light2);
       }
       case SOUTH -> {
-        renderer.vertex(matrix, x2, y1, z2).color(r, g, b, a).uv(u1, v1).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x2, y2, z2).color(r, g, b, a).uv(u2, v2).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x1, y2, z2).color(r, g, b, a).uv(u3, v3).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x1, y1, z2).color(r, g, b, a).uv(u4, v4).uv2(light1, light2).endVertex();
+        renderer.addVertex(matrix, x2, y1, z2).setColor(r, g, b, a).setUv(u1, v1).setUv2(light1, light2);
+        renderer.addVertex(matrix, x2, y2, z2).setColor(r, g, b, a).setUv(u2, v2).setUv2(light1, light2);
+        renderer.addVertex(matrix, x1, y2, z2).setColor(r, g, b, a).setUv(u3, v3).setUv2(light1, light2);
+        renderer.addVertex(matrix, x1, y1, z2).setColor(r, g, b, a).setUv(u4, v4).setUv2(light1, light2);
       }
       case WEST -> {
-        renderer.vertex(matrix, x1, y1, z2).color(r, g, b, a).uv(u1, v1).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x1, y2, z2).color(r, g, b, a).uv(u2, v2).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x1, y2, z1).color(r, g, b, a).uv(u3, v3).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x1, y1, z1).color(r, g, b, a).uv(u4, v4).uv2(light1, light2).endVertex();
+        renderer.addVertex(matrix, x1, y1, z2).setColor(r, g, b, a).setUv(u1, v1).setUv2(light1, light2);
+        renderer.addVertex(matrix, x1, y2, z2).setColor(r, g, b, a).setUv(u2, v2).setUv2(light1, light2);
+        renderer.addVertex(matrix, x1, y2, z1).setColor(r, g, b, a).setUv(u3, v3).setUv2(light1, light2);
+        renderer.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a).setUv(u4, v4).setUv2(light1, light2);
       }
       case EAST -> {
-        renderer.vertex(matrix, x2, y1, z1).color(r, g, b, a).uv(u1, v1).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x2, y2, z1).color(r, g, b, a).uv(u2, v2).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x2, y2, z2).color(r, g, b, a).uv(u3, v3).uv2(light1, light2).endVertex();
-        renderer.vertex(matrix, x2, y1, z2).color(r, g, b, a).uv(u4, v4).uv2(light1, light2).endVertex();
+        renderer.addVertex(matrix, x2, y1, z1).setColor(r, g, b, a).setUv(u1, v1).setUv2(light1, light2);
+        renderer.addVertex(matrix, x2, y2, z1).setColor(r, g, b, a).setUv(u2, v2).setUv2(light1, light2);
+        renderer.addVertex(matrix, x2, y2, z2).setColor(r, g, b, a).setUv(u3, v3).setUv2(light1, light2);
+        renderer.addVertex(matrix, x2, y1, z2).setColor(r, g, b, a).setUv(u4, v4).setUv2(light1, light2);
       }
     }
   }
 
   /**
    * Renders a full fluid cuboid for the given data
-   * @param matrices  Matrix stack instance
-   * @param buffer    Buffer type
-   * @param still     Still sprite
-   * @param flowing   Flowing sprite
-   * @param cube      Fluid cuboid
-   * @param from      Fluid start
-   * @param to        Fluid end
-   * @param color     Fluid color
-   * @param light     Quad lighting
-   * @param isGas     If true, fluid is a gas
+   * 
+   * @param matrices Matrix stack instance
+   * @param buffer   Buffer type
+   * @param still    Still sprite
+   * @param flowing  Flowing sprite
+   * @param cube     Fluid cuboid
+   * @param from     Fluid start
+   * @param to       Fluid end
+   * @param color    Fluid color
+   * @param light    Quad lighting
+   * @param isGas    If true, fluid is a gas
    */
-  public static void renderCuboid(PoseStack matrices, VertexConsumer buffer, FluidCuboid cube, TextureAtlasSprite still, TextureAtlasSprite flowing, Vector3f from, Vector3f to, int color, int light, boolean isGas) {
+  public static void renderCuboid(PoseStack matrices, VertexConsumer buffer, FluidCuboid cube, TextureAtlasSprite still,
+      TextureAtlasSprite flowing, Vector3f from, Vector3f to, int color, int light, boolean isGas) {
     Matrix4f matrix = matrices.last().pose();
     int rotation = isGas ? 180 : 0;
     for (Direction dir : Direction.values()) {
@@ -252,13 +292,15 @@ public class FluidRenderer {
 
   /**
    * Renders a list of fluid cuboids
-   * @param matrices  Matrix stack instance
-   * @param buffer    Buffer instance
-   * @param cubes     List of cubes to render
-   * @param fluid     Fluid to use in rendering
-   * @param light     Light level from TER
+   * 
+   * @param matrices Matrix stack instance
+   * @param buffer   Buffer instance
+   * @param cubes    List of cubes to render
+   * @param fluid    Fluid to use in rendering
+   * @param light    Light level from TER
    */
-  public static void renderCuboids(PoseStack matrices, VertexConsumer buffer, List<FluidCuboid> cubes, FluidStack fluid, int light) {
+  public static void renderCuboids(PoseStack matrices, VertexConsumer buffer, List<FluidCuboid> cubes, FluidStack fluid,
+      int light) {
     if (fluid.isEmpty()) {
       return;
     }
@@ -274,23 +316,29 @@ public class FluidRenderer {
 
     // render all given cuboids
     for (FluidCuboid cube : cubes) {
-      renderCuboid(matrices, buffer, cube, still, flowing, cube.getFromScaled(), cube.getToScaled(), color, light, isGas);
+      renderCuboid(matrices, buffer, cube, still, flowing, cube.getFromScaled(), cube.getToScaled(), color, light,
+          isGas);
     }
   }
 
   /**
-   * Renders a fluid cuboid with the given offset, used to manually place cuboids from a list for rendering {@link #renderCuboids(PoseStack, VertexConsumer, List, FluidStack, int)}
-   * @param matrices  Matrix stack instance
-   * @param buffer    Buffer type
-   * @param cube      Fluid cuboid
-   * @param yOffset   Amount to offset the cube in the Y direction, used in faucets for rendering fluid in lower block
-   * @param still     Still sprite
-   * @param flowing   Flowing sprite
-   * @param color     Fluid color
-   * @param light     Quad lighting from TER
-   * @param isGas     If true, fluid is a gas
+   * Renders a fluid cuboid with the given offset, used to manually place cuboids
+   * from a list for rendering
+   * {@link #renderCuboids(PoseStack, VertexConsumer, List, FluidStack, int)}
+   * 
+   * @param matrices Matrix stack instance
+   * @param buffer   Buffer type
+   * @param cube     Fluid cuboid
+   * @param yOffset  Amount to offset the cube in the Y direction, used in faucets
+   *                 for rendering fluid in lower block
+   * @param still    Still sprite
+   * @param flowing  Flowing sprite
+   * @param color    Fluid color
+   * @param light    Quad lighting from TER
+   * @param isGas    If true, fluid is a gas
    */
-  public static void renderCuboid(PoseStack matrices, VertexConsumer buffer, FluidCuboid cube, float yOffset, TextureAtlasSprite still, TextureAtlasSprite flowing, int color, int light, boolean isGas) {
+  public static void renderCuboid(PoseStack matrices, VertexConsumer buffer, FluidCuboid cube, float yOffset,
+      TextureAtlasSprite still, TextureAtlasSprite flowing, int color, int light, boolean isGas) {
     if (yOffset != 0) {
       matrices.pushPose();
       matrices.translate(0, yOffset, 0);
@@ -303,16 +351,18 @@ public class FluidRenderer {
 
   /**
    * Renders a fluid cuboid with partial height based on the capacity
-   * @param matrices  Matrix stack instance
-   * @param buffer    Render type buffer instance
-   * @param fluid     Fluid to render
-   * @param offset    Fluid amount offset, used to animate transitions
-   * @param capacity  Fluid tank capacity, must be above 0
-   * @param light     Quad lighting from TER
-   * @param cube      Fluid cuboid instance
-   * @param flipGas   If true, flips gas cubes
+   * 
+   * @param matrices Matrix stack instance
+   * @param buffer   Render type buffer instance
+   * @param fluid    Fluid to render
+   * @param offset   Fluid amount offset, used to animate transitions
+   * @param capacity Fluid tank capacity, must be above 0
+   * @param light    Quad lighting from TER
+   * @param cube     Fluid cuboid instance
+   * @param flipGas  If true, flips gas cubes
    */
-  public static void renderScaledCuboid(PoseStack matrices, MultiBufferSource buffer, FluidCuboid cube, FluidStack fluid, float offset, int capacity, int light, boolean flipGas) {
+  public static void renderScaledCuboid(PoseStack matrices, MultiBufferSource buffer, FluidCuboid cube,
+      FluidStack fluid, float offset, int capacity, int light, boolean flipGas) {
     // nothing to render
     if (fluid.isEmpty() || capacity <= 0) {
       return;
@@ -343,15 +393,22 @@ public class FluidRenderer {
     }
 
     // draw cuboid
-    renderCuboid(matrices, buffer.getBuffer(MantleRenderTypes.FLUID), cube, still, flowing, from, to, color, light, isGas);
+    renderCuboid(matrices, buffer.getBuffer(MantleRenderTypes.FLUID), cube, still, flowing, from, to, color, light,
+        isGas);
   }
 
-  /** Same as {@link net.minecraft.client.renderer.ScreenEffectRenderer#renderFluid(Minecraft, PoseStack, ResourceLocation)} but with opacity and color control */
-  public static void renderCamera(Minecraft minecraft, PoseStack poseStack, ResourceLocation texture, float opacity, int color) {
+  /**
+   * Same as
+   * {@link net.minecraft.client.renderer.ScreenEffectRenderer#renderFluid(Minecraft, PoseStack, ResourceLocation)}
+   * but with opacity and color control
+   */
+  public static void renderCamera(Minecraft minecraft, PoseStack poseStack, ResourceLocation texture, float opacity,
+      int color) {
     assert minecraft.player != null;
     RenderSystem.setShader(GameRenderer::getPositionTexShader);
     RenderSystem.setShaderTexture(0, texture);
-    BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+    Tesselator tesselator = Tesselator.getInstance();
+    BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
     BlockPos pos = BlockPos.containing(minecraft.player.getX(), minecraft.player.getEyeY(), minecraft.player.getZ());
     Level level = minecraft.player.level();
     float brightness = LightTexture.getBrightness(level.dimensionType(), level.getMaxLocalRawBrightness(pos));
@@ -359,22 +416,21 @@ public class FluidRenderer {
     // apply fluid tint if one is set
     if (color != -1) {
       RenderSystem.setShaderColor(
-        brightness * (color >> 16 & 255) / 255f,
-        brightness * (color >> 8 & 255) / 255f,
-        brightness * (color & 255) / 255f,
-        opacity * (color >>> 24) / 255f);
+          brightness * (color >> 16 & 255) / 255f,
+          brightness * (color >> 8 & 255) / 255f,
+          brightness * (color & 255) / 255f,
+          opacity * (color >>> 24) / 255f);
     } else {
       RenderSystem.setShaderColor(brightness, brightness, brightness, opacity);
     }
     float yRot = -minecraft.player.getYRot() / 64;
     float xRot = minecraft.player.getXRot() / 64;
     Matrix4f matrix = poseStack.last().pose();
-    buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-    buffer.vertex(matrix, -1, -1, -0.5f).uv(4 + yRot, 4 + xRot).endVertex();
-    buffer.vertex(matrix,  1, -1, -0.5f).uv(0 + yRot, 4 + xRot).endVertex();
-    buffer.vertex(matrix,  1,  1, -0.5f).uv(0 + yRot, 0 + xRot).endVertex();
-    buffer.vertex(matrix, -1,  1, -0.5f).uv(4 + yRot, 0 + xRot).endVertex();
-    BufferUploader.drawWithShader(buffer.end());
+    buffer.addVertex(matrix, -1, -1, -0.5f).setUv(4 + yRot, 4 + xRot);
+    buffer.addVertex(matrix, 1, -1, -0.5f).setUv(0 + yRot, 4 + xRot);
+    buffer.addVertex(matrix, 1, 1, -0.5f).setUv(0 + yRot, 0 + xRot);
+    buffer.addVertex(matrix, -1, 1, -0.5f).setUv(4 + yRot, 0 + xRot);
+    BufferUploader.drawWithShader(buffer.buildOrThrow());
     RenderSystem.setShaderColor(1, 1, 1, 1);
     RenderSystem.disableBlend();
   }

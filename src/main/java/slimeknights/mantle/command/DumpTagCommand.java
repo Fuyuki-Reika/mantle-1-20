@@ -38,13 +38,14 @@ public class DumpTagCommand {
 
   /**
    * Registers this sub command with the root command
-   * @param subCommand  Command builder
+   * 
+   * @param subCommand Command builder
    */
   public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand) {
     subCommand.requires(sender -> sender.hasPermission(MantleCommand.PERMISSION_EDIT_SPAWN))
-      .then(Action.LOG.build())
-      .then(Action.SAVE.build())
-      .then(Action.SOURCES.build());
+        .then(Action.LOG.build())
+        .then(Action.SAVE.build())
+        .then(Action.SOURCES.build());
   }
 
   private enum Action {
@@ -53,24 +54,25 @@ public class DumpTagCommand {
     /** Builds the command for this action */
     public ArgumentBuilder<CommandSourceStack, ?> build() {
       return Commands.literal(name().toLowerCase())
-        .then(TagSourceArgument.argument().then(TagSourceArgument.tagArgument("name")
-          .executes(context -> run(context, this))));
+          .then(TagSourceArgument.argument().then(TagSourceArgument.tagArgument("name")
+              .executes(context -> run(context, this))));
     }
   }
 
   /**
    * Runs the view-tag command
    *
-   * @param context  Tag context
-   * @return  Integer return
-   * @throws CommandSyntaxException  If invalid values are passed
+   * @param context Tag context
+   * @return Integer return
+   * @throws CommandSyntaxException If invalid values are passed
    */
   private static int run(CommandContext<CommandSourceStack> context, Action action) throws CommandSyntaxException {
     return runGeneric(context, TagSourceArgument.get(context), action);
   }
 
   /** Parses a tag from the resource list */
-  public static void parseTag(List<Resource> resources, List<TagLoader.EntryWithSource> list, ResourceLocation regName, ResourceLocation tagName, ResourceLocation path) {
+  public static void parseTag(List<Resource> resources, List<TagLoader.EntryWithSource> list, ResourceLocation regName,
+      ResourceLocation tagName, ResourceLocation path) {
     for (Resource resource : resources) {
       String packId = resource.sourcePackId();
       try (Reader reader = resource.openAsReader()) {
@@ -90,11 +92,10 @@ public class DumpTagCommand {
   /** Converts the given entry list to a string tag file */
   public static String tagToJson(List<TagLoader.EntryWithSource> entries) {
     return GSON.toJson(JsonHelper.serialize(TagFile.CODEC, new TagFile(
-      // TODO: cancel out matching entries?
-      entries.stream().filter(e -> !e.remove()).map(EntryWithSource::entry).toList(),
-      true,
-      entries.stream().filter(EntryWithSource::remove).map(EntryWithSource::entry).toList()
-    )));
+        // TODO: cancel out matching entries?
+        entries.stream().filter(e -> !e.remove()).map(EntryWithSource::entry).toList(),
+        true,
+        entries.stream().filter(EntryWithSource::remove).map(EntryWithSource::entry).toList())));
   }
 
   /** Saves the tag to the given path */
@@ -110,19 +111,23 @@ public class DumpTagCommand {
   }
 
   /**
-   * Runs the view-tag command, with the generic for the registry so those don't get mad
+   * Runs the view-tag command, with the generic for the registry so those don't
+   * get mad
    *
-   * @param context   Tag context
-   * @param registry  Registry
-   * @return  Integer return
-   * @throws CommandSyntaxException  If invalid values are passed
+   * @param context  Tag context
+   * @param registry Registry
+   * @return Integer return
+   * @throws CommandSyntaxException If invalid values are passed
    */
-  private static <T> int runGeneric(CommandContext<CommandSourceStack> context, TagSource<T> registry, Action action) throws CommandSyntaxException {
+  private static <T> int runGeneric(CommandContext<CommandSourceStack> context, TagSource<T> registry, Action action)
+      throws CommandSyntaxException {
     ResourceLocation regName = registry.key().location();
     ResourceLocation name = context.getArgument("name", ResourceLocation.class);
     ResourceManager manager = context.getSource().getServer().getResourceManager();
 
-    ResourceLocation path = new ResourceLocation(name.getNamespace(), registry.folder() + "/" + name.getPath() + ".json");
+    // ResourceLocation constructor is private in 1.21.1, use fromNamespaceAndPath
+    ResourceLocation path = ResourceLocation.fromNamespaceAndPath(name.getNamespace(),
+        registry.folder() + "/" + name.getPath() + ".json");
 
     // if the tag file does not exist, only error if the tag is unknown
     List<Resource> resources = manager.getResourceStack(path);
@@ -140,9 +145,11 @@ public class DumpTagCommand {
     switch (action) {
       case SAVE -> {
         // save creates a file in the data dump location of the tag at the proper path
-        Path output = DumpAllTagsCommand.getOutputFile(context).toPath().resolve(path.getNamespace() + "/" + path.getPath());
+        Path output = DumpAllTagsCommand.getOutputFile(context).toPath()
+            .resolve(path.getNamespace() + "/" + path.getPath());
         saveTag(list, output);
-        context.getSource().sendSuccess(() -> Component.translatable("command.mantle.dump_tag.success_log", regName, name, GeneratePackHelper.getOutputComponent(output)), true);
+        context.getSource().sendSuccess(() -> Component.translatable("command.mantle.dump_tag.success_log", regName,
+            name, GeneratePackHelper.getOutputComponent(output)), true);
       }
       case LOG -> {
         // log writes the merged JSON to the console

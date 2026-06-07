@@ -33,9 +33,25 @@ public class MantleClientCommand {
     // source command suggestions
     FileToIdConverter atlases = new FileToIdConverter("textures/atlas", ".png");
     ClientSourcesCommand.registerMinecraft("atlases",
-        (context, builder) -> SharedSuggestionProvider.suggestResource(
-            Minecraft.getInstance().getModelManager().atlases.atlases.keySet().stream().map(atlases::fileToId),
-            builder));
+        (context, builder) -> {
+          // ModelManager.atlases and AtlasSet.atlases are private in 1.21.1, use
+          // reflection
+          try {
+            var modelManager = Minecraft.getInstance().getModelManager();
+            var atlasesField = modelManager.getClass().getDeclaredField("atlases");
+            atlasesField.setAccessible(true);
+            var atlasSet = atlasesField.get(modelManager);
+            var atlasesMapField = atlasSet.getClass().getDeclaredField("atlases");
+            atlasesMapField.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            var atlasesMap = (java.util.Map<net.minecraft.resources.ResourceLocation, ?>) atlasesMapField.get(atlasSet);
+            return SharedSuggestionProvider.suggestResource(atlasesMap.keySet().stream().map(atlases::fileToId),
+                builder);
+          } catch (ReflectiveOperationException e) {
+            Mantle.logger.error("Failed to access atlases via reflection", e);
+            return builder.buildFuture();
+          }
+        });
     ClientSourcesCommand.registerMinecraft("blockstates",
         (context, builder) -> SharedSuggestionProvider.suggestResource(BuiltInRegistries.BLOCK.keySet(), builder));
     ClientSourcesCommand.register("item_models", "models/item", ".json",

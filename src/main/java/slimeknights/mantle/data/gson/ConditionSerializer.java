@@ -22,11 +22,18 @@ public class ConditionSerializer implements JsonDeserializer<ICondition>, JsonSe
   @Override
   public ICondition deserialize(JsonElement json, Type type, JsonDeserializationContext context)
       throws JsonParseException {
-    return CraftingHelper.getCondition(GsonHelper.convertToJsonObject(json, "condition"));
+    // TODO 1.21.1: CraftingHelper.getCondition removed
+    throw new UnsupportedOperationException(
+        "ConditionSerializer.deserialize temporarily disabled - CraftingHelper.getCondition removed");
+    // return CraftingHelper.getCondition(GsonHelper.convertToJsonObject(json,
+    // "condition"));
   }
 
   @Override
   public JsonElement serialize(ICondition condition, Type type, JsonSerializationContext context) {
-    return CraftingHelper.serialize(condition);
+    // TODO 1.21.1: CraftingHelper.serialize removed
+    throw new UnsupportedOperationException(
+        "ConditionSerializer.serialize temporarily disabled - CraftingHelper.serialize removed");
+    // return CraftingHelper.serialize(condition);
   }
 }

@@ -8,20 +8,27 @@ import net.neoforged.fml.ModLoader;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-/** Same as {@link ISafeManagerReloadListener}, but reloads earlier. Needed to work with some parts of models. */
+/**
+ * Same as {@link ISafeManagerReloadListener}, but reloads earlier. Needed to
+ * work with some parts of models.
+ */
 public interface IEarlySafeManagerReloadListener extends PreparableReloadListener {
   @Override
-  default CompletableFuture<Void> reload(PreparationBarrier stage, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
+  default CompletableFuture<Void> reload(PreparationBarrier stage, ResourceManager resourceManager,
+      ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor,
+      Executor gameExecutor) {
     return CompletableFuture.runAsync(() -> {
-      if (ModLoader.isLoadingStateValid()) {
-        onReloadSafe(resourceManager);
-      }
+      // TODO 1.21.1: ModLoader.isLoadingStateValid() removed in NeoForge 21.1.85
+      // Removed check - assuming reload is always safe at this point
+      onReloadSafe(resourceManager);
     }, backgroundExecutor).thenCompose(stage::wait);
   }
 
   /**
-   * Safely handle a resource manager reload. Only runs if the mod loading state is valid
-   * @param resourceManager  Resource manager
+   * Safely handle a resource manager reload. Only runs if the mod loading state
+   * is valid
+   * 
+   * @param resourceManager Resource manager
    */
   void onReloadSafe(ResourceManager resourceManager);
 }

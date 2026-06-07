@@ -16,7 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.common.TierSortingRegistry;
+import javax.annotation.Nullable;
 import slimeknights.mantle.Mantle;
 
 import java.io.BufferedWriter;
@@ -30,7 +30,9 @@ import java.util.Objects;
 /** Command to dump global loot modifiers */
 public class HarvestTiersCommand {
   /** Resource location of the global loot manager "tag" */
-  protected static final ResourceLocation HARVEST_TIERS = new ResourceLocation("forge", "item_tier_ordering.json");
+  // ResourceLocation constructor is private in 1.21.1, use fromNamespaceAndPath
+  protected static final ResourceLocation HARVEST_TIERS = ResourceLocation.fromNamespaceAndPath("forge",
+      "item_tier_ordering.json");
   /** Path for saving the loot modifiers */
   private static final String HARVEST_TIER_PATH = HARVEST_TIERS.getNamespace() + "/" + HARVEST_TIERS.getPath();
 
@@ -40,78 +42,109 @@ public class HarvestTiersCommand {
 
   /**
    * Registers this sub command with the root command
-   * @param subCommand  Command builder
+   * 
+   * @param subCommand Command builder
    */
   public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand) {
     subCommand.requires(sender -> sender.hasPermission(MantleCommand.PERMISSION_EDIT_SPAWN))
-              .then(Commands.literal("save").executes(source -> run(source, true)))
-              .then(Commands.literal("log").executes(source -> run(source, false)))
-              .then(Commands.literal("list").executes(HarvestTiersCommand::list));
+        .then(Commands.literal("save").executes(source -> run(source, true)))
+        .then(Commands.literal("log").executes(source -> run(source, false)))
+        .then(Commands.literal("list").executes(HarvestTiersCommand::list));
   }
 
   /** Creates a clickable component for a block tag */
   private static Object getTagComponent(TagKey<Block> tag) {
     ResourceLocation id = tag.location();
-    return Component.literal(id.toString()).withStyle(style -> style.withUnderlined(true).withClickEvent(new ClickEvent(Action.SUGGEST_COMMAND, "/mantle dump_tag " + Registries.BLOCK.location() + " " + id + " save")));
+    return Component.literal(id.toString())
+        .withStyle(style -> style.withUnderlined(true).withClickEvent(new ClickEvent(Action.SUGGEST_COMMAND,
+            "/mantle dump_tag " + Registries.BLOCK.location() + " " + id + " save")));
   }
 
   /** Runs the command, dumping the tag */
   private static int list(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-    List<Tier> sortedTiers = TierSortingRegistry.getSortedTiers();
+    // TODO: TierSortingRegistry API removed/changed in 1.21.1 - needs
+    // reimplementation
+    // List<Tier> sortedTiers = TierSortingRegistry.getSortedTiers();
+    context.getSource().sendFailure(
+        Component.literal("Harvest tiers command temporarily disabled - TierSortingRegistry API changed in 1.21.1"));
+    return 0;
 
-    // start building output message
-    MutableComponent output = Component.translatable("command.mantle.harvest_tiers.success_list");
-    // if no values, print empty
-    if (sortedTiers.isEmpty()) {
-      output.append("\n* ").append(EMPTY);
-    } else {
-      for (Tier tier : sortedTiers) {
-        output.append("\n* ");
-        TagKey<Block> tag = tier.getTag();
-        ResourceLocation id = TierSortingRegistry.getName(tier);
-        if (tag != null) {
-          output.append(Component.translatable("command.mantle.harvest_tiers.tag", id, getTagComponent(tag)));
-        } else {
-          output.append(Component.translatable("command.mantle.harvest_tiers.no_tag", id));
-        }
-      }
-    }
-    context.getSource().sendSuccess(() -> output, true);
-    return sortedTiers.size();
+    /*
+     * Original implementation - commented out until API is updated
+     * // start building output message
+     * MutableComponent output =
+     * Component.translatable("command.mantle.harvest_tiers.success_list");
+     * // if no values, print empty
+     * if (sortedTiers.isEmpty()) {
+     * output.append("\n* ").append(EMPTY);
+     * } else {
+     * for (Tier tier : sortedTiers) {
+     * output.append("\n* ");
+     * TagKey<Block> tag = tier.getTag();
+     * ResourceLocation id = TierSortingRegistry.getName(tier);
+     * if (tag != null) {
+     * output.append(Component.translatable("command.mantle.harvest_tiers.tag", id,
+     * getTagComponent(tag)));
+     * } else {
+     * output.append(Component.translatable("command.mantle.harvest_tiers.no_tag",
+     * id));
+     * }
+     * }
+     * }
+     * context.getSource().sendSuccess(() -> output, true);
+     * return sortedTiers.size();
+     */
   }
 
   /** Runs the command, dumping the tag */
   private static int run(CommandContext<CommandSourceStack> context, boolean saveFile) throws CommandSyntaxException {
-    List<Tier> sortedTiers = TierSortingRegistry.getSortedTiers();
-
-    // save the list as JSON
-    JsonArray entries = new JsonArray();
-    for (Tier location : sortedTiers) {
-      entries.add(Objects.requireNonNull(TierSortingRegistry.getName(location)).toString());
-    }
-    JsonObject json = new JsonObject();
-    json.add("order", entries);
-
-    // if requested, save
-    if (saveFile) {
-      // save file
-      File output = new File(DumpAllTagsCommand.getOutputFile(context), HARVEST_TIER_PATH);
-      Path path = output.toPath();
-      try {
-        Files.createDirectories(path.getParent());
-        try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-          writer.write(DumpTagCommand.GSON.toJson(json));
-        }
-      } catch (IOException ex) {
-        Mantle.logger.error("Couldn't save harvests tiers to {}", path, ex);
-      }
-      context.getSource().sendSuccess(() -> Component.translatable("command.mantle.harvest_tiers.success_save", GeneratePackHelper.getOutputComponent(output)), true);
-    } else {
-      // print to console
-      context.getSource().sendSuccess(() -> SUCCESS_LOG, true);
-      Mantle.logger.info("Dump of harvests tiers:\n{}", DumpTagCommand.GSON.toJson(json));
-    }
-    // return a number to finish
-    return sortedTiers.size();
+    // TODO: TierSortingRegistry API removed/changed in 1.21.1 - needs
+    // reimplementation
+    context.getSource().sendFailure(
+        Component.literal("Harvest tiers command temporarily disabled - TierSortingRegistry API changed in 1.21.1"));
+    return 0;
   }
+
+  /*
+   * Original implementation - commented out until API is updated
+   * private static int run_DISABLED(CommandContext<CommandSourceStack> context,
+   * boolean saveFile) throws CommandSyntaxException {
+   * List<Tier> sortedTiers = TierSortingRegistry.getSortedTiers();
+   * 
+   * // save the list as JSON
+   * JsonArray entries = new JsonArray();
+   * for (Tier location : sortedTiers) {
+   * entries.add(Objects.requireNonNull(TierSortingRegistry.getName(location)).
+   * toString());
+   * }
+   * JsonObject json = new JsonObject();
+   * json.add("order", entries);
+   * 
+   * // if requested, save
+   * if (saveFile) {
+   * // save file
+   * File output = new File(DumpAllTagsCommand.getOutputFile(context),
+   * HARVEST_TIER_PATH);
+   * Path path = output.toPath();
+   * try {
+   * Files.createDirectories(path.getParent());
+   * try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+   * writer.write(DumpTagCommand.GSON.toJson(json));
+   * }
+   * } catch (IOException ex) {
+   * Mantle.logger.error("Couldn't save harvests tiers to {}", path, ex);
+   * }
+   * context.getSource().sendSuccess(() ->
+   * Component.translatable("command.mantle.harvest_tiers.success_save",
+   * GeneratePackHelper.getOutputComponent(output)), true);
+   * } else {
+   * // print to console
+   * context.getSource().sendSuccess(() -> SUCCESS_LOG, true);
+   * Mantle.logger.info("Dump of harvests tiers:\n{}",
+   * DumpTagCommand.GSON.toJson(json));
+   * }
+   * // return a number to finish
+   * return sortedTiers.size();
+   * }
+   */
 }

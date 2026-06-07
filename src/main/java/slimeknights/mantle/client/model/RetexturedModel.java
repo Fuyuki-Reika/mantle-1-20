@@ -52,7 +52,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
- * Model that dynamically retextures a list of textures based on data from {@link RetexturedHelper}.
+ * Model that dynamically retextures a list of textures based on data from
+ * {@link RetexturedHelper}.
  */
 @SuppressWarnings("WeakerAccess")
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -64,34 +65,36 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
   private final Set<String> retextured;
 
   @Override
-  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, IGeometryBakingContext context) {
+  public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, IGeometryBakingContext context) {
     model.resolveParents(modelGetter, context);
   }
 
   @Override
-  public BakedModel bake(IGeometryBakingContext owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
+  public BakedModel bake(IGeometryBakingContext owner, ModelBaker baker,
+      Function<Material, TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides) {
     // bake the model and return
-    BakedModel baked = model.bake(owner, baker, spriteGetter, transform, overrides, location);
+    BakedModel baked = model.bake(owner, baker, spriteGetter, transform, overrides);
     return new Baked(baked, owner, model, transform, getAllRetextured(owner, this.model, retextured));
   }
 
   /**
-   * Gets a list of all names to retexture based on the block model texture references
-   * @param owner        Model config instance
-   * @param model        Model fallback
-   * @param originalSet  Original list of names to retexture
-   * @return  Set of textures including parent textures
+   * Gets a list of all names to retexture based on the block model texture
+   * references
+   * 
+   * @param owner       Model config instance
+   * @param model       Model fallback
+   * @param originalSet Original list of names to retexture
+   * @return Set of textures including parent textures
    */
-  public static Set<String> getAllRetextured(IGeometryBakingContext owner, SimpleBlockModel model, Set<String> originalSet) {
+  public static Set<String> getAllRetextured(IGeometryBakingContext owner, SimpleBlockModel model,
+      Set<String> originalSet) {
     Set<String> retextured = Sets.newHashSet(originalSet);
-    for (Map<String,Either<Material, String>> textures : ModelTextureIteratable.of(owner, model)) {
-      textures.forEach((name, either) ->
-        either.ifRight(parent -> {
-          if (retextured.contains(parent)) {
-            retextured.add(name);
-          }
-        })
-      );
+    for (Map<String, Either<Material, String>> textures : ModelTextureIteratable.of(owner, model)) {
+      textures.forEach((name, either) -> either.ifRight(parent -> {
+        if (retextured.contains(parent)) {
+          retextured.add(name);
+        }
+      }));
     }
     return Set.copyOf(retextured);
   }
@@ -108,8 +111,9 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
 
   /**
    * Gets the list of retextured textures from the model
-   * @param json  Model json
-   * @return  Set of textures
+   * 
+   * @param json Model json
+   * @return Set of textures
    */
   public static Set<String> getRetexturedNames(JsonObject json) {
     if (json.has("retextured")) {
@@ -138,7 +142,7 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
   /** Baked variant of the model, used to swap out quads based on the texture */
   public static class Baked extends DynamicBakedWrapper<BakedModel> {
     /** Cache of texture name to baked model */
-    private final Map<ResourceLocation,BakedModel> cache = new ConcurrentHashMap<>();
+    private final Map<ResourceLocation, BakedModel> cache = new ConcurrentHashMap<>();
     /* Properties for rebaking */
     private final IGeometryBakingContext owner;
     private final SimpleBlockModel model;
@@ -147,7 +151,8 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
     private final Set<String> retextured;
     private final ItemOverrides overrides = new RetexturedOverride();
 
-    public Baked(BakedModel baked, IGeometryBakingContext owner, SimpleBlockModel model, ModelState transform, Set<String> retextured) {
+    public Baked(BakedModel baked, IGeometryBakingContext owner, SimpleBlockModel model, ModelState transform,
+        Set<String> retextured) {
       super(baked);
       this.model = model;
       this.owner = owner;
@@ -157,8 +162,9 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
 
     /**
      * Gets the model with the given texture applied
-     * @param name  Texture location
-     * @return  Retextured model
+     * 
+     * @param name Texture location
+     * @return Retextured model
      */
     private BakedModel getRetexturedModel(ResourceLocation name) {
       return model.bakeDynamic(new RetexturedContext(owner, retextured, name), transform);
@@ -166,8 +172,9 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
 
     /**
      * Gets a cached retextured model, computing it if missing from the cache
-     * @param block  Block determining the texture
-     * @return  Retextured model
+     * 
+     * @param block Block determining the texture
+     * @return Retextured model
      */
     private BakedModel getCachedModel(Block block) {
       return cache.computeIfAbsent(ModelHelper.getParticleTexture(block), this::getRetexturedModel);
@@ -187,7 +194,8 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
 
     @Nonnull
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction direction, RandomSource random, ModelData data, @Nullable RenderType renderType) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction direction, RandomSource random,
+        ModelData data, @Nullable RenderType renderType) {
       Block block = data.get(RetexturedHelper.BLOCK_PROPERTY);
       if (block == null) {
         return originalModel.getQuads(state, direction, random, data, null);
@@ -204,8 +212,9 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
     private class RetexturedOverride extends ItemOverrides {
       @Nullable
       @Override
-      public BakedModel resolve(BakedModel originalModel, ItemStack stack, @Nullable ClientLevel world, @Nullable LivingEntity entity, int pSeed) {
-        if (stack.isEmpty() || !stack.hasTag()) {
+      public BakedModel resolve(BakedModel originalModel, ItemStack stack, @Nullable ClientLevel world,
+          @Nullable LivingEntity entity, int pSeed) {
+        if (stack.isEmpty() || !stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA)) {
           return originalModel;
         }
 
@@ -232,9 +241,10 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
 
     /**
      * Creates a new configuration wrapper
-     * @param base        Original model configuration
-     * @param retextured  Set of textures that should be retextured
-     * @param texture     New texture to replace those in the set
+     * 
+     * @param base       Original model configuration
+     * @param retextured Set of textures that should be retextured
+     * @param texture    New texture to replace those in the set
      */
     public RetexturedContext(IGeometryBakingContext base, Set<String> retextured, ResourceLocation texture) {
       super(base);

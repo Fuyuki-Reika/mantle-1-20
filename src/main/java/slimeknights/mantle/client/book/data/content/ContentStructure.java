@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -20,9 +21,11 @@ import slimeknights.mantle.client.screen.book.element.BookElement;
 import slimeknights.mantle.client.screen.book.element.StructureElement;
 import slimeknights.mantle.client.screen.book.element.TextElement;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 public class ContentStructure extends PageContent {
 
@@ -53,14 +56,29 @@ public class ContentStructure extends PageContent {
     }
 
     try {
-      CompoundTag compoundnbt = NbtIo.readCompressed(resource.open());
+      // NbtIo.readCompressed removed, use DataInputStream wrapper
+      CompoundTag compoundnbt = NbtIo.read(new DataInputStream(new GZIPInputStream(resource.open())),
+          NbtAccounter.unlimitedHeap());
       this.template.load(BuiltInRegistries.BLOCK.asLookup(), compoundnbt);
     } catch (IOException e) {
       e.printStackTrace();
       return;
     }
 
-    this.templateBlocks = this.template.palettes.get(0).blocks();
+    // template.palettes is now private in 1.21.1, use reflection to access
+    try {
+      java.lang.reflect.Field palettesField = StructureTemplate.class.getDeclaredField("palettes");
+      palettesField.setAccessible(true);
+      @SuppressWarnings("unchecked")
+      List<StructureTemplate.Palette> palettes = (List<StructureTemplate.Palette>) palettesField.get(this.template);
+      if (palettes.isEmpty()) {
+        return;
+      }
+      this.templateBlocks = palettes.get(0).blocks();
+    } catch (ReflectiveOperationException e) {
+      Mantle.logger.error("Failed to access template palettes", e);
+      return;
+    }
 
     for (int i = 0; i < this.templateBlocks.size(); i++) {
       StructureTemplate.StructureBlockInfo info = this.templateBlocks.get(i);
@@ -87,18 +105,19 @@ public class ContentStructure extends PageContent {
     int structureSizeX = BookScreen.PAGE_WIDTH;
     int structureSizeY = BookScreen.PAGE_HEIGHT - y - 10;
 
-
     if (this.description != null && this.description.length > 0) {
       offset = 15;
       structureSizeX -= 2 * offset;
       structureSizeY -= 2 * offset;
-      list.add(new TextElement(0, BookScreen.PAGE_HEIGHT - 10 - 2 * offset, BookScreen.PAGE_WIDTH, 2 * offset, this.description));
+      list.add(new TextElement(0, BookScreen.PAGE_HEIGHT - 10 - 2 * offset, BookScreen.PAGE_WIDTH, 2 * offset,
+          this.description));
     }
 
     if (this.template != null && this.template.getSize() != BlockPos.ZERO) {
       boolean showButtons = this.template.getSize().getY() > 1;
 
-      StructureElement structureElement = new StructureElement(offset, y, structureSizeX, structureSizeY, this.template, this.templateBlocks);
+      StructureElement structureElement = new StructureElement(offset, y, structureSizeX, structureSizeY, this.template,
+          this.templateBlocks);
       list.add(structureElement);
 
       if (showButtons) {
@@ -106,7 +125,8 @@ public class ContentStructure extends PageContent {
         int colHover = book.appearance.structureButtonColorHovered;
         int colToggled = book.appearance.structureButtonColorToggled;
 
-        list.add(new AnimationToggleElement(BookScreen.PAGE_WIDTH - ArrowButton.ArrowType.REFRESH.w, 0, ArrowButton.ArrowType.REFRESH, col, colHover, colToggled, structureElement));
+        list.add(new AnimationToggleElement(BookScreen.PAGE_WIDTH - ArrowButton.ArrowType.REFRESH.w, 0,
+            ArrowButton.ArrowType.REFRESH, col, colHover, colToggled, structureElement));
       }
     }
   }

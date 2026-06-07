@@ -2,8 +2,8 @@ package slimeknights.mantle.registration.adapter;
 
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.fluids.ForgeFlowingFluid;
-import net.neoforged.neoforge.fluids.ForgeFlowingFluid.Properties;
+import net.neoforged.neoforge.fluids.BaseFlowingFluid;
+import net.neoforged.neoforge.fluids.BaseFlowingFluid.Properties;
 import slimeknights.mantle.registration.DelayedSupplier;
 import slimeknights.mantle.registration.FluidBuilder;
 
@@ -35,7 +35,7 @@ public class FluidRegistryAdapter extends RegistryAdapter<Fluid> {
    * @param <F>     Fluid type
    * @return Still fluid instance
    */
-  public <F extends ForgeFlowingFluid> F register(FluidBuilder<?> builder, Function<Properties, F> still,
+  public <F extends BaseFlowingFluid> F register(FluidBuilder<?> builder, Function<Properties, F> still,
       Function<Properties, F> flowing, String name) {
     // have to create still and flowing later, as the props need these suppliers
     DelayedSupplier<Fluid> stillDelayed = new DelayedSupplier<>();
@@ -48,8 +48,8 @@ public class FluidRegistryAdapter extends RegistryAdapter<Fluid> {
     // TODO: should we be using holders?
     F stillFluid = register(still.apply(props), name);
     stillDelayed.setSupplier(() -> stillFluid);
-    F flowingFluid = register(flowing.apply(props), "flowing_" + name);
-    flowingDelayed.setSupplier(() -> flowingFluid);
+    F BaseFlowingFluid = register(flowing.apply(props), "flowing_" + name);
+    flowingDelayed.setSupplier(() -> BaseFlowingFluid);
 
     // return the final nice object
     return stillFluid;
@@ -62,7 +62,7 @@ public class FluidRegistryAdapter extends RegistryAdapter<Fluid> {
    * @param name    Fluid name
    * @return Still fluid
    */
-  public ForgeFlowingFluid register(FluidBuilder<?> builder, String name) {
-    return register(builder, ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new, name);
+  public BaseFlowingFluid register(FluidBuilder<?> builder, String name) {
+    return register(builder, BaseFlowingFluid.Source::new, BaseFlowingFluid.Flowing::new, name);
   }
 }

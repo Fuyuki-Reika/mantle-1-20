@@ -6,7 +6,8 @@ import net.minecraft.resources.ResourceLocation;
 @Deprecated(forRemoval = true)
 public interface IdExtender<T extends ResourceLocation> {
   /** Extender for standard resource locations */
-  LocationExtender INSTANCE = new LocationExtender() {};
+  LocationExtender INSTANCE = new LocationExtender() {
+  };
 
   /** Creates a resource location */
   T location(String namespace, String path);
@@ -33,7 +34,7 @@ public interface IdExtender<T extends ResourceLocation> {
   interface LocationExtender extends IdExtender<ResourceLocation> {
     @Override
     default ResourceLocation location(String namespace, String path) {
-      return new ResourceLocation(namespace, path);
+      return ResourceLocation.fromNamespaceAndPath(namespace, path);
     }
   }
 }

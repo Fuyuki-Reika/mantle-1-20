@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
@@ -21,12 +22,16 @@ import java.util.stream.Stream;
 
 public abstract class BookElement {
 
-  /** TODO 1.21: make this field protected instead of public to ensure setter is used. */
+  /**
+   * TODO 1.21: make this field protected instead of public to ensure setter is
+   * used.
+   */
   @Setter
   public BookScreen parent;
 
   protected Minecraft mc = Minecraft.getInstance();
-  protected TextureManager renderEngine = this.mc.textureManager;
+  // TODO 1.21.1: textureManager is now private, use getter instead
+  protected TextureManager renderEngine = this.mc.getTextureManager();
 
   public int x, y;
 
@@ -53,7 +58,11 @@ public abstract class BookElement {
   }
 
   public void renderToolTip(GuiGraphics graphics, Font fontRenderer, ItemStack stack, int x, int y) {
-    List<Component> list = stack.getTooltipLines(this.mc.player, this.mc.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
+    // TODO 1.21.1: getTooltipLines now requires Item.TooltipContext instead of
+    // Player
+    Item.TooltipContext tooltipContext = Item.TooltipContext.of(this.mc.level);
+    List<Component> list = stack.getTooltipLines(tooltipContext, this.mc.player,
+        this.mc.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
 
     Font font = IClientItemExtensions.of(stack).getFont(stack, FontContext.TOOLTIP);
     if (font == null) {
@@ -62,7 +71,6 @@ public abstract class BookElement {
 
     this.drawTooltip(graphics, list, x, y, font);
   }
-
 
   private static Stream<ClientTooltipComponent> splitLine(FormattedText text, Font font, int maxWidth) {
     if (text instanceof Component component) {
@@ -73,8 +81,12 @@ public abstract class BookElement {
     return font.split(text, maxWidth).stream().map(ClientTooltipComponent::create);
   }
 
-  /** Tooltip positioner to keep the tooltip within the page for the relative mouse positions */
-  private static final ClientTooltipPositioner POSITIONER = (screenWidth, screenHeight, mouseX, mouseY, tooltipWidth, tooltipHeight) -> {
+  /**
+   * Tooltip positioner to keep the tooltip within the page for the relative mouse
+   * positions
+   */
+  private static final ClientTooltipPositioner POSITIONER = (screenWidth, screenHeight, mouseX, mouseY, tooltipWidth,
+      tooltipHeight) -> {
     Vector2i pos = (new Vector2i(mouseX, mouseY)).add(12, -12);
     if (pos.x + tooltipWidth > BookScreen.PAGE_WIDTH) {
       pos.x = Math.max(pos.x - 24 - tooltipWidth, 4);
@@ -88,37 +100,19 @@ public abstract class BookElement {
 
   /**
    * Renders a tooltip in a book.
-   * Based on {@link net.neoforged.neoforge.client.ForgeHooksClient#gatherTooltipComponents(ItemStack, List, int, int, int, Font)}, but with three notable changes:
-   * Uses the book page size (since mouseX and mouseY tend to be page relative), actually uses the updated tooltipX position, and drops the unused non-text component code.
+   * Based on
+   * {@link net.neoforged.neoforge.client.ForgeHooksClient#gatherTooltipComponents(ItemStack, List, int, int, int, Font)},
+   * but with three notable changes:
+   * Uses the book page size (since mouseX and mouseY tend to be page relative),
+   * actually uses the updated tooltipX position, and drops the unused non-text
+   * component code.
    */
-  @SuppressWarnings("UnstableApiUsage")  // this is a javadoc my dude
+  @SuppressWarnings("UnstableApiUsage") // this is a javadoc my dude
   public void drawTooltip(GuiGraphics graphics, List<Component> textLines, int mouseX, int mouseY, Font font) {
-    // find max width of the tooltip
-    int tooltipTextWidth = textLines.stream().mapToInt(font::width).max().orElse(0);
-    boolean needsWrap = false;
-    int tooltipX = mouseX + 12;
-    // if the max width plus the position is too wide, need to fix
-    if (tooltipX + tooltipTextWidth + 4 > BookScreen.PAGE_WIDTH) {
-      // if repositioning fails, we will need to wrap the tooltip
-      tooltipX = mouseX - 16 - tooltipTextWidth;
-      if (tooltipX < 4) {
-        if (mouseX > BookScreen.PAGE_WIDTH / 2) {
-          tooltipTextWidth = mouseX - 12 - 8;
-        } else {
-          tooltipTextWidth = BookScreen.PAGE_WIDTH - 16 - mouseX;
-        }
-
-        needsWrap = true;
-      }
-    }
-
-    // map to client tooltips, wrapping if needed
-    int tooltipTextWidthF = tooltipTextWidth;
-    List<ClientTooltipComponent> components = needsWrap
-      ? textLines.stream().flatMap(text -> splitLine(text, font, tooltipTextWidthF)).toList()
-      : textLines.stream().map(text -> ClientTooltipComponent.create(text.getVisualOrderText())).toList();
-
-    // render the tooltip
-    graphics.renderTooltipInternal(font, components, mouseX, mouseY, POSITIONER);
+    // TODO 1.21.1: renderTooltipInternal with custom positioner is private
+    // Using renderComponentTooltip for List<Component> support
+    // This doesn't support custom positioning, so tooltips may not stay within book
+    // page bounds
+    graphics.renderComponentTooltip(font, textLines, mouseX, mouseY);
   }
 }

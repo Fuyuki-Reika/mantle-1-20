@@ -12,6 +12,7 @@ import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.chunk.EmptyLevelChunk;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 
@@ -47,7 +48,7 @@ public class TemplateChunkSource extends ChunkSource {
 
   @Nullable
   @Override
-  public ChunkAccess getChunk(int chunkX, int chunkZ, boolean load) {
+  public ChunkAccess getChunk(int chunkX, int chunkZ, ChunkStatus status, boolean load) {
     return this.chunks.computeIfAbsent(new ChunkPos(chunkX, chunkZ), p -> new EmptyLevelChunk(level, p,
         level.registryAccess().registryOrThrow(Registries.BIOME).getHolderOrThrow(Biomes.PLAINS)));
   }

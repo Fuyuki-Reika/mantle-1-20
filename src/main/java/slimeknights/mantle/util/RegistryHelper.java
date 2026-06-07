@@ -17,11 +17,12 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class RegistryHelper {
-  private RegistryHelper() {}
+  private RegistryHelper() {
+  }
 
   /** Gets the registry for the given key, dealing with tags */
   @Nullable
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings({ "unchecked" })
   public static <T> Registry<T> getRegistry(ResourceKey<? extends Registry<T>> key) {
     return (Registry<T>) BuiltInRegistries.REGISTRY.get(key.location());
   }
@@ -56,7 +57,8 @@ public class RegistryHelper {
     if (index == Registry.DEFAULT) {
       return false;
     }
-    return registry.getHolder(index).filter(holder -> holder.containsTag(tag)).isPresent();
+    // TODO 1.21.1: Use .is(tag) instead of .containsTag(tag)
+    return registry.getHolder(index).filter(holder -> holder.is(tag)).isPresent();
   }
 
   /** Checks if the given tag contains the given registry object */
@@ -94,12 +96,15 @@ public class RegistryHelper {
 
   /**
    * Gets a holder for a registry object
-   * @param registry  Registry instance
-   * @param entry     Entry to fetch holder
-   * @param <T>       Registry type
-   * @return  Supplier for the given registry
+   * 
+   * @param registry Registry instance
+   * @param entry    Entry to fetch holder
+   * @param <T>      Registry type
+   * @return Supplier for the given registry
    */
   public static <T> Supplier<T> getHolder(DefaultedRegistry<T> registry, T entry) {
-    return registry.getHolder(registry.getId(entry)).orElseThrow();
+    // TODO 1.21.1: Holder no longer implements Supplier, wrap in lambda
+    Holder<T> holder = registry.getHolder(registry.getId(entry)).orElseThrow();
+    return holder::value;
   }
 }

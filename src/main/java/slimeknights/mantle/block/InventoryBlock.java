@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -59,15 +60,17 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
   @SuppressWarnings("deprecation")
   @Deprecated
   @Override
-  public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
+  protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player,
+      InteractionHand hand,
       BlockHitResult rayTraceResult) {
     if (player.isSuppressingBounce()) {
-      return InteractionResult.PASS;
+      return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
     if (!world.isClientSide) {
-      return this.openGui(player, world, pos) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+      return this.openGui(player, world, pos) ? ItemInteractionResult.SUCCESS
+          : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
-    return InteractionResult.SUCCESS;
+    return ItemInteractionResult.SUCCESS;
   }
 
   /* Naming */
@@ -78,7 +81,7 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
     super.setPlacedBy(worldIn, pos, state, placer, stack);
 
     // set custom name from named stack
-    if (stack.hasCustomHoverName()) {
+    if (stack.has(net.minecraft.core.component.DataComponents.CUSTOM_NAME)) {
       BlockEntity tileentity = worldIn.getBlockEntity(pos);
       if (tileentity instanceof INameableMenuProvider provider) {
         provider.setCustomName(stack.getHoverName());

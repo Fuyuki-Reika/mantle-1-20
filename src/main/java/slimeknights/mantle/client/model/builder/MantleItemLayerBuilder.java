@@ -11,12 +11,16 @@ import slimeknights.mantle.client.model.util.MantleItemLayerModel.LayerData;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Builder for {@link slimeknights.mantle.client.model.util.MantleItemLayerModel} */
-@SuppressWarnings("unused")  // API
+/**
+ * Builder for
+ * {@link slimeknights.mantle.client.model.util.MantleItemLayerModel}
+ */
+@SuppressWarnings("unused") // API
 public class MantleItemLayerBuilder<T extends ModelBuilder<T>> extends CustomLoaderBuilder<T> {
   private final List<LayerData> layers = new ArrayList<>();
+
   protected MantleItemLayerBuilder(ResourceLocation loaderId, T parent, ExistingFileHelper existingFileHelper) {
-    super(loaderId, parent, existingFileHelper);
+    super(loaderId, parent, existingFileHelper, true);
   }
 
   public MantleItemLayerBuilder(T parent, ExistingFileHelper existingFileHelper) {

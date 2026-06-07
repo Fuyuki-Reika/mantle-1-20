@@ -98,7 +98,11 @@ public class FluidTransferHelper {
       if (simulatedFill > 0) {
         // actually drain, use the fluid we successfully filled with just in case that
         // changes
-        FluidStack drainedFluid = input.drain(new FluidStack(fluid, simulatedFill), FluidAction.EXECUTE);
+        // TODO 1.21.1: FluidStack(FluidStack, int) constructor removed - use copy +
+        // setAmount
+        FluidStack drainRequest = fluid.copy();
+        drainRequest.setAmount(simulatedFill);
+        FluidStack drainedFluid = input.drain(drainRequest, FluidAction.EXECUTE);
         if (!drainedFluid.isEmpty()) {
           // actually fill
           int actualFill = output.fill(drainedFluid.copy(), FluidAction.EXECUTE);
@@ -106,7 +110,11 @@ public class FluidTransferHelper {
           if (actualFill < drainedFluid.getAmount()) {
             int toReturn = drainedFluid.getAmount() - actualFill;
             drainedFluid.setAmount(actualFill);
-            int returned = input.fill(new FluidStack(drainedFluid, toReturn), FluidAction.EXECUTE);
+            // TODO 1.21.1: FluidStack(FluidStack, int) constructor removed - use copy +
+            // setAmount
+            FluidStack returnRequest = drainedFluid.copy();
+            returnRequest.setAmount(toReturn);
+            int returned = input.fill(returnRequest, FluidAction.EXECUTE);
             // failed to put the rest back, so all that's left to do is delete it
             if (returned < toReturn) {
               Mantle.logger.error("Lost {} fluid during transfer", toReturn - returned);
@@ -186,26 +194,36 @@ public class FluidTransferHelper {
       Player player, InteractionHand hand, Direction offset) {
     ItemStack held = player.getItemInHand(hand);
     if (held.getItem() instanceof BucketItem bucket) {
-      Fluid fluid = bucket.getFluid();
-      if (fluid != Fluids.EMPTY) {
-        if (!world.isClientSide) {
-          FluidStack fluidStack = new FluidStack(bucket.getFluid(), FluidType.BUCKET_VOLUME);
-          // must empty the whole bucket
-          if (handler.fill(fluidStack, FluidAction.SIMULATE) == FluidType.BUCKET_VOLUME) {
-            SoundEvent sound = getEmptySound(fluidStack);
-            handler.fill(fluidStack, FluidAction.EXECUTE);
-            bucket.checkExtraContent(player, world, held, pos.relative(offset));
-            world.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
-            player.displayClientMessage(Component.translatable(KEY_FILLED, COMMA_FORMAT.format(FluidType.BUCKET_VOLUME),
-                fluidStack.getDisplayName()), true);
-            if (!player.isCreative()) {
-              player.setItemInHand(hand, held.getCraftingRemainingItem());
-            }
-            return FluidInteractionResult.DRAINED_STACK;
-          }
-        }
-        return FluidInteractionResult.CONTAINER;
-      }
+      // TODO 1.21.1: BucketItem.getFluid() removed - need to get fluid from bucket's
+      // data component
+      // Temporarily disabled - needs investigation of new bucket fluid storage API
+      throw new UnsupportedOperationException(
+          "interactWithFilledBucket temporarily disabled - BucketItem.getFluid removed");
+      /*
+       * Fluid fluid = bucket.getFluid();
+       * if (fluid != Fluids.EMPTY) {
+       * if (!world.isClientSide) {
+       * FluidStack fluidStack = new FluidStack(bucket.getFluid(),
+       * FluidType.BUCKET_VOLUME);
+       * // must empty the whole bucket
+       * if (handler.fill(fluidStack, FluidAction.SIMULATE) ==
+       * FluidType.BUCKET_VOLUME) {
+       * SoundEvent sound = getEmptySound(fluidStack);
+       * handler.fill(fluidStack, FluidAction.EXECUTE);
+       * bucket.checkExtraContent(player, world, held, pos.relative(offset));
+       * world.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+       * player.displayClientMessage(Component.translatable(KEY_FILLED,
+       * COMMA_FORMAT.format(FluidType.BUCKET_VOLUME),
+       * fluidStack.getDisplayName()), true);
+       * if (!player.isCreative()) {
+       * player.setItemInHand(hand, held.getCraftingRemainingItem());
+       * }
+       * return FluidInteractionResult.DRAINED_STACK;
+       * }
+       * }
+       * return FluidInteractionResult.CONTAINER;
+       * }
+       */
     }
     return FluidInteractionResult.MISSING;
   }
@@ -304,7 +322,9 @@ public class FluidTransferHelper {
     }
 
     // if the item has a capability, do a direct transfer
-    ItemStack copy = ItemHandlerHelper.copyStackWithSize(stack, 1);
+    // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize removed - use
+    // ItemStack.copyWithCount
+    ItemStack copy = stack.copyWithCount(1);
     IFluidHandlerItem itemHandler = copy.getCapability(Capabilities.FluidHandler.ITEM);
     if (itemHandler != null) {
       FluidInteractionResult result = FluidInteractionResult.CONTAINER;
@@ -424,7 +444,9 @@ public class FluidTransferHelper {
       }
 
       // if the item has a capability, do a direct transfer
-      ItemStack copy = ItemHandlerHelper.copyStackWithSize(stack, 1);
+      // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize removed - use
+      // ItemStack.copyWithCount
+      ItemStack copy = stack.copyWithCount(1);
       IFluidHandlerItem itemHandler = copy.getCapability(Capabilities.FluidHandler.ITEM);
       if (itemHandler != null) {
         // first, try filling the TE from the item
@@ -499,7 +521,9 @@ public class FluidTransferHelper {
       }
 
       // if the item has a capability, do a direct transfer
-      ItemStack copy = ItemHandlerHelper.copyStackWithSize(stack, 1);
+      // TODO 1.21.1: ItemHandlerHelper.copyStackWithSize removed - use
+      // ItemStack.copyWithCount
+      ItemStack copy = stack.copyWithCount(1);
       IFluidHandlerItem itemHandler = copy.getCapability(Capabilities.FluidHandler.ITEM);
       if (itemHandler != null) {
         // first, try filling the TE from the item

@@ -1,26 +1,27 @@
 package slimeknights.mantle.recipe.helper;
 
-import com.google.gson.JsonObject;
-import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 
-import javax.annotation.Nullable;
-
-/** Finished recipe implementation for {@link SimpleRecipeSerializer}, use like {@code consumer.accept(new SimpleFinishedRecipe(...))} */
-public record SimpleFinishedRecipe(ResourceLocation getId, RecipeSerializer<?> getType) implements FinishedRecipe {
-  @Override
-  public void serializeRecipeData(JsonObject pJson) {}
-
-  @Nullable
-  @Override
-  public JsonObject serializeAdvancement() {
-    return null;
-  }
-
-  @Nullable
-  @Override
-  public ResourceLocation getAdvancementId() {
-    return null;
+/**
+ * @deprecated FinishedRecipe no longer exists in NeoForge 1.21.1.
+ *             Instead, use RecipeOutput.accept(ResourceLocation id, Recipe<?>
+ *             recipe, AdvancementHolder advancement, ICondition... conditions)
+ *             directly with your Recipe object.
+ */
+@Deprecated(forRemoval = true, since = "NeoForge 21.1")
+public record SimpleFinishedRecipe(ResourceLocation getId, RecipeSerializer<?> getType) {
+  /**
+   * @deprecated This class is deprecated and should not be used. Migrate to
+   *             RecipeOutput.accept() pattern.
+   */
+  // TODO 1.21.1: Canonical constructor parameter names must match record
+  // component names
+  @Deprecated(forRemoval = true)
+  public SimpleFinishedRecipe(ResourceLocation getId, RecipeSerializer<?> getType) {
+    this.getId = getId;
+    this.getType = getType;
+    throw new UnsupportedOperationException(
+        "SimpleFinishedRecipe is deprecated. Use RecipeOutput.accept(id, recipe, advancement, conditions) instead.");
   }
 }

@@ -27,15 +27,18 @@ public class ImageData extends DataLocation {
     this(location, u, v, uw, vh, texWidth, texHeight, uw, vh, 0xFFFFFF);
   }
 
-  public ImageData(ResourceLocation location, int u, int v, int uw, int vh, int texWidth, int texHeight, int colorMultiplier) {
+  public ImageData(ResourceLocation location, int u, int v, int uw, int vh, int texWidth, int texHeight,
+      int colorMultiplier) {
     this(location, u, v, uw, vh, texWidth, texHeight, uw, vh);
   }
 
-  public ImageData(ResourceLocation location, int u, int v, int uw, int vh, int texWidth, int texHeight, int width, int height) {
+  public ImageData(ResourceLocation location, int u, int v, int uw, int vh, int texWidth, int texHeight, int width,
+      int height) {
     this(location, u, v, uw, vh, texWidth, texHeight, width, height, 0xFFFFFF);
   }
 
-  public ImageData(ResourceLocation location, int u, int v, int uw, int vh, int texWidth, int texHeight, int width, int height, int colorMultiplier) {
+  public ImageData(ResourceLocation location, int u, int v, int uw, int vh, int texWidth, int texHeight, int width,
+      int height, int colorMultiplier) {
     this.location = location;
     this.u = u;
     this.v = v;
@@ -49,7 +52,7 @@ public class ImageData extends DataLocation {
   }
 
   static {
-    MISSING.location = new ResourceLocation("mantle:textures/gui/missingno.png");
+    MISSING.location = ResourceLocation.parse("mantle:textures/gui/missingno.png");
     MISSING.texWidth = 32;
     MISSING.texHeight = 32;
     MISSING.uw = 32;

@@ -55,22 +55,28 @@ public abstract class GenericDataProvider implements DataProvider {
 
   /**
    * Saves the given object to JSON
-   * @param output     Output for writing
-   * @param location   Location relative to this data provider's root
-   * @param object     Object to save, will be converted using this provider's GSON instance
+   * 
+   * @param output   Output for writing
+   * @param location Location relative to this data provider's root
+   * @param object   Object to save, will be converted using this provider's GSON
+   *                 instance
    */
-  protected CompletableFuture<?> saveJson(CachedOutput output, ResourceLocation location, Object object, @Nullable Comparator<String> keyComparator) {
-    return saveStable(output, gson.toJsonTree(object), this.pathProvider.json(location), keyComparator).exceptionally(e -> {
-      Mantle.logger.error("Couldn't create data for {}", location, e);
-      return null;
-    });
+  protected CompletableFuture<?> saveJson(CachedOutput output, ResourceLocation location, Object object,
+      @Nullable Comparator<String> keyComparator) {
+    return saveStable(output, gson.toJsonTree(object), this.pathProvider.json(location), keyComparator)
+        .exceptionally(e -> {
+          Mantle.logger.error("Couldn't create data for {}", location, e);
+          return null;
+        });
   }
 
   /**
    * Saves the given object to JSON
-   * @param output     Output for writing
-   * @param location   Location relative to this data provider's root
-   * @param object     Object to save, will be converted using this provider's GSON instance
+   * 
+   * @param output   Output for writing
+   * @param location Location relative to this data provider's root
+   * @param object   Object to save, will be converted using this provider's GSON
+   *                 instance
    */
   protected CompletableFuture<?> saveJson(CachedOutput output, ResourceLocation location, Object object) {
     return saveJson(output, location, object, DataProvider.KEY_COMPARATOR);
@@ -78,13 +84,17 @@ public abstract class GenericDataProvider implements DataProvider {
 
   /**
    * Saves the given object to JSON using a codec
-   * @param output     Output for writing
-   * @param location   Location relative to this data provider's root
-   * @param codec      Codec to save the object
-   * @param object     Object to save, will be converted using the passed codec
+   * 
+   * @param output   Output for writing
+   * @param location Location relative to this data provider's root
+   * @param codec    Codec to save the object
+   * @param object   Object to save, will be converted using the passed codec
    */
-  protected <T> CompletableFuture<?> saveJson(CachedOutput output, ResourceLocation location, Codec<T> codec, T object) {
-    return saveJson(output, location, codec.encodeStart(JsonOps.INSTANCE, object).getOrThrow(false, Mantle.logger::error));
+  protected <T> CompletableFuture<?> saveJson(CachedOutput output, ResourceLocation location, Codec<T> codec,
+      T object) {
+    // TODO 1.21.1: DataResult.getOrThrow signature changed - no longer takes
+    // boolean and Consumer
+    return saveJson(output, location, codec.encodeStart(JsonOps.INSTANCE, object).getOrThrow());
   }
 
   /** Combines a stream of completable futures into a single completable future */
@@ -97,9 +107,14 @@ public abstract class GenericDataProvider implements DataProvider {
     return CompletableFuture.allOf(tasks.toArray(CompletableFuture[]::new));
   }
 
-  /** Recreation of {@link DataProvider#saveStable(CachedOutput, JsonElement, Path)} that allows swapping tke key comparator */
+  /**
+   * Recreation of
+   * {@link DataProvider#saveStable(CachedOutput, JsonElement, Path)} that allows
+   * swapping tke key comparator
+   */
   @SuppressWarnings("UnstableApiUsage")
-  static CompletableFuture<?> saveStable(CachedOutput cache, JsonElement pJson, Path pPath, @Nullable Comparator<String> keyComparator) {
+  static CompletableFuture<?> saveStable(CachedOutput cache, JsonElement pJson, Path pPath,
+      @Nullable Comparator<String> keyComparator) {
     return CompletableFuture.runAsync(() -> {
       try {
         ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();

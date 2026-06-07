@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /** Handles events for any Mantle driven logic. */
-@EventBusSubscriber(modid = Mantle.modId, bus = Bus.FORGE)
+@EventBusSubscriber(modid = Mantle.modId, bus = Bus.GAME)
 public class MantleEvents {
   /* Soulbound */
   /**
@@ -50,7 +50,13 @@ public class MantleEvents {
       for (int i = 0; i < totalSize; i++) {
         ItemStack stack = inventory.getItem(i);
         if (!stack.isEmpty() && stack.is(MantleTags.Items.SOULBOUND)) {
-          stack.getOrCreateTag().putInt(SOULBOUND_SLOT, i);
+          // TODO 1.21.1: ItemStack.getOrCreateTag() removed, using
+          // getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).update()
+          final int slotIndex = i;
+          stack.update(net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+              net.minecraft.world.item.component.CustomData.EMPTY, data -> data.update(tag -> {
+                tag.putInt(SOULBOUND_SLOT, slotIndex);
+              }));
         }
       }
     }
@@ -75,9 +81,13 @@ public class MantleEvents {
         ItemStack stack = itemEntity.getItem();
         // find items with our soulbound tag set and move them back into the inventory,
         // will move them over later
-        CompoundTag tag = stack.getTag();
-        if (tag != null && tag.contains(SOULBOUND_SLOT, Tag.TAG_ANY_NUMERIC)) {
-          int slot = tag.getInt(SOULBOUND_SLOT);
+        // TODO 1.21.1: ItemStack.getTag() removed, using
+        // get(DataComponents.CUSTOM_DATA)
+        net.minecraft.world.item.component.CustomData customData = stack.getOrDefault(
+            net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+            net.minecraft.world.item.component.CustomData.EMPTY);
+        if (!customData.isEmpty() && customData.contains(SOULBOUND_SLOT)) {
+          int slot = customData.copyTag().getInt(SOULBOUND_SLOT);
           // return the tool to its requested slot if possible, remove from the drops
           if (inventory.getItem(slot).isEmpty()) {
             inventory.setItem(slot, stack);
@@ -100,13 +110,12 @@ public class MantleEvents {
           // ground
           // this should never happen, but better to be safe
           // ditch the soulbound slot tag, to prevent item stacking issues
-          CompoundTag tag = stack.getTag();
-          if (tag != null) {
-            tag.remove(SOULBOUND_SLOT);
-            if (tag.isEmpty()) {
-              stack.setTag(null);
-            }
-          }
+          // TODO 1.21.1: ItemStack.getTag() removed, using
+          // update(DataComponents.CUSTOM_DATA)
+          stack.update(net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+              net.minecraft.world.item.component.CustomData.EMPTY, data -> data.update(tag -> {
+                tag.remove(SOULBOUND_SLOT);
+              }));
           drops.add(itemEntity);
         }
       }
@@ -138,18 +147,24 @@ public class MantleEvents {
     for (int i = 0; i < size; i++) {
       ItemStack stack = originalInv.getItem(i);
       if (!stack.isEmpty()) {
-        CompoundTag tag = stack.getTag();
-        if (tag != null && tag.contains(SOULBOUND_SLOT, Tag.TAG_ANY_NUMERIC)) {
+        // TODO 1.21.1: ItemStack.getTag() removed, using
+        // get(DataComponents.CUSTOM_DATA)
+        net.minecraft.world.item.component.CustomData customData = stack.getOrDefault(
+            net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+            net.minecraft.world.item.component.CustomData.EMPTY);
+        if (!customData.isEmpty() && customData.contains(SOULBOUND_SLOT)) {
           if (cloneInv.getItem(i).isEmpty()) {
             cloneInv.setItem(i, stack);
           } else {
             takenSlot.add(stack);
           }
-          // remove the slot tag, clear the tag if needed
-          tag.remove(SOULBOUND_SLOT);
-          if (tag.isEmpty()) {
-            stack.setTag(null);
-          }
+          // remove the slot tag
+          // TODO 1.21.1: ItemStack.setTag(null) removed, using
+          // update(DataComponents.CUSTOM_DATA)
+          stack.update(net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+              net.minecraft.world.item.component.CustomData.EMPTY, data -> data.update(tag -> {
+                tag.remove(SOULBOUND_SLOT);
+              }));
         }
       }
     }

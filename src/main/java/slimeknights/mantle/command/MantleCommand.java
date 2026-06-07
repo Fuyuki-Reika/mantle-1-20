@@ -61,8 +61,11 @@ public class MantleCommand {
     TagSourceArgument.registerSuggestions();
 
     // register interesting sources
-    SourcesCommand.register(LootDataType.TABLE.directory(), (context, builder) -> SharedSuggestionProvider
-        .suggestResource(context.getSource().getServer().getLootData().getKeys(LootDataType.TABLE), builder));
+    // TODO: LootDataType API changed in 1.21.1, needs reimplementation
+    // SourcesCommand.register("loot_table", (context, builder) ->
+    // SharedSuggestionProvider
+    // .suggestResource(context.getSource().getServer().getLootData().getKeys(LootDataType.TABLE),
+    // builder));
     SourcesCommand.register("recipes",
         (context, builder) -> SharedSuggestionProvider.suggestResource(context.getSource().getRecipeNames(), builder));
 

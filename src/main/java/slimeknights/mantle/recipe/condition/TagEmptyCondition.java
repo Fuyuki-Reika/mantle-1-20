@@ -10,9 +10,14 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.loot.MantleLoot;
 
-/** Condition that checks when a tag is empty. Same as {@link net.neoforged.common.crafting.conditions.TagEmptyCondition} but for any registry */
+/**
+ * Condition that checks when a tag is empty. Same as
+ * {@link net.neoforged.common.crafting.conditions.TagEmptyCondition} but for
+ * any registry
+ */
 public class TagEmptyCondition<T> extends TagCondition<T> implements LootItemCondition {
-  public static final Serializer<TagEmptyCondition<?>> SERIALIZER = new Serializer<>(Mantle.getResource("tag_empty"), TagEmptyCondition::new);
+  public static final Serializer<TagEmptyCondition<?>> SERIALIZER = new Serializer<>(Mantle.getResource("tag_empty"),
+      TagEmptyCondition::new);
 
   public TagEmptyCondition(TagKey<T> tag) {
     super(tag);
@@ -22,9 +27,15 @@ public class TagEmptyCondition<T> extends TagCondition<T> implements LootItemCon
     this(TagKey.create(registry, name));
   }
 
-  @Override
+  // TODO 1.21.1: getID() is not an override, removed @Override annotation
   public ResourceLocation getID() {
     return SERIALIZER.getID();
+  }
+
+  // TODO 1.21.1: codec() added to ICondition interface
+  @Override
+  public com.mojang.serialization.MapCodec<? extends net.neoforged.neoforge.common.conditions.ICondition> codec() {
+    return SERIALIZER.codec();
   }
 
   @Override

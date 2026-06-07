@@ -11,13 +11,13 @@ import com.mojang.blaze3d.vertex.VertexSorting;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
@@ -46,34 +46,36 @@ public class BookCommand {
 
   /**
    * Registers this sub command with the root command
-   * @param subCommand  Command builder
+   * 
+   * @param subCommand Command builder
    */
   public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand) {
-    subCommand.requires(source -> source.hasPermission(MantleCommand.PERMISSION_GAME_COMMANDS) && source.getEntity() instanceof AbstractClientPlayer)
-      .then(Commands.literal("open")
-        .then(Commands.argument("id", ResourceLocationArgument.id()).suggests(MantleClientCommand.REGISTERED_BOOKS)
-          .executes(BookCommand::openBook)))
-      .then(Commands.literal("export_images")
-        .then(Commands.argument("id", ResourceLocationArgument.id()).suggests(MantleClientCommand.REGISTERED_BOOKS)
-          .then(Commands.argument("scale", IntegerArgumentType.integer(1, 16))
-            .executes(BookCommand::exportImagesWithScale))
-          .executes(BookCommand::exportImages)));
+    subCommand
+        .requires(source -> source.hasPermission(MantleCommand.PERMISSION_GAME_COMMANDS)
+            && source.getEntity() instanceof AbstractClientPlayer)
+        .then(Commands.literal("open")
+            .then(Commands.argument("id", ResourceLocationArgument.id()).suggests(MantleClientCommand.REGISTERED_BOOKS)
+                .executes(BookCommand::openBook)))
+        .then(Commands.literal("export_images")
+            .then(Commands.argument("id", ResourceLocationArgument.id()).suggests(MantleClientCommand.REGISTERED_BOOKS)
+                .then(Commands.argument("scale", IntegerArgumentType.integer(1, 16))
+                    .executes(BookCommand::exportImagesWithScale))
+                .executes(BookCommand::exportImages)));
   }
 
   /**
    * Opens the specified book
-   * @param context  Command context
-   * @return  Integer return
+   * 
+   * @param context Command context
+   * @return Integer return
    */
   private static int openBook(CommandContext<CommandSourceStack> context) {
     ResourceLocation book = ResourceLocationArgument.getId(context, "id");
 
     BookData bookData = BookLoader.getBook(book);
-    if(bookData != null) {
+    if (bookData != null) {
       // Delay execution to ensure chat window is closed
-      Minecraft.getInstance().tell(() ->
-        bookData.openGui(Component.literal("Book"), "", null, null)
-      );
+      Minecraft.getInstance().tell(() -> bookData.openGui(Component.literal("Book"), "", null, null));
     } else {
       bookNotFound(book);
       return 1;
@@ -84,8 +86,9 @@ public class BookCommand {
 
   /**
    * Renders all images in the book to files at specified scale
-   * @param context  Command context
-   * @return  Integer return
+   * 
+   * @param context Command context
+   * @return Integer return
    */
   private static int exportImagesWithScale(CommandContext<CommandSourceStack> context) {
     ResourceLocation book = ResourceLocationArgument.getId(context, "id");
@@ -96,8 +99,9 @@ public class BookCommand {
 
   /**
    * Renders all images in the book to files
-   * @param context  Command context
-   * @return  Integer return
+   * 
+   * @param context Command context
+   * @return Integer return
    */
   private static int exportImages(CommandContext<CommandSourceStack> context) {
     ResourceLocation book = ResourceLocationArgument.getId(context, "id");
@@ -107,19 +111,22 @@ public class BookCommand {
 
   /**
    * Renders all images in the book to files
+   * 
    * @param book  Book to export
-   * @param scale  Scale to export at
-   * @return  Integer return
+   * @param scale Scale to export at
+   * @return Integer return
    */
   private static int doExportImages(ResourceLocation book, int scale) {
     BookData bookData = BookLoader.getBook(book);
 
     Path gameDirectory = Minecraft.getInstance().gameDirectory.toPath();
-    Path screenshotDir = Paths.get(gameDirectory.toString(), Screenshot.SCREENSHOT_DIR, "mantle_book", book.getNamespace(), book.getPath());
+    Path screenshotDir = Paths.get(gameDirectory.toString(), Screenshot.SCREENSHOT_DIR, "mantle_book",
+        book.getNamespace(), book.getPath());
 
-    if(bookData != null) {
-      if(!screenshotDir.toFile().mkdirs() && !screenshotDir.toFile().exists()) {
-        throw new CommandRuntimeException(Component.translatable(EXPORT_FAIL_IO));
+    if (bookData != null) {
+      if (!screenshotDir.toFile().mkdirs() && !screenshotDir.toFile().exists()) {
+        Mantle.logger.error("Failed to create screenshot directory");
+        return 1;
       }
 
       int width = BookScreen.PAGE_WIDTH_UNSCALED * 2 * scale;
@@ -136,9 +143,11 @@ public class BookCommand {
       Matrix4f matrix = (new Matrix4f()).setOrtho(0.0F, width, height, 0.0F, 1000.0F, zFar);
       RenderSystem.setProjectionMatrix(matrix, VertexSorting.ORTHOGRAPHIC_Z);
 
-      PoseStack stack = RenderSystem.getModelViewStack();
-      stack.pushPose();
-      stack.setIdentity();
+      // RenderSystem.getModelViewStack() returns Matrix4fStack in 1.21.1, use var to
+      // infer
+      var stack = RenderSystem.getModelViewStack();
+      stack.pushMatrix();
+      stack.identity();
       stack.translate(0, 0, 1000F - zFar);
       stack.scale(scale, scale, 1);
       RenderSystem.applyModelViewMatrix();
@@ -158,8 +167,9 @@ public class BookCommand {
 
           screen.tick();
 
-          RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
-            GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
+          RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
+              GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+              GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
 
           gui.pose().pushPose();
           screen.render(gui, 0, 0, 0);
@@ -174,22 +184,22 @@ public class BookCommand {
             if (page == -1) { // the cover is half the width
               try (NativeImage scaled = new NativeImage(image.format(), width / 2, height, false)) {
                 image.copyRect(scaled, image.getWidth() / 2 - width / 4, 0, 0, 0,
-                  width / 2, height, false, false);
+                    width / 2, height, false, false);
                 scaled.writeToFile(path);
               } catch (Exception e) {
                 Mantle.logger.error("Failed to save screenshot", e);
-                throw new CommandRuntimeException(Component.translatable(EXPORT_FAIL));
+                return 1;
               }
             } else {
               image.writeToFile(path);
             }
           } catch (Exception e) {
             Mantle.logger.error("Failed to save screenshot", e);
-            throw new CommandRuntimeException(Component.translatable(EXPORT_FAIL));
+            return 1;
           }
         } while (screen.nextPage());
       } finally {
-        stack.popPose();
+        stack.popMatrix();
         RenderSystem.applyModelViewMatrix();
         RenderSystem.defaultBlendFunc();
         target.unbindWrite();
@@ -203,14 +213,16 @@ public class BookCommand {
     Player player = Minecraft.getInstance().player;
     if (player != null) {
       Component fileComponent = Component.literal(screenshotDir.toString()).withStyle(ChatFormatting.UNDERLINE)
-        .withStyle(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshotDir.toAbsolutePath().toString())));
+          .withStyle(style -> style
+              .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, screenshotDir.toAbsolutePath().toString())));
       player.displayClientMessage(Component.translatable(EXPORT_SUCCESS, fileComponent), false);
     }
     return 0;
   }
 
   /**
-   * Duplicate of {@link net.minecraft.client.Screenshot#takeScreenshot}, but with transparency
+   * Duplicate of {@link net.minecraft.client.Screenshot#takeScreenshot}, but with
+   * transparency
    */
   private static NativeImage takeScreenshot(RenderTarget pFramebuffer) {
     int i = pFramebuffer.width;
