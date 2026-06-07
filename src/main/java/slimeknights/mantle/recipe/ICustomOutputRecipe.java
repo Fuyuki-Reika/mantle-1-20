@@ -1,6 +1,6 @@
 package slimeknights.mantle.recipe;
 
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
 
@@ -13,17 +13,16 @@ import net.minecraft.world.item.crafting.RecipeInput;
 // RecipeInput>
 public interface ICustomOutputRecipe<C extends RecipeInput> extends ICommonRecipe<C> {
   /** @deprecated Item stack output not supported */
-  // TODO 1.21.1: getResultItem signature likely changed - removed @Override
-  // annotation
   @Deprecated
-  default ItemStack getResultItem(RegistryAccess access) {
+  @Override
+  default ItemStack getResultItem(HolderLookup.Provider registries) {
     return ItemStack.EMPTY;
   }
 
   /** @deprecated Item stack output not supported */
-  // TODO 1.21.1: assemble signature likely changed - removed @Override annotation
   @Deprecated
-  default ItemStack assemble(C inv, RegistryAccess access) {
+  @Override
+  default ItemStack assemble(C inv, HolderLookup.Provider registries) {
     return ItemStack.EMPTY;
   }
 }

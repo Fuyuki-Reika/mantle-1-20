@@ -1,6 +1,6 @@
 package slimeknights.mantle.recipe;
 
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeInput;
@@ -13,10 +13,9 @@ import net.minecraft.world.item.crafting.RecipeInput;
 // TODO 1.21.1: Container changed to RecipeInput - Recipe<C extends RecipeInput>
 // instead of Recipe<C extends Container>
 public interface ICommonRecipe<C extends RecipeInput> extends Recipe<C> {
-  // TODO 1.21.1: assemble() signature likely changed - removed @Override
-  // annotation
-  default ItemStack assemble(C inv, RegistryAccess access) {
-    return getResultItem(access).copy();
+  @Override
+  default ItemStack assemble(C inv, HolderLookup.Provider registries) {
+    return getResultItem(registries).copy();
   }
 
   /** @deprecated Means nothing outside of crafting tables */
