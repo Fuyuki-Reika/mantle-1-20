@@ -25,9 +25,10 @@ import java.util.Set;
 @SuppressWarnings("WeakerAccess")
 public class RetexturedLootFunction extends LootItemConditionalFunction {
   // Using commonFields() as the replacement for removed CONDITIONAL_CODEC
-  // RetexturedLootFunction has no extra fields; construct directly from conditions list
-  public static final MapCodec<RetexturedLootFunction> CODEC = RecordCodecBuilder.mapCodec(instance ->
-      LootItemConditionalFunction.commonFields(instance)
+  // RetexturedLootFunction has no extra fields; construct directly from
+  // conditions list
+  public static final MapCodec<RetexturedLootFunction> CODEC = RecordCodecBuilder
+      .mapCodec(instance -> LootItemConditionalFunction.commonFields(instance)
           .apply(instance, RetexturedLootFunction::new));
 
   /**

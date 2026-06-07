@@ -242,13 +242,17 @@ public class Mantle {
       // info);
       ArgumentTypeInfos.registerByClass(RegistrationHelper.genericArgumentType(ResourceOrTagKeyArgument.class), info);
     } else if (key == NeoForgeRegistries.Keys.CONDITION_CODECS) {
-      // Register tag-based recipe conditions in the NeoForge 1.21.1 condition codec registry
+      // Register tag-based recipe conditions in the NeoForge 1.21.1 condition codec
+      // registry
       @SuppressWarnings("unchecked")
-      net.minecraft.core.Registry<com.mojang.serialization.MapCodec<? extends net.neoforged.neoforge.common.conditions.ICondition>> conditionRegistry =
-          (net.minecraft.core.Registry<com.mojang.serialization.MapCodec<? extends net.neoforged.neoforge.common.conditions.ICondition>>) java.util.Objects.requireNonNull(event.getRegistry());
-      net.minecraft.core.Registry.register(conditionRegistry, TagEmptyCondition.SERIALIZER.getID(), TagEmptyCondition.SERIALIZER.codec());
-      net.minecraft.core.Registry.register(conditionRegistry, TagFilledCondition.SERIALIZER.getID(), TagFilledCondition.SERIALIZER.codec());
-      net.minecraft.core.Registry.register(conditionRegistry, TagCombinationCondition.SERIALIZER.getID(), TagCombinationCondition.SERIALIZER.codec());
+      net.minecraft.core.Registry<com.mojang.serialization.MapCodec<? extends net.neoforged.neoforge.common.conditions.ICondition>> conditionRegistry = (net.minecraft.core.Registry<com.mojang.serialization.MapCodec<? extends net.neoforged.neoforge.common.conditions.ICondition>>) java.util.Objects
+          .requireNonNull(event.getRegistry());
+      net.minecraft.core.Registry.register(conditionRegistry, TagEmptyCondition.SERIALIZER.getID(),
+          TagEmptyCondition.SERIALIZER.codec());
+      net.minecraft.core.Registry.register(conditionRegistry, TagFilledCondition.SERIALIZER.getID(),
+          TagFilledCondition.SERIALIZER.codec());
+      net.minecraft.core.Registry.register(conditionRegistry, TagCombinationCondition.SERIALIZER.getID(),
+          TagCombinationCondition.SERIALIZER.codec());
     } else {
       MantleLoot.registerGlobalLootModifiers(event);
     }

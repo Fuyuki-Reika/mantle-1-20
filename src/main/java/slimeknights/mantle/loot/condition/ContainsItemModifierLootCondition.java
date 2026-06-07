@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
+import com.mojang.serialization.JsonOps;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -43,34 +44,22 @@ public class ContainsItemModifierLootCondition implements ILootModifierCondition
 
   @Override
   public JsonObject serialize(JsonSerializationContext context) {
-    // TODO 1.21.1: Ingredient.toJson() removed - entire JSON serialization needs
-    // API migration
-    throw new UnsupportedOperationException(
-        "ContainsItemModifierLootCondition JSON serialization disabled - needs NeoForge 1.21.1 loot API migration");
-    /*
-     * JsonObject json = new JsonObject();
-     * json.addProperty("type", ID.toString());
-     * json.add("ingredient", ingredient.toJson());
-     * if (amountNeeded != 1) {
-     * json.addProperty("needed", amountNeeded);
-     * }
-     * return json;
-     */
+    JsonObject json = new JsonObject();
+    json.addProperty("type", ID.toString());
+    json.add("ingredient", Ingredient.CODEC_NONEMPTY.encodeStart(JsonOps.INSTANCE, ingredient).getOrThrow());
+    if (amountNeeded != 1) {
+      json.addProperty("needed", amountNeeded);
+    }
+    return json;
   }
 
   /** Parses this from JSON */
   public static ContainsItemModifierLootCondition deserialize(JsonElement element, Type typeOfT,
       JsonDeserializationContext context) throws JsonParseException {
-    // TODO 1.21.1: Ingredient.fromJson() removed - entire JSON deserialization
-    // needs API migration
-    throw new UnsupportedOperationException(
-        "ContainsItemModifierLootCondition JSON deserialization disabled - needs NeoForge 1.21.1 loot API migration");
-    /*
-     * JsonObject json = GsonHelper.convertToJsonObject(element, "condition");
-     * Ingredient ingredient = Ingredient.fromJson(GsonHelper.getAsJsonObject(json,
-     * "ingredient"));
-     * int needed = GsonHelper.getAsInt(json, "needed", 1);
-     * return new ContainsItemModifierLootCondition(ingredient, needed);
-     */
+    JsonObject json = GsonHelper.convertToJsonObject(element, "condition");
+    Ingredient ingredient = Ingredient.CODEC_NONEMPTY
+        .parse(JsonOps.INSTANCE, GsonHelper.getAsJsonObject(json, "ingredient")).getOrThrow();
+    int needed = GsonHelper.getAsInt(json, "needed", 1);
+    return new ContainsItemModifierLootCondition(ingredient, needed);
   }
 }

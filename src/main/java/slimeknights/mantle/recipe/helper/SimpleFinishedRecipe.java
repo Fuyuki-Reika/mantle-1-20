@@ -21,7 +21,5 @@ public record SimpleFinishedRecipe(ResourceLocation getId, RecipeSerializer<?> g
   public SimpleFinishedRecipe(ResourceLocation getId, RecipeSerializer<?> getType) {
     this.getId = getId;
     this.getType = getType;
-    throw new UnsupportedOperationException(
-        "SimpleFinishedRecipe is deprecated. Use RecipeOutput.accept(id, recipe, advancement, conditions) instead.");
   }
 }

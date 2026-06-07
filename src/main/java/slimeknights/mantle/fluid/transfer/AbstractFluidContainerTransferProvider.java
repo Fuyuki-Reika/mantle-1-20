@@ -121,15 +121,11 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
       JsonElement element = FluidContainerTransferManager.GSON.toJsonTree(transfer, IFluidContainerTransfer.class);
       assert element.isJsonObject();
       if (conditions.length != 0) {
-        // TODO 1.21.1: CraftingHelper.serialize removed - conditions serialization
-        // disabled
-        // JsonArray array = new JsonArray();
-        // for (ICondition condition : conditions) {
-        // array.add(CraftingHelper.serialize(condition));
-        // }
-        // element.getAsJsonObject().add("conditions", array);
-        throw new UnsupportedOperationException(
-            "Condition serialization temporarily disabled - CraftingHelper.serialize removed");
+        // Use ICondition.writeConditions with JsonOps to serialize conditions array
+        net.neoforged.neoforge.common.conditions.ICondition.writeConditions(
+            com.mojang.serialization.JsonOps.INSTANCE,
+            element.getAsJsonObject(),
+            java.util.Arrays.asList(conditions));
       }
       return element;
     }

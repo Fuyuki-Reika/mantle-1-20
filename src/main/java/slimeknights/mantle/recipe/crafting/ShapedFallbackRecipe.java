@@ -134,9 +134,9 @@ public class ShapedFallbackRecipe extends ShapedRecipe {
               .forGetter(r -> r.getResultItem(emptyProvider())),
           com.mojang.serialization.Codec.BOOL.optionalFieldOf("show_notification", true)
               .forGetter(ShapedRecipe::showNotification),
-          ResourceLocation.CODEC.listOf().fieldOf("alternatives").forGetter(r -> r.alternatives)
-      ).apply(inst, (group, category, pattern, result, showNotification, alternatives) ->
-          new ShapedFallbackRecipe(group, category, pattern, result, alternatives)));
+          ResourceLocation.CODEC.listOf().fieldOf("alternatives").forGetter(r -> r.alternatives))
+          .apply(inst, (group, category, pattern, result, showNotification,
+              alternatives) -> new ShapedFallbackRecipe(group, category, pattern, result, alternatives)));
     }
 
     @Override
@@ -145,16 +145,19 @@ public class ShapedFallbackRecipe extends ShapedRecipe {
           (buf, recipe) -> {
             BASE.streamCodec().encode(buf, recipe);
             buf.writeVarInt(recipe.alternatives.size());
-            for (ResourceLocation alt : recipe.alternatives) buf.writeResourceLocation(alt);
+            for (ResourceLocation alt : recipe.alternatives)
+              buf.writeResourceLocation(alt);
           },
           buf -> {
             ShapedRecipe base = BASE.streamCodec().decode(buf);
             int size = buf.readVarInt();
             List<ResourceLocation> alts = new ArrayList<>(size);
-            for (int i = 0; i < size; i++) alts.add(buf.readResourceLocation());
+            for (int i = 0; i < size; i++)
+              alts.add(buf.readResourceLocation());
             return new ShapedFallbackRecipe(base, List.copyOf(alts));
           });
     }
+
     public ShapedFallbackRecipe fromJsonFallback(ResourceLocation id, JsonObject json) {
       ShapedRecipe base = BASE.codec().codec().parse(com.mojang.serialization.JsonOps.INSTANCE, json).getOrThrow();
       List<ResourceLocation> alternatives = JsonHelper.parseList(json, "alternatives", Loadables.RESOURCE_LOCATION);

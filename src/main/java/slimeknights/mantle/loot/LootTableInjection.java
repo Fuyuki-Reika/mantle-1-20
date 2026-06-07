@@ -21,47 +21,37 @@ import java.util.Map;
  * Record holding a list of entries to inject into the given loot table
  */
 public record LootTableInjection(ResourceLocation name, List<LootPoolInjection> pools) {
-  // TODO 1.21.1: Disabled due to LootPoolInjection.LOADABLE being unavailable
-  // public static final RecordLoadable<LootTableInjection> LOADABLE =
-  // RecordLoadable.create(
-  // Loadables.RESOURCE_LOCATION.requiredField("name", LootTableInjection::name),
-  // LootPoolInjection.LOADABLE.list(1).requiredField("pools",
-  // LootTableInjection::pools),
-  // LootTableInjection::new);
+  // Codec-based LOADABLE using LootPoolEntries.CODEC for entries
+  public static final RecordLoadable<LootTableInjection> LOADABLE = RecordLoadable.create(
+      Loadables.RESOURCE_LOCATION.requiredField("name", LootTableInjection::name),
+      LootPoolInjection.LOADABLE.list(1).requiredField("pools", LootTableInjection::pools),
+      LootTableInjection::new);
 
   /**
    * Record holding a list of entries to inject into the given pool
    */
   public record LootPoolInjection(String name, LootPoolEntryContainer[] entries) {
-    // TODO 1.21.1: Loadables.LOOT_ENTRY removed, pool.entries field made private -
-    // needs loot system API migration
-    // public static final RecordLoadable<LootPoolInjection> LOADABLE =
-    // RecordLoadable.create(
-    // StringLoadable.DEFAULT.requiredField("name", LootPoolInjection::name),
-    // Loadables.LOOT_ENTRY.list(1).requiredField("entries", pool ->
-    // List.of(pool.entries)),
-    // LootPoolInjection::new);
+    // Codec-based LOADABLE using LootPoolEntries.CODEC from vanilla 1.21.1
+    public static final RecordLoadable<LootPoolInjection> LOADABLE = RecordLoadable.create(
+        StringLoadable.DEFAULT.requiredField("name", LootPoolInjection::name),
+        new slimeknights.mantle.data.loadable.common.CodecLoadable<>(
+            net.minecraft.world.level.storage.loot.entries.LootPoolEntries.CODEC).list(1)
+            .requiredField("entries", pool -> java.util.Arrays.asList(pool.entries)),
+        LootPoolInjection::new);
 
     public LootPoolInjection(String name, List<LootPoolEntryContainer> entries) {
       this(name, entries.toArray(new LootPoolEntryContainer[0]));
     }
 
-    /** Injects this into the given loot pool */
-    // TODO 1.21.1: LootPool.entries field made private - need to find new API or
-    // use AccessTransformer
+    /** Injects this into the given loot table */
     public void inject(LootTable table) {
-      throw new UnsupportedOperationException(
-          "Loot injection temporarily disabled - needs NeoForge 1.21.1 loot API migration");
-      // LootPool pool = table.getPool(name);
-      // //noinspection ConstantConditions method is annotated wrongly
-      // if (pool != null) {
-      // int oldLength = pool.entries.length;
-      // pool.entries = Arrays.copyOf(pool.entries, oldLength + entries.length);
-      // System.arraycopy(entries, 0, pool.entries, oldLength, entries.length);
-      // } else {
-      // Mantle.logger.warn("Failed to inject loot into {} pool {}",
-      // table.getLootTableId(), name);
-      // }
+      LootPool pool = table.getPool(name);
+      if (pool != null) {
+        // Use AT-exposed entries list to add new entries
+        pool.entries.addAll(java.util.Arrays.asList(entries));
+      } else {
+        Mantle.logger.warn("Failed to inject loot into pool {} - pool not found in table", name);
+      }
     }
   }
 

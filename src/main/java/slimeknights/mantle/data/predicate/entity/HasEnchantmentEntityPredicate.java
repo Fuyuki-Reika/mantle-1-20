@@ -12,14 +12,14 @@ import slimeknights.mantle.data.loadable.record.RecordLoadable;
 
 /**
  * Predicate that checks if the given entity has the given enchantment on any of
- * their equipment. Uses ResourceKey since enchantments are now a datapack registry.
+ * their equipment. Uses ResourceKey since enchantments are now a datapack
+ * registry.
  */
 public record HasEnchantmentEntityPredicate(ResourceKey<Enchantment> enchantmentKey) implements LivingEntityPredicate {
   public static final RecordLoadable<HasEnchantmentEntityPredicate> LOADER = RecordLoadable.create(
       Loadables.RESOURCE_LOCATION.xmap(
           (loc, e) -> ResourceKey.create(Registries.ENCHANTMENT, loc),
-          (key, e) -> key.location()
-      ).requiredField("enchantment", HasEnchantmentEntityPredicate::enchantmentKey),
+          (key, e) -> key.location()).requiredField("enchantment", HasEnchantmentEntityPredicate::enchantmentKey),
       HasEnchantmentEntityPredicate::new);
 
   @Override

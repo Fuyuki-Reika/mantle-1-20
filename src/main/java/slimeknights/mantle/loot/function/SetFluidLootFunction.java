@@ -22,10 +22,9 @@ import java.util.List;
  */
 public class SetFluidLootFunction extends LootItemConditionalFunction {
   // Using commonFields() as the replacement for removed CONDITIONAL_CODEC
-  public static final MapCodec<SetFluidLootFunction> CODEC = RecordCodecBuilder.mapCodec(instance ->
-      LootItemConditionalFunction.commonFields(instance).and(
-          FluidStack.CODEC.fieldOf("fluid").forGetter(f -> f.fluid)
-      ).apply(instance, SetFluidLootFunction::new));
+  public static final MapCodec<SetFluidLootFunction> CODEC = RecordCodecBuilder
+      .mapCodec(instance -> LootItemConditionalFunction.commonFields(instance).and(
+          FluidStack.CODEC.fieldOf("fluid").forGetter(f -> f.fluid)).apply(instance, SetFluidLootFunction::new));
 
   /** Fluid to add to the item */
   private final FluidStack fluid;

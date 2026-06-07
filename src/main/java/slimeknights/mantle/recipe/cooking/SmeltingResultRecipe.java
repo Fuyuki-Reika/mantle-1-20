@@ -32,7 +32,8 @@ public class SmeltingResultRecipe extends SmeltingRecipe implements CookingResul
 
   private final ItemOutput result;
 
-  public SmeltingResultRecipe(net.minecraft.resources.ResourceLocation id, String group, CookingBookCategory category, Ingredient ingredient,
+  public SmeltingResultRecipe(net.minecraft.resources.ResourceLocation id, String group, CookingBookCategory category,
+      Ingredient ingredient,
       ItemOutput result, float experience, int cookingTime) {
     super(group, category, ingredient, ItemStack.EMPTY, experience, cookingTime);
     this.result = result;
@@ -53,4 +54,3 @@ public class SmeltingResultRecipe extends SmeltingRecipe implements CookingResul
     return result.copy();
   }
 }
-

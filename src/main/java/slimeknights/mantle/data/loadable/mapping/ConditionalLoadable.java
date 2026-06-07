@@ -1,8 +1,8 @@
 package slimeknights.mantle.data.loadable.mapping;
 
 import com.google.gson.JsonObject;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.network.FriendlyByteBuf;
-import net.neoforged.neoforge.common.crafting.CraftingHelper;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import net.neoforged.neoforge.common.conditions.ICondition.IContext;
 import slimeknights.mantle.data.loadable.field.ContextKey;
@@ -30,10 +30,9 @@ public record ConditionalLoadable<T extends IHaveLoader>(GenericLoaderRegistry<T
     // allow passing in the condition context via the loadable context
     // if missing, assume tags are invalid
     IContext conditionContext = context.getOrDefault(ContextKey.CONDITION_CONTEXT, IContext.TAGS_INVALID);
-    // TODO 1.21.1: CraftingHelper.processConditions removed in NeoForge 21.1.85
-    // Need to find replacement API for conditional recipe processing
-    // For now, always process if_true branch (conditions temporarily disabled)
-    boolean conditionsMet = true; // was: CraftingHelper.processConditions(json, "conditions", conditionContext)
+    // In 1.21.1, use ICondition.conditionsMatched with JsonOps to evaluate
+    // conditions array
+    boolean conditionsMet = !json.has("conditions") || ICondition.conditionsMatched(JsonOps.INSTANCE, json);
     // if the condition matches, use the true value
     if (conditionsMet) {
       return registry.getIfPresent(json, "if_true");
@@ -50,10 +49,10 @@ public record ConditionalLoadable<T extends IHaveLoader>(GenericLoaderRegistry<T
   @Override
   public void serialize(T object, JsonObject json) {
     ConditionalObject<T> conditional = (ConditionalObject<T>) object;
-    // TODO 1.21.1: CraftingHelper.serialize removed in NeoForge 21.1.85
-    // Need to find replacement API for serializing conditions
-    // For now, skip conditions serialization (temporarily disabled)
-    // json.add("conditions", CraftingHelper.serialize(conditional.conditions()));
+    // Serialize conditions using ICondition.writeConditions with JsonOps
+    if (conditional.conditions().length > 0) {
+      ICondition.writeConditions(JsonOps.INSTANCE, json, java.util.Arrays.asList(conditional.conditions()));
+    }
     json.add("if_true", registry.serialize(conditional.ifTrue()));
     T ifFalse = conditional.ifFalse();
     if (ifFalse != defaultIfFalse) {

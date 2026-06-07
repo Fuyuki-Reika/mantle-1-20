@@ -73,13 +73,9 @@ public class MantleLoot {
       // TODO 1.21.1: Use SERIALIZER.codec() for MapCodec access
       BLOCK_TAG_CONDITION = Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE, Mantle.getResource("block_tag"),
           new LootItemConditionType(BlockTagLootCondition.SERIALIZER.codec()));
-      // TODO 1.21.1: HAS_CONTEXT_SET registration disabled - codec() throws
-      // UnsupportedOperationException
-      // HasLootContextSetCondition needs LootContextParamSets API which was removed
-      // HAS_CONTEXT_SET = Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE,
-      // Mantle.getResource("has_context_set"),
-      // new LootItemConditionType(new
-      // HasLootContextSetCondition.Serializer().codec()));
+      // Re-enabled: LootContextParamSets.CODEC is available in 1.21.1
+      HAS_CONTEXT_SET = Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE, Mantle.getResource("has_context_set"),
+          new LootItemConditionType(new HasLootContextSetCondition.Serializer().codec()));
       TAG_EMPTY = Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE, TagEmptyCondition.SERIALIZER.getID(),
           new LootItemConditionType(TagEmptyCondition.SERIALIZER.codec()));
       TAG_FILLED = Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE, TagFilledCondition.SERIALIZER.getID(),

@@ -53,7 +53,10 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
     this.matchAll = matchAll;
   }
 
-  /** Creates a new recipe using the passed parameters (with ResourceLocation id for legacy compat) */
+  /**
+   * Creates a new recipe using the passed parameters (with ResourceLocation id
+   * for legacy compat)
+   */
   protected ShapedRetexturedRecipe(ResourceLocation id, String group, CraftingBookCategory category, int width,
       int height, NonNullList<Ingredient> ingredients, ItemStack result, boolean showNotification, Ingredient texture,
       boolean matchAll) {
@@ -150,10 +153,11 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
               .forGetter(ShapedRecipe::showNotification),
           Ingredient.CODEC_NONEMPTY.fieldOf("texture").forGetter(ShapedRetexturedRecipe::getTexture),
           com.mojang.serialization.Codec.BOOL.optionalFieldOf("match_all", false)
-              .forGetter(r -> r.matchAll)
-      ).apply(inst, (group, category, pattern, result, showNotification, texture, matchAll) ->
-          new ShapedRetexturedRecipe(group, category, pattern.width(), pattern.height(),
-              pattern.ingredients(), result, showNotification, texture, matchAll)));
+              .forGetter(r -> r.matchAll))
+          .apply(inst,
+              (group, category, pattern, result, showNotification, texture, matchAll) -> new ShapedRetexturedRecipe(
+                  group, category, pattern.width(), pattern.height(),
+                  pattern.ingredients(), result, showNotification, texture, matchAll)));
     }
 
     @Override

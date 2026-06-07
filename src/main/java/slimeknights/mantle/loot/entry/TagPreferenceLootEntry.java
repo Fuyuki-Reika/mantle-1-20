@@ -33,11 +33,11 @@ public class TagPreferenceLootEntry extends LootPoolSingletonContainer {
   }
 
   /** Codec for serialization/deserialization using singletonFields() pattern */
-  public static final MapCodec<TagPreferenceLootEntry> CODEC = RecordCodecBuilder.mapCodec(instance ->
-      LootPoolSingletonContainer.singletonFields(instance).and(
-          TagKey.codec(Registries.ITEM).fieldOf("tag").forGetter(e -> e.tag)
-      ).apply(instance, (weight, quality, conditions, functions, tag) ->
-          new TagPreferenceLootEntry(tag, weight, quality, conditions, functions)));
+  public static final MapCodec<TagPreferenceLootEntry> CODEC = RecordCodecBuilder
+      .mapCodec(instance -> LootPoolSingletonContainer.singletonFields(instance).and(
+          TagKey.codec(Registries.ITEM).fieldOf("tag").forGetter(e -> e.tag))
+          .apply(instance, (weight, quality, conditions, functions, tag) -> new TagPreferenceLootEntry(tag, weight,
+              quality, conditions, functions)));
 
   @Override
   public LootPoolEntryType getType() {
