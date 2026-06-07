@@ -7,7 +7,7 @@ license = "MIT"
 [[mods]]
 modId = "mantle"
 version = "${version}"
-displayName = "Mantle"
+displayName = "Mantle (NeoForge 21.1.85 / MC 1.21.1)"
 authors = "Slime Knights"
 description = '''
 Shared code for Slime Knights mods and others.

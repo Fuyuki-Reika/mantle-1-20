@@ -95,7 +95,8 @@ public class Mantle {
   public static final Logger logger = LogManager.getLogger("Mantle");
   /**
    * Namespace for common tags. Uses the legacy "forge" prefix for backwards
-   * compatibility; will migrate to "c" (NeoForge common namespace) in a future version.
+   * compatibility; will migrate to "c" (NeoForge common namespace) in a future
+   * version.
    */
   public static final String COMMON = "forge";
 
