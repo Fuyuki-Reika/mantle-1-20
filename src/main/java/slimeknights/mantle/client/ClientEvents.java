@@ -74,7 +74,7 @@ public class ClientEvents {
   public static void onConstruct() {
   }
 
-  @SuppressWarnings({"ConstantConditions", "unchecked"})
+  @SuppressWarnings({ "ConstantConditions", "unchecked" })
   @SubscribeEvent
   static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
     net.minecraft.world.level.block.entity.BlockEntityType<?> signType = net.minecraft.core.registries.BuiltInRegistries.BLOCK_ENTITY_TYPE

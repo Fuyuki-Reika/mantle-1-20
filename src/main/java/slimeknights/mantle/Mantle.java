@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.Block;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.common.crafting.CraftingHelper;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -95,8 +94,8 @@ public class Mantle {
   public static final String modId = "mantle";
   public static final Logger logger = LogManager.getLogger("Mantle");
   /**
-   * Namespace for common tags, used for easier migration to the future "c"
-   * standard
+   * Namespace for common tags. Uses the legacy "forge" prefix for backwards
+   * compatibility; will migrate to "c" (NeoForge common namespace) in a future version.
    */
   public static final String COMMON = "forge";
 
@@ -287,7 +286,7 @@ public class Mantle {
   }
 
   /**
-   * Gets a resource location for the common namespace, which is "forge" for 1.20
+   * Gets a resource location for the common namespace.
    * and "c" for 1.21.
    * 
    * @param name Name

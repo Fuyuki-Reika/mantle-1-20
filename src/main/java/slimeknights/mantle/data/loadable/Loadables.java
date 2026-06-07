@@ -26,7 +26,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.neoforged.neoforge.common.ItemAbility;
-import net.neoforged.neoforge.common.loot.LootModifierManager;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import slimeknights.mantle.client.model.util.ModelHelper;
@@ -104,7 +103,7 @@ public class Loadables {
   /** Loadable for a loot entry instance */
   // public static final Loadable<LootPoolEntryContainer> LOOT_ENTRY = new
   // GsonLoadable<>(
-  // LootModifierManager.GSON_INSTANCE, LootPoolEntryContainer.class);
+  // Codec-based LOOT_ENTRY and LOOT_FUNCTIONS are defined in MantleCodecs
 
   /** Loadable for a rotation value, from 0 to 270 */
   public static final Loadable<Integer> ROTATION = new IntLoadable(0, 270, IntNetwork.SHORT)

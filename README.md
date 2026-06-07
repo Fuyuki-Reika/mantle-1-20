@@ -1,25 +1,28 @@
 ![Mantle logo](https://raw.github.com/SlimeKnights/Mantle/master/src/main/resources/Mantle.png)  
 # Mantle  
-**Shared code for Forge mods**
+**Shared code for NeoForge mods — Minecraft 1.21.1**
+
+> Migrated from Forge 1.20.x to NeoForge 21.1.85 (Minecraft 1.21.1)
 
 ## Compile from Source
 Note: Git MUST be installed and in the system path to use our scripts.
-* setup: Import as a gradle project into your desired IDE. Run `gradlew[.bat] [genIntellijRuns|genEclipseRuns]` to be able to launch the game
-* build: Run [gradle]in the repository root: `gradlew[.bat] build`
+* setup: Import as a gradle project into your desired IDE. Run `gradlew[.bat] runClient` to launch the game
+* build: Run gradle in the repository root: `gradlew[.bat] build`
 * if obscure gradle issues are found try running `gradlew clean` or/and `gradlew cleanCache`
+* requires JDK 21
 
 ## Issue reporting  
 Please include the following:
 
-* Minecraft version
+* Minecraft version (1.21.1)
 * Mantle version
-* Versions of Mantle dependant mods
-* Forge version/build
+* Versions of Mantle dependent mods
+* NeoForge version/build
 * Versions of any mods potentially related to the issue 
 * Any relevant screenshots are greatly appreciated.
 * For crashes:
 	* Steps to reproduce
-	* ForgeModLoader-client-0.log (the FML log) from the root folder of the client
+	* `latest.log` from the `logs/` folder
 
 ## Licenses  
 The MIT License (MIT)

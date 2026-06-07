@@ -9,7 +9,6 @@ import net.minecraft.world.level.storage.loot.entries.LootPoolEntries;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctions;
-import net.neoforged.neoforge.common.loot.LootModifierManager;
 import slimeknights.mantle.data.JsonCodec.GsonCodec;
 
 /**
