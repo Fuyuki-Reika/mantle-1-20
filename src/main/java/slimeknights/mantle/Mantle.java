@@ -21,6 +21,7 @@ import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
@@ -103,13 +104,10 @@ public class Mantle {
   public static Mantle instance;
 
   /* Proxies for sides, used for graphics processing */
-  public Mantle(IEventBus bus) {
-    // TODO 1.21.1: Config registration API changed in NeoForge 21.1.85 - need to
-    // find new method
-    // ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT,
-    // Config.CLIENT_SPEC);
-    // ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON,
-    // Config.SERVER_SPEC);
+  public Mantle(IEventBus bus, ModContainer container) {
+    // Register configs via ModContainer (NeoForge 21.1.85 API)
+    container.registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_SPEC);
+    container.registerConfig(ModConfig.Type.COMMON, Config.SERVER_SPEC);
 
     FluidContainerTransferManager.INSTANCE.init();
     MantleTags.init();
@@ -211,14 +209,11 @@ public class Mantle {
         // property
         LivingEntityPredicate.LOADER.register(getResource("mob_type"), MobTypePredicate.LOADER);
         LivingEntityPredicate.LOADER.register(getResource("has_enchantment"), HasEnchantmentEntityPredicate.LOADER);
-        // register mob types (Mob Category in 1.21)
+        // register mob types (MobCategory in 1.21.1)
+        // Note: UNDEAD and ARTHROPOD were removed from MobCategory in 1.21.1 - these
+        // are now entity type tags (#minecraft:undead, #minecraft:arthropod).
+        // A future tag-based predicate would be needed to check these mob types.
         MobTypePredicate.MOB_TYPES.register(ResourceLocation.parse("undefined"), MobCategory.MISC);
-        // TODO 1.21.1: UNDEAD and ARTHROPOD removed from MobCategory - need to
-        // determine correct replacement
-        // MobTypePredicate.MOB_TYPES.register(ResourceLocation.parse("undead"),
-        // MobCategory.UNDEAD);
-        // MobTypePredicate.MOB_TYPES.register(ResourceLocation.parse("arthropod"),
-        // MobCategory.ARTHROPOD);
         MobTypePredicate.MOB_TYPES.register(ResourceLocation.parse("illager"), MobCategory.MONSTER);
         MobTypePredicate.MOB_TYPES.register(ResourceLocation.parse("water"), MobCategory.WATER_CREATURE);
 

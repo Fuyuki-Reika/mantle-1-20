@@ -119,7 +119,8 @@ public class LoadableRecipeSerializer<T extends Recipe<?>> implements LoggingRec
   }
 
   // TODO 1.21.1: codec() is now required by RecipeSerializer
-  // MapCodec bridges Mantle's RecordLoadable deserialization to Mojang's codec system
+  // MapCodec bridges Mantle's RecordLoadable deserialization to Mojang's codec
+  // system
   @Override
   public MapCodec<T> codec() {
     return new MapCodec<>() {

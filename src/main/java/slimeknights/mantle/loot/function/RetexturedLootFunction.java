@@ -1,6 +1,7 @@
 package slimeknights.mantle.loot.function;
 
 import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -23,18 +24,11 @@ import java.util.Set;
  */
 @SuppressWarnings("WeakerAccess")
 public class RetexturedLootFunction extends LootItemConditionalFunction {
-  // TODO 1.21.1: LootItemConditionalFunction.CONDITIONAL_CODEC removed - loot
-  // function API changed
-  // May need to implement Serializer instead of using CODEC pattern
-  public static final MapCodec<RetexturedLootFunction> CODEC = MapCodec.unit(() -> {
-    throw new UnsupportedOperationException(
-        "RetexturedLootFunction CODEC temporarily disabled - needs NeoForge 1.21.1 loot API migration");
-  });
-  /*
-   * public static final MapCodec<RetexturedLootFunction> CODEC =
-   * LootItemConditionalFunction.CONDITIONAL_CODEC
-   * .xmap(RetexturedLootFunction::new, function -> function.predicates);
-   */
+  // Using commonFields() as the replacement for removed CONDITIONAL_CODEC
+  // RetexturedLootFunction has no extra fields; construct directly from conditions list
+  public static final MapCodec<RetexturedLootFunction> CODEC = RecordCodecBuilder.mapCodec(instance ->
+      LootItemConditionalFunction.commonFields(instance)
+          .apply(instance, RetexturedLootFunction::new));
 
   /**
    * Creates a new instance from the given conditions

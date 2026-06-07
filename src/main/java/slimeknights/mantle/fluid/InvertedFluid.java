@@ -62,7 +62,8 @@ public abstract class InvertedFluid extends BaseFlowingFluid {
     return count;
   }
 
-  // TODO 1.21.1: spreadToSides() removed from BaseFlowingFluid - reimplemented locally
+  // TODO 1.21.1: spreadToSides() removed from BaseFlowingFluid - reimplemented
+  // locally
   // Spreads the fluid to adjacent horizontal positions where possible
   protected void spreadToSides(Level level, BlockPos pos, FluidState fluid, BlockState block) {
     Map<Direction, FluidState> spread = this.getSpread(level, pos, block);

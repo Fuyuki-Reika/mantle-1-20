@@ -3,6 +3,7 @@ package slimeknights.mantle.loot.function;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
@@ -20,20 +21,11 @@ import java.util.List;
  * Loot function to set the fluid on a dropped item
  */
 public class SetFluidLootFunction extends LootItemConditionalFunction {
-  // TODO 1.21.1: LootItemConditionalFunction.CONDITIONAL_CODEC removed - loot
-  // function API changed
-  // May need to implement Serializer instead of using CODEC pattern
-  public static final MapCodec<SetFluidLootFunction> CODEC = MapCodec.unit(() -> {
-    throw new UnsupportedOperationException(
-        "SetFluidLootFunction CODEC temporarily disabled - needs NeoForge 1.21.1 loot API migration");
-  });
-  /*
-   * public static final MapCodec<SetFluidLootFunction> CODEC =
-   * RecordCodecBuilder.mapCodec(instance -> instance.group(
-   * LootItemConditionalFunction.CONDITIONAL_CODEC.forGetter(f -> f.predicates),
-   * FluidStack.CODEC.fieldOf("fluid").forGetter(f -> f.fluid)
-   * ).apply(instance, SetFluidLootFunction::new));
-   */
+  // Using commonFields() as the replacement for removed CONDITIONAL_CODEC
+  public static final MapCodec<SetFluidLootFunction> CODEC = RecordCodecBuilder.mapCodec(instance ->
+      LootItemConditionalFunction.commonFields(instance).and(
+          FluidStack.CODEC.fieldOf("fluid").forGetter(f -> f.fluid)
+      ).apply(instance, SetFluidLootFunction::new));
 
   /** Fluid to add to the item */
   private final FluidStack fluid;

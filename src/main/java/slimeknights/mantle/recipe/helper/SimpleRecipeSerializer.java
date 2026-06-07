@@ -25,7 +25,8 @@ public record SimpleRecipeSerializer<T extends Recipe<?>>(Function<ResourceLocat
 
   // TODO 1.21.1: fromNetwork with new signature - no ID available
   public T fromNetwork(RegistryFriendlyByteBuf pBuffer) {
-    // Zero-data recipe: construct with placeholder ID (actual ID comes from RecipeHolder)
+    // Zero-data recipe: construct with placeholder ID (actual ID comes from
+    // RecipeHolder)
     return constructor.apply(ResourceLocation.withDefaultNamespace("simple_recipe"));
   }
 
@@ -43,7 +44,8 @@ public record SimpleRecipeSerializer<T extends Recipe<?>>(Function<ResourceLocat
   @Override
   public StreamCodec<RegistryFriendlyByteBuf, T> streamCodec() {
     return StreamCodec.of(
-        (buf, recipe) -> {},  // no data to write
+        (buf, recipe) -> {
+        }, // no data to write
         buf -> constructor.apply(ResourceLocation.withDefaultNamespace("simple_recipe")));
   }
 

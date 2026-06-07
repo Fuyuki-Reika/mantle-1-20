@@ -27,12 +27,12 @@ import java.util.function.BiFunction;
 /** Loot modifier to replace an item with another */
 public class ReplaceItemLootModifier extends LootModifier {
   // Codec using native 1.21.1 ingredient and function codecs
-  public static final MapCodec<ReplaceItemLootModifier> CODEC = RecordCodecBuilder.mapCodec(inst ->
-      codecStart(inst).and(inst.group(
+  public static final MapCodec<ReplaceItemLootModifier> CODEC = RecordCodecBuilder.mapCodec(inst -> codecStart(inst)
+      .and(inst.group(
           MantleCodecs.INGREDIENT.fieldOf("original").forGetter(m -> m.original),
           ItemOutput.REQUIRED_STACK_CODEC.fieldOf("replacement").forGetter(m -> m.replacement),
-          MantleCodecs.LOOT_FUNCTIONS.fieldOf("functions").forGetter(m -> m.functions)
-      )).apply(inst, ReplaceItemLootModifier::new));
+          MantleCodecs.LOOT_FUNCTIONS.fieldOf("functions").forGetter(m -> m.functions)))
+      .apply(inst, ReplaceItemLootModifier::new));
 
   /** Ingredient to test for the original item */
   private final Ingredient original;

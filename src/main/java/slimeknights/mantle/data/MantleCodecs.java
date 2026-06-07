@@ -21,9 +21,8 @@ public class MantleCodecs {
   /** Codec for loot pool entries */
   public static final Codec<LootPoolEntryContainer> LOOT_ENTRY = LootPoolEntries.CODEC;
   /** Codec for loot item functions as an array */
-  public static final Codec<LootItemFunction[]> LOOT_FUNCTIONS =
-      LootItemFunctions.ROOT_CODEC.listOf()
-          .xmap(l -> l.toArray(LootItemFunction[]::new), java.util.Arrays::asList);
+  public static final Codec<LootItemFunction[]> LOOT_FUNCTIONS = LootItemFunctions.ROOT_CODEC.listOf()
+      .xmap(l -> l.toArray(LootItemFunction[]::new), java.util.Arrays::asList);
   /** Codec for ingredients, handling NeoForge ingredient types */
   public static final Codec<Ingredient> INGREDIENT = new JsonCodec<>() {
     @Override

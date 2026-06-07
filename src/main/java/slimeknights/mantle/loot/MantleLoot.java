@@ -61,8 +61,8 @@ public class MantleLoot {
 
     if (key == NeoForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS) {
       @SuppressWarnings("unchecked")
-      Registry<com.mojang.serialization.MapCodec<? extends net.neoforged.neoforge.common.loot.IGlobalLootModifier>> modifierRegistry =
-          (Registry<com.mojang.serialization.MapCodec<? extends net.neoforged.neoforge.common.loot.IGlobalLootModifier>>) Objects.requireNonNull(event.getRegistry());
+      Registry<com.mojang.serialization.MapCodec<? extends net.neoforged.neoforge.common.loot.IGlobalLootModifier>> modifierRegistry = (Registry<com.mojang.serialization.MapCodec<? extends net.neoforged.neoforge.common.loot.IGlobalLootModifier>>) Objects
+          .requireNonNull(event.getRegistry());
       Registry.register(modifierRegistry, Mantle.getResource("add_entry"), AddEntryLootModifier.CODEC);
       Registry.register(modifierRegistry, Mantle.getResource("replace_item"), ReplaceItemLootModifier.CODEC);
     } else if (key == Registries.LOOT_FUNCTION_TYPE) {
