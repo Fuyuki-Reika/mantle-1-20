@@ -135,10 +135,7 @@ public abstract class FluidOutput implements Supplier<FluidStack> {
    * @param buffer Packet buffer instance
    */
   public void write(FriendlyByteBuf buffer) {
-    // TODO 1.21.1: writeFluidStack removed, using basic serialization (STREAM_CODEC
-    // needed)
-    FluidStack stack = get();
-    buffer.writeInt(stack.getAmount());
+    FluidStack.STREAM_CODEC.encode((net.minecraft.network.RegistryFriendlyByteBuf) buffer, get());
   }
 
   /**
@@ -148,10 +145,7 @@ public abstract class FluidOutput implements Supplier<FluidStack> {
    * @return Item output
    */
   public static FluidOutput read(FriendlyByteBuf buffer) {
-    // TODO 1.21.1: readFluidStack removed, using basic serialization (STREAM_CODEC
-    // needed)
-    buffer.readInt(); // skip amount
-    return fromStack(FluidStack.EMPTY);
+    return fromStack(FluidStack.STREAM_CODEC.decode((net.minecraft.network.RegistryFriendlyByteBuf) buffer));
   }
 
   /**

@@ -29,22 +29,16 @@ public abstract class AbstractLootTableInjectionProvider extends GenericDataProv
   /** Method to add all relevant tables */
   protected abstract void addTables();
 
-  // TODO 1.21.1: Disabled due to LootTableInjection.LOADABLE being unavailable
   @Override
   public final CompletableFuture<?> run(CachedOutput output) {
-    throw new UnsupportedOperationException(
-        "Loot table injection data generation temporarily disabled - needs NeoForge 1.21.1 loot API migration");
-    // addTables();
-    // return lookupProvider.thenCompose(provider ->
-    // allOf(builders.stream().map(builder -> {
-    // JsonObject json =
-    // LootTableInjection.LOADABLE.serialize(builder.build()).getAsJsonObject();
-    // if (!builder.conditions.isEmpty()) {
-    // ICondition.writeConditions(provider, json, builder.conditions);
-    // }
-    // return saveJson(output, ResourceLocation.fromNamespaceAndPath(domain,
-    // builder.path), json);
-    // })));
+    addTables();
+    return lookupProvider.thenCompose(provider -> allOf(builders.stream().map(builder -> {
+      JsonObject json = LootTableInjection.LOADABLE.serialize(builder.build()).getAsJsonObject();
+      if (!builder.conditions.isEmpty()) {
+        ICondition.writeConditions(provider, json, builder.conditions);
+      }
+      return saveJson(output, ResourceLocation.fromNamespaceAndPath(domain, builder.path), json);
+    })));
   }
 
   /** Creates a new injection */
