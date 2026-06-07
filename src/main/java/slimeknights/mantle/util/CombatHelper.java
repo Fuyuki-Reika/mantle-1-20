@@ -104,18 +104,8 @@ public class CombatHelper {
 
   /**
    * Performs an attack, mimicing {@link Player#attack(Entity)}.
-   * For use in
-   * {@link net.minecraft.world.item.Item#interactLivingEntity(ItemStack, Player, LivingEntity, InteractionHand)}
-   * primarily,
-   * but can also be used to fake an attack similar to
-   * {@link net.neoforged.common.extensions.IForgeItem#onLeftClickEntity(ItemStack, Player, Entity)}.
-   *
-   * @param stack        Stack used for attacking.
-   * @param target       Entity target
-   * @param targetLiving Living entity target. May be different in the case of
-   *                     multipart entities.
-   * @param hand         Hand used for attacking.
    */
+  @SuppressWarnings("removal")
   public static boolean attack(ItemStack stack, Player player, Entity target, @Nullable LivingEntity targetLiving,
       InteractionHand hand) {
     if (target.isAttackable() && !target.skipAttackInteraction(player)) {

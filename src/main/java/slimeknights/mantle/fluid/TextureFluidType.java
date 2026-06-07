@@ -8,7 +8,8 @@ import java.util.function.Consumer;
 
 /**
  * Fluid type whose color and textures are determined by the model.
- * Just implements {@link ClientTextureFluidType} in initializeClient as the Forge API is dumb and does not let me do that in a client place.
+ * Just implements {@link ClientTextureFluidType} in initializeClient as the
+ * Forge API is dumb and does not let me do that in a client place.
  */
 public class TextureFluidType extends FluidType {
   public TextureFluidType(Properties properties) {
@@ -16,6 +17,7 @@ public class TextureFluidType extends FluidType {
   }
 
   @Override
+  @SuppressWarnings("removal")
   public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
     consumer.accept(new ClientTextureFluidType(this));
   }

@@ -90,7 +90,7 @@ public class GaugeBlock extends Block {
             player.displayClientMessage(formatCapacity(handler.getTankCapacity(0)), true);
           } else {
             Component contents = Component.translatable(CONTENTS_FORMAT, COMMA_FORMAT.format(fluid.getAmount()),
-                COMMA_FORMAT.format(handler.getTankCapacity(0)), fluid.getDisplayName());
+                COMMA_FORMAT.format(handler.getTankCapacity(0)), fluid.getHoverName());
             player.displayClientMessage(Component.translatable(CONTENTS_KEY, contents), true);
           }
         }

@@ -46,6 +46,7 @@ public class RetexturableRecipeExtension implements ICraftingCategoryExtension<S
   }
 
   @Override
+  @SuppressWarnings("removal")
   public java.util.Optional<ResourceLocation> getRegistryName(
       net.minecraft.world.item.crafting.RecipeHolder<ShapedRetexturedRecipe> holder) {
     return java.util.Optional.of(holder.id());

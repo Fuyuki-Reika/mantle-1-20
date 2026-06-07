@@ -26,6 +26,7 @@ public class JEIPlugin implements IModPlugin {
   }
 
   @Override
+  @SuppressWarnings("removal")
   public void registerIngredients(IModIngredientRegistration registration) {
     registration.register(MantleJEIConstants.ENTITY_TYPE, Collections.emptyList(), new EntityIngredientHelper(),
         new EntityIngredientRenderer(16));

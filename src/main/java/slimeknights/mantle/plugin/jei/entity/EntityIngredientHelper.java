@@ -23,6 +23,7 @@ public class EntityIngredientHelper implements IIngredientHelper<EntityIngredien
   }
 
   @Override
+  @SuppressWarnings("removal")
   public String getUniqueId(EntityIngredient.EntityInput type, UidContext context) {
     return getResourceLocation(type).toString();
   }

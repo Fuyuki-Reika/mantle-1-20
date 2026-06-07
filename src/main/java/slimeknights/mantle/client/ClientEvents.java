@@ -74,14 +74,22 @@ public class ClientEvents {
   public static void onConstruct() {
   }
 
-  @SuppressWarnings("ConstantConditions")
+  @SuppressWarnings({"ConstantConditions", "unchecked"})
   @SubscribeEvent
   static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
-    if (MantleRegistrations.SIGN != null) {
-      event.registerBlockEntityRenderer(MantleRegistrations.SIGN, SignRenderer::new);
+    net.minecraft.world.level.block.entity.BlockEntityType<?> signType = net.minecraft.core.registries.BuiltInRegistries.BLOCK_ENTITY_TYPE
+        .get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("mantle", "sign"));
+    if (signType != null) {
+      event.registerBlockEntityRenderer(
+          (net.minecraft.world.level.block.entity.BlockEntityType<slimeknights.mantle.block.entity.MantleSignBlockEntity>) signType,
+          SignRenderer::new);
     }
-    if (MantleRegistrations.HANGING_SIGN != null) {
-      event.registerBlockEntityRenderer(MantleRegistrations.HANGING_SIGN, HangingSignRenderer::new);
+    net.minecraft.world.level.block.entity.BlockEntityType<?> hangingSignType = net.minecraft.core.registries.BuiltInRegistries.BLOCK_ENTITY_TYPE
+        .get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("mantle", "hanging_sign"));
+    if (hangingSignType != null) {
+      event.registerBlockEntityRenderer(
+          (net.minecraft.world.level.block.entity.BlockEntityType<slimeknights.mantle.block.entity.MantleHangingSignBlockEntity>) hangingSignType,
+          HangingSignRenderer::new);
     }
   }
 
@@ -149,6 +157,7 @@ public class ClientEvents {
     }
 
     // fetch the current cooldown
+    @SuppressWarnings("removal")
     OffhandCooldownTracker tracker = OffhandCooldownTracker.get(minecraft.player);
     if (tracker == null) {
       return;
@@ -260,7 +269,7 @@ public class ClientEvents {
       // in the tag, don't show capacity
       ResourceLocation id = BuiltInRegistries.FLUID.getKey(fluid.getFluid());
       tooltip = new ArrayList<>(3);
-      tooltip.add(fluid.getDisplayName());
+      tooltip.add(fluid.getHoverName());
       FluidTooltipHandler.appendAdvanced(id, tooltip);
       tooltip.add(GaugeBlock.formatCapacity(handler.getTankCapacity(0)).withStyle(ChatFormatting.GRAY));
       tooltip.add(FluidTooltipHandler.formatModName(id));

@@ -201,7 +201,7 @@ public class FluidTransferHelper {
             handler.fill(fluidStack.copy(), FluidAction.EXECUTE);
             world.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
             player.displayClientMessage(Component.translatable(KEY_FILLED,
-                COMMA_FORMAT.format(fluidStack.getAmount()), fluidStack.getDisplayName()), true);
+                COMMA_FORMAT.format(fluidStack.getAmount()), fluidStack.getHoverName()), true);
             if (!player.isCreative()) {
               player.setItemInHand(hand, held.getCraftingRemainingItem());
             }
@@ -218,7 +218,7 @@ public class FluidTransferHelper {
   public static void playEmptySound(Level world, BlockPos pos, Player player, FluidStack transferred) {
     world.playSound(null, pos, getEmptySound(transferred), SoundSource.BLOCKS, 1.0F, 1.0F);
     player.displayClientMessage(
-        Component.translatable(KEY_FILLED, COMMA_FORMAT.format(transferred.getAmount()), transferred.getDisplayName()),
+        Component.translatable(KEY_FILLED, COMMA_FORMAT.format(transferred.getAmount()), transferred.getHoverName()),
         true);
   }
 
@@ -226,7 +226,7 @@ public class FluidTransferHelper {
   public static void playFillSound(Level world, BlockPos pos, Player player, FluidStack transferred) {
     world.playSound(null, pos, getFillSound(transferred), SoundSource.BLOCKS, 1.0F, 1.0F);
     player.displayClientMessage(
-        Component.translatable(KEY_DRAINED, COMMA_FORMAT.format(transferred.getAmount()), transferred.getDisplayName()),
+        Component.translatable(KEY_DRAINED, COMMA_FORMAT.format(transferred.getAmount()), transferred.getHoverName()),
         true);
   }
 

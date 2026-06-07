@@ -215,7 +215,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener {
     List<Component> tooltip = new ArrayList<>();
     ResourceLocation key = BuiltInRegistries.FLUID.getKey(fluid.getFluid());
     // fluid name, not sure if there is a cleaner way to do this
-    tooltip.add(fluid.getDisplayName());
+    tooltip.add(fluid.getHoverName());
     // add ID if advanced
     appendAdvanced(key, tooltip);
     // material

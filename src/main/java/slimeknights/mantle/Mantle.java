@@ -126,10 +126,12 @@ public class Mantle {
     }
   }
 
+  @SuppressWarnings("removal")
   private void registerCapabilities(RegisterCapabilitiesEvent event) {
     OffhandCooldownTracker.register(event);
   }
 
+  @SuppressWarnings("removal")
   private void commonSetup(final FMLCommonSetupEvent event) {
     MantleNetwork.registerPackets();
     MantleCommand.init();
@@ -228,11 +230,17 @@ public class Mantle {
           net.minecraft.core.registries.BuiltInRegistries.BLOCK_ENTITY_TYPE);
       Set<Block> signs = MantleSignBlockEntity.buildSignBlocks();
       if (!signs.isEmpty()) {
-        adapter.register(MantleSignBlockEntity::new, signs, "sign");
+        @SuppressWarnings("unchecked")
+        net.minecraft.world.level.block.entity.BlockEntityType<MantleSignBlockEntity> signType = (net.minecraft.world.level.block.entity.BlockEntityType<MantleSignBlockEntity>) adapter
+            .register(MantleSignBlockEntity::new, signs, "sign");
+        MantleSignBlockEntity.setRegisteredType(signType);
       }
       signs = MantleHangingSignBlockEntity.buildSignBlocks();
       if (!signs.isEmpty()) {
-        adapter.register(MantleHangingSignBlockEntity::new, signs, "hanging_sign");
+        @SuppressWarnings("unchecked")
+        net.minecraft.world.level.block.entity.BlockEntityType<MantleHangingSignBlockEntity> hangingType = (net.minecraft.world.level.block.entity.BlockEntityType<MantleHangingSignBlockEntity>) adapter
+            .register(MantleHangingSignBlockEntity::new, signs, "hanging_sign");
+        MantleHangingSignBlockEntity.setRegisteredType(hangingType);
       }
     } else if (key == Registries.COMMAND_ARGUMENT_TYPE) {
       ResourceOrTagKeyArgument.Info<?> info = new ResourceOrTagKeyArgument.Info<>();

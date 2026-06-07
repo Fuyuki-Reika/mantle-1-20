@@ -86,6 +86,7 @@ public abstract class AbstractRecipeBuilder<T extends AbstractRecipeBuilder<T>> 
    * @param folder Group folder for saving recipes
    * @return AdvancementHolder
    */
+  @SuppressWarnings("removal")
   private AdvancementHolder buildAdvancementInternal(ResourceLocation id, String folder) {
     ResourceLocation advancementId = ResourceLocation.fromNamespaceAndPath(id.getNamespace(),
         "recipes/" + folder + "/" + id.getPath());

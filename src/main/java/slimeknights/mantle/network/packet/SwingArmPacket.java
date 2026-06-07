@@ -38,6 +38,7 @@ public class SwingArmPacket implements IThreadsafePacket {
   }
 
   private static class HandleClient {
+    @SuppressWarnings("removal")
     private static void handle(SwingArmPacket packet) {
       Level world = Minecraft.getInstance().level;
       if (world != null) {

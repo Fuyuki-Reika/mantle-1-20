@@ -60,8 +60,8 @@ public class EmptyPotionTransfer extends EmptyFluidContainerTransfer {
         .map(value -> {
           FluidStack result = new FluidStack(value, fluid.getAmount());
           // Copy all CustomData from the item stack (includes potion effects)
-          net.minecraft.world.item.component.CustomData itemCustomData =
-              stack.getOrDefault(DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY);
+          net.minecraft.world.item.component.CustomData itemCustomData = stack.getOrDefault(DataComponents.CUSTOM_DATA,
+              net.minecraft.world.item.component.CustomData.EMPTY);
           if (!itemCustomData.isEmpty()) {
             result.set(DataComponents.CUSTOM_DATA, itemCustomData);
           }

@@ -61,7 +61,8 @@ public class BlockTagLootCondition implements LootItemCondition {
 
   // SerializerImpl is public to allow external codec() access from MantleLoot
   public static class SerializerImpl {
-    // JSON serialize/deserialize are not used — modern loot system uses codec() exclusively
+    // JSON serialize/deserialize are not used — modern loot system uses codec()
+    // exclusively
     public void serialize(JsonObject json, BlockTagLootCondition loot, JsonSerializationContext context) {
       throw new UnsupportedOperationException(
           "BlockTagLootCondition JSON serialization disabled - use codec() instead");

@@ -5,30 +5,47 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.HangingSignBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import slimeknights.mantle.registration.MantleRegistrations;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-/** Hanging sign block entity to make it easier for signs to be registered, as the vanilla block entity has a closed set of blocks */
+/**
+ * Hanging sign block entity to make it easier for signs to be registered, as
+ * the vanilla block entity has a closed set of blocks
+ */
 public class MantleHangingSignBlockEntity extends HangingSignBlockEntity {
   /** Sign blocks to use for the block entity valid blocks */
   private static final List<Supplier<? extends Block>> SIGN_BLOCKS = new ArrayList<>();
+  /**
+   * The registered BlockEntityType for MantleHangingSignBlockEntity — set during
+   * registration
+   */
+  @Nullable
+  private static BlockEntityType<MantleHangingSignBlockEntity> REGISTERED_TYPE = null;
+
   public MantleHangingSignBlockEntity(BlockPos pos, BlockState state) {
     super(pos, state);
   }
 
   @Override
   public BlockEntityType<?> getType() {
-    return MantleRegistrations.HANGING_SIGN;
+    return REGISTERED_TYPE;
+  }
+
+  /** Called during block entity registration to store the registered type */
+  public static void setRegisteredType(BlockEntityType<MantleHangingSignBlockEntity> type) {
+    REGISTERED_TYPE = type;
   }
 
   /**
-   * Registers a sign block to be injected into the tile entity, should be called before common setup
-   * @param sign  Sign block supplier
+   * Registers a sign block to be injected into the tile entity, should be called
+   * before common setup
+   * 
+   * @param sign Sign block supplier
    */
   public static void registerSignBlock(Supplier<? extends Block> sign) {
     synchronized (SIGN_BLOCKS) {
