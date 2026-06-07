@@ -1,15 +1,15 @@
 package slimeknights.mantle.recipe.cooking;
 
 import lombok.Getter;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.Container;
+
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.CampfireCookingRecipe;
 import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import slimeknights.mantle.data.loadable.common.IngredientLoadable;
 import slimeknights.mantle.data.loadable.field.ContextKey;
 import slimeknights.mantle.data.loadable.field.LoadableField;
@@ -32,25 +32,27 @@ public class CampfireResultRecipe extends CampfireCookingRecipe implements Cooki
 
   private final ItemOutput result;
 
-  // TODO 1.21.1: CampfireCookingRecipe constructor no longer takes id parameter
-  public CampfireResultRecipe(ResourceLocation id, String group, CookingBookCategory category, Ingredient ingredient,
+  public CampfireResultRecipe(net.minecraft.resources.ResourceLocation id, String group, CookingBookCategory category, Ingredient ingredient,
       ItemOutput result, float experience, int cookingTime) {
     super(group, category, ingredient, ItemStack.EMPTY, experience, cookingTime);
     this.result = result;
   }
 
-  // TODO 1.21.1: getSerializer() is not an override, removed @Override annotation
+  @Override
   public RecipeSerializer<?> getSerializer() {
     return MantleRecipes.CAMPFIRE.get();
   }
 
-  // TODO 1.21.1: getResultItem() is not an override, removed @Override annotation
-  public ItemStack getResultItem(RegistryAccess pRegistryAccess) {
+  @Override
+  public ItemStack getResultItem(HolderLookup.Provider registries) {
     return result.get();
   }
 
-  // TODO 1.21.1: assemble() is not an override, removed @Override annotation
-  public ItemStack assemble(Container pContainer, RegistryAccess pRegistryAccess) {
+  @Override
+  public ItemStack assemble(SingleRecipeInput input, HolderLookup.Provider registries) {
     return result.copy();
   }
 }
+
+
+
