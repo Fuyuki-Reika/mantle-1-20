@@ -245,9 +245,8 @@ public class RemoveRecipesCommand {
 
     // create the object for removing recipes
     JsonObject json = new JsonObject();
-    // TODO: CraftingHelper.serialize method removed in 1.21.1 - manually creating
-    // false condition JSON
-    // FalseCondition format: {"type": "neoforge:false"}
+    // NeoForge 1.21.1: CraftingHelper.serialize removed, manually create false
+    // condition
     JsonObject falseCondition = new JsonObject();
     falseCondition.addProperty("type", "neoforge:false");
     json.add("conditions", falseCondition);

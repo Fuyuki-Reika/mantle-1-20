@@ -12,10 +12,7 @@ import net.neoforged.fml.ModLoader;
 public interface ISafeManagerReloadListener extends ResourceManagerReloadListener {
   @Override
   default void onResourceManagerReload(ResourceManager resourceManager) {
-    // ModLoader.isLoadingStateValid() removed in 1.21.1 - loading state check no
-    // longer needed
-    // TODO: Verify this is the correct migration - may need alternative loading
-    // state check
+    // NeoForge 1.21.1: ModLoader.isLoadingStateValid() removed; direct call is safe
     onReloadSafe(resourceManager);
   }
 

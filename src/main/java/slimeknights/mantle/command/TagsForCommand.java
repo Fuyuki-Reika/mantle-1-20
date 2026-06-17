@@ -9,6 +9,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -23,7 +24,7 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -223,21 +224,20 @@ public class TagsForCommand {
   private static int heldEnchantments(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     CommandSourceStack source = context.getSource();
     ItemStack stack = source.getPlayerOrException().getMainHandItem();
-    // TODO: EnchantmentHelper.getEnchantments() API changed in NeoForge 21.1.85
-    // Need to investigate new enchantment API for ItemStack
-    /*
-     * Map<Enchantment, Integer> enchantments =
-     * EnchantmentHelper.getEnchantments(stack);
-     * if (!enchantments.isEmpty()) {
-     * int totalTags = 0;
-     * // print tags for each contained enchantment
-     * for (Enchantment enchantment : enchantments.keySet()) {
-     * totalTags += printOwningTags(context, BuiltInRegistries.ENCHANTMENT,
-     * enchantment);
-     * }
-     * return totalTags;
-     * }
-     */
+    ItemEnchantments enchantments = stack.getTagEnchantments();
+    if (!enchantments.isEmpty()) {
+      int totalTags = 0;
+      // NeoForge 1.21.1: Enchantment registry must be accessed from registryAccess()
+      Registry<Enchantment> enchantmentRegistry = source.registryAccess()
+          .registry(Registries.ENCHANTMENT)
+          .orElseThrow(() -> new IllegalStateException("Enchantment registry not available"));
+      // print tags for each contained enchantment
+      for (var entry : enchantments.entrySet()) {
+        Enchantment enchantment = entry.getKey().value();
+        totalTags += printOwningTags(context, enchantmentRegistry, enchantment);
+      }
+      return totalTags;
+    }
     source.sendSuccess(() -> NO_HELD_ENCHANTMENT, true);
     return 0;
   }

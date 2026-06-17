@@ -15,6 +15,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.Block;
 import javax.annotation.Nullable;
 import slimeknights.mantle.Mantle;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 /** Command to dump global loot modifiers */
@@ -62,47 +64,78 @@ public class HarvestTiersCommand {
 
   /** Runs the command, dumping the tag */
   private static int list(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-    // TODO: TierSortingRegistry API removed/changed in 1.21.1 - needs
-    // reimplementation
-    // List<Tier> sortedTiers = TierSortingRegistry.getSortedTiers();
-    context.getSource().sendFailure(
-        Component.literal("Harvest tiers command temporarily disabled - TierSortingRegistry API changed in 1.21.1"));
-    return 0;
+    List<Tier> sortedTiers = getVanillaTierOrder();
 
-    /*
-     * Original implementation - commented out until API is updated
-     * // start building output message
-     * MutableComponent output =
-     * Component.translatable("command.mantle.harvest_tiers.success_list");
-     * // if no values, print empty
-     * if (sortedTiers.isEmpty()) {
-     * output.append("\n* ").append(EMPTY);
-     * } else {
-     * for (Tier tier : sortedTiers) {
-     * output.append("\n* ");
-     * TagKey<Block> tag = tier.getTag();
-     * ResourceLocation id = TierSortingRegistry.getName(tier);
-     * if (tag != null) {
-     * output.append(Component.translatable("command.mantle.harvest_tiers.tag", id,
-     * getTagComponent(tag)));
-     * } else {
-     * output.append(Component.translatable("command.mantle.harvest_tiers.no_tag",
-     * id));
-     * }
-     * }
-     * }
-     * context.getSource().sendSuccess(() -> output, true);
-     * return sortedTiers.size();
-     */
+    // start building output message
+    MutableComponent output = Component.translatable("command.mantle.harvest_tiers.success_list");
+    // if no values, print empty
+    if (sortedTiers.isEmpty()) {
+      output.append("\n* ").append(EMPTY);
+    } else {
+      for (Tier tier : sortedTiers) {
+        output.append("\n* ");
+        // NeoForge 1.21.1: Tier.getTag() removed; incorrectBlockForDrops() returns
+        // TagKey<Block>
+        TagKey<Block> tag = tier.getIncorrectBlocksForDrops();
+        ResourceLocation id = getTierName(tier);
+        if (tag != null) {
+          output.append(Component.translatable("command.mantle.harvest_tiers.tag", id, getTagComponent(tag)));
+        } else {
+          output.append(Component.translatable("command.mantle.harvest_tiers.no_tag", id));
+        }
+      }
+    }
+    context.getSource().sendSuccess(() -> output, true);
+    return sortedTiers.size();
   }
 
   /** Runs the command, dumping the tag */
   private static int run(CommandContext<CommandSourceStack> context, boolean saveFile) throws CommandSyntaxException {
-    // TODO: TierSortingRegistry API removed/changed in 1.21.1 - needs
-    // reimplementation
-    context.getSource().sendFailure(
-        Component.literal("Harvest tiers command temporarily disabled - TierSortingRegistry API changed in 1.21.1"));
-    return 0;
+    List<Tier> sortedTiers = getVanillaTierOrder();
+
+    // save the list as JSON
+    JsonArray entries = new JsonArray();
+    for (Tier tier : sortedTiers) {
+      entries.add(getTierName(tier).toString());
+    }
+    JsonObject json = new JsonObject();
+    json.add("order", entries);
+
+    // if requested, save
+    if (saveFile) {
+      // save file
+      File output = new File(DumpAllTagsCommand.getOutputFile(context), HARVEST_TIER_PATH);
+      Path path = output.toPath();
+      try {
+        Files.createDirectories(path.getParent());
+        try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+          writer.write(DumpTagCommand.GSON.toJson(json));
+        }
+      } catch (IOException ex) {
+        Mantle.logger.error("Couldn't save harvests tiers to {}", path, ex);
+      }
+      context.getSource().sendSuccess(() -> Component.translatable("command.mantle.harvest_tiers.success_save",
+          GeneratePackHelper.getOutputComponent(output)), true);
+    } else {
+      // print to console
+      context.getSource().sendSuccess(() -> SUCCESS_LOG, true);
+      Mantle.logger.info("Dump of harvests tiers:\n{}", DumpTagCommand.GSON.toJson(json));
+    }
+    // return a number to finish
+    return sortedTiers.size();
+  }
+
+  /** NeoForge 1.21 fallback until TierSortingRegistry replacement is exposed */
+  private static List<Tier> getVanillaTierOrder() {
+    return List.of(Tiers.values());
+  }
+
+  /** Gets a stable ID for a tier entry */
+  private static ResourceLocation getTierName(Tier tier) {
+    if (tier instanceof Tiers vanilla) {
+      return ResourceLocation.withDefaultNamespace(vanilla.name().toLowerCase(Locale.ROOT));
+    }
+    return ResourceLocation.withDefaultNamespace("unknown");
   }
 
   /*

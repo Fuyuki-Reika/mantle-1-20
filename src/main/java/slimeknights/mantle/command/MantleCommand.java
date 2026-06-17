@@ -61,10 +61,13 @@ public class MantleCommand {
     TagSourceArgument.registerSuggestions();
 
     // register interesting sources
-    // TODO: LootDataType API changed in 1.21.1, needs reimplementation
+    // NeoForge 1.21.1: Loot tables moved to registry system; getKeys API removed
+    // Loot table suggestions disabled until registry-based alternative is
+    // implemented
     // SourcesCommand.register("loot_table", (context, builder) ->
-    // SharedSuggestionProvider
-    // .suggestResource(context.getSource().getServer().getLootData().getKeys(LootDataType.TABLE),
+    // SharedSuggestionProvider.suggestResource(
+    // context.getSource().getServer().fullRegistries().lookup().
+    // lookupOrThrow(Registries.LOOT_TABLE).listElementIds(),
     // builder));
     SourcesCommand.register("recipes",
         (context, builder) -> SharedSuggestionProvider.suggestResource(context.getSource().getRecipeNames(), builder));

@@ -76,9 +76,8 @@ public class GeneratePackHelper {
   /** Saves a JSON that removes the given resource using forge conditions */
   public static boolean saveConditionRemove(Path path, String conditionKey) {
     JsonObject json = new JsonObject();
-    // TODO: CraftingHelper.serialize method removed in 1.21.1 - manually creating
-    // false condition JSON
-    // FalseCondition format: {"type": "neoforge:false"}
+    // NeoForge 1.21.1: CraftingHelper.serialize removed, manually create false
+    // condition
     JsonObject falseCondition = new JsonObject();
     falseCondition.addProperty("type", "neoforge:false");
     json.add(conditionKey, falseCondition);

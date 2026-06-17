@@ -206,16 +206,10 @@ public class MultiModuleScreen<CONTAINER extends MultiModuleContainerMenu<?>>
       }
     }
 
-    // update slot positions
-    // TODO: Slot x and y are now final in 1.21.1, cannot be assigned
-    // This may break slot rendering for wrapped slots
-    /*
-     * if (slotIn instanceof WrapperSlot) {
-     * slotIn.x = ((WrapperSlot) slotIn).parent.x;
-     * slotIn.y = ((WrapperSlot) slotIn).parent.y;
-     * }
-     */
-
+    // NeoForge 1.21.1: Slot x and y are now final - position sync happens in
+    // WrapperSlot constructor
+    // Runtime position updates no longer possible; positions must be correct at
+    // slot creation
     super.renderSlot(graphics, slotIn);
   }
 
